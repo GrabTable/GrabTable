@@ -1,14 +1,19 @@
 package edu.skku.grabtable.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.Getter;
 
 @Entity
-public class Menu {
+@Getter
+public class Menu extends BaseTimeEntity{
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -20,5 +25,6 @@ public class Menu {
 
     private String menuPictureUrl;
 
+    @Enumerated(EnumType.STRING)
     private MenuStatus status;
 }

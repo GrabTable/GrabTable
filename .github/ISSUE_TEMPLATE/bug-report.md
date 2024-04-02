@@ -1,7 +1,7 @@
 ---
 name: 🐞 Bug
 about: GrabTable의 버그를 보고합니다
-title: '[BUG] '
+title: '[BUG]: '
 
 ---
 

@@ -14,7 +14,8 @@ import lombok.Getter;
 @Getter
 public class Review extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
@@ -30,4 +31,6 @@ public class Review extends BaseTimeEntity {
     private String message;
 
     private Double rating;
+
+    private ReviewStatus status;
 }

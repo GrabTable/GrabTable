@@ -38,9 +38,28 @@ public class Review extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ReviewPlatform reviewPlatform;
 
+    @Column(length = 1000)
     private String message;
 
     private Double rating;
 
+    @Enumerated(EnumType.STRING)
     private ReviewStatus status;
+
+    public static Review of(Store store, User user, String message, Double rating) {
+        Review review = new Review();
+        review.store = store;
+        review.user = user;
+        review.message = message;
+        review.rating = rating;
+        review.reviewPlatform = ReviewPlatform.GRABTABLE;
+        review.status = ReviewStatus.VALID;
+
+        return review;
+    }
+
+    public void update(String message, Double rating) {
+        this.message = message;
+        this.rating = rating;
+    }
 }

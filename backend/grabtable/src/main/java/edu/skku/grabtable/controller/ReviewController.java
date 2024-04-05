@@ -4,6 +4,7 @@ import edu.skku.grabtable.domain.request.ReviewRequest;
 import edu.skku.grabtable.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.domain.response.ReviewResponse;
 import edu.skku.grabtable.service.ReviewService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/v1/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
 

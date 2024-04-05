@@ -1,5 +1,6 @@
 package edu.skku.grabtable.domain;
 
+import edu.skku.grabtable.auth.domain.AuthProvider;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,5 +43,17 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.email = email;
         this.phone = phone;
+    }
+    @OneToMany(mappedBy = "user")
+    private List<AuthProvider>  authProviderList = new ArrayList<>();
+    public User(AuthProvider authProvider) {
+        addAuthProvider(authProvider);
+    }
+
+    private void addAuthProvider(AuthProvider authProvider) {
+        authProviderList.add(authProvider);
+        if(authProvider.getUser() == null){
+            authProvider.setUser(this);
+        }
     }
 }

@@ -1,9 +1,10 @@
 package edu.skku.grabtable.auth.service;
 
-import edu.skku.grabtable.common.exception.BusinessException;
-import edu.skku.grabtable.common.exception.ErrorCode;
 import edu.skku.grabtable.auth.domain.response.KakaoAccessResponseDto;
 import edu.skku.grabtable.auth.domain.response.KakaoUserInfoResponseDto;
+import edu.skku.grabtable.common.exception.BusinessException;
+import edu.skku.grabtable.common.exception.ErrorCode;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,7 @@ public class KakaoAuthService {
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
             params.add("grant_type", "authorization_code");
 //            params.add("client_id", "5b41d5a0ea1ba89951211349a0b8f5bd");
-            params.add("client_id", kakaoAuthProperties.adminKey());
+            params.add("client_id", kakaoAuthProperties.getAdminKey());
             params.add("redirect_uri", "http://localhost:8000/v1/auth/login/kakao");
             params.add("code", authenticationCode);
             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
@@ -43,7 +44,7 @@ public class KakaoAuthService {
             ResponseEntity<KakaoAccessResponseDto> response = restTemplate.exchange(
                     OAUTH_ENDPOINT, HttpMethod.POST, entity, KakaoAccessResponseDto.class);
 //            System.out.println(response.getBody());
-            return response.getBody().access_token();
+            return Objects.requireNonNull(response.getBody()).access_token();
         } catch (RestClientException e) {
             throw new RuntimeException(e);
         }

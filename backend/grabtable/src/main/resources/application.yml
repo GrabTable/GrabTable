@@ -16,7 +16,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
   sql:
     init:
-      mode: always
+      mode: never
 
 --- #local ??
 spring:

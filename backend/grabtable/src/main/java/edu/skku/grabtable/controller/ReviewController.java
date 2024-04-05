@@ -35,12 +35,12 @@ public class ReviewController {
 
     //밑의 모든 엔드포인트는 AUTH 모듈과 통합 필요
     @PostMapping
-    public void upload(@RequestBody ReviewRequest request) {
+    public void upload(@RequestBody @Valid ReviewRequest request) {
         reviewService.upload(request);
     }
 
     @PatchMapping("/{reviewId}")
-    public void update(@RequestBody ReviewUpdateRequest request,
+    public void update(@RequestBody @Valid ReviewUpdateRequest request,
                        @PathVariable Long reviewId) {
         reviewService.update(reviewId, request.getMessage(), request.getRating());
     }

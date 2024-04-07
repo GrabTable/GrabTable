@@ -83,7 +83,7 @@ public class ReviewService {
                 ratingOfPlatforms, hasRisk, reviewsOfPlatforms);
     }
 
-    private static Map<String, List<ReviewResponse>> groupReviewsByPlatform(List<Review> reviews) {
+    private Map<String, List<ReviewResponse>> groupReviewsByPlatform(List<Review> reviews) {
         return reviews.stream()
                 .collect(Collectors.groupingBy(review -> review.getReviewPlatform().toString(),
                         Collectors.mapping(ReviewResponse::of, Collectors.toList())));
@@ -92,11 +92,12 @@ public class ReviewService {
     private Map<String, Double> calculatePlatformRatings(List<Review> reviews) {
         return reviews.stream()
                 .collect(Collectors.groupingBy(review -> review.getReviewPlatform().toString(),
-                        Collectors.averagingDouble(Review::getRating)));
+                        Collectors.averagingDouble(review -> review.getRating() != null ? review.getRating() : 0.0)));
     }
 
     private double calculateAverageRating(List<Review> reviews) {
         return reviews.stream()
+                .filter(review -> review.getRating() != null)
                 .mapToDouble(Review::getRating)
                 .average()
                 .orElse(0.0);

@@ -18,9 +18,12 @@ public class ReviewResponse {
     private Double rating;
 
     public static ReviewResponse of(Review review) {
+
+        final String username = (review.getUser() == null) ? null : review.getUser().getUsername();
+
         return new ReviewResponse(
                 review.getId(),
-                review.getUser().getUsername(),
+                username,
                 review.getStore().getStoreName(),
                 review.getReviewPlatform(),
                 review.getMessage(),

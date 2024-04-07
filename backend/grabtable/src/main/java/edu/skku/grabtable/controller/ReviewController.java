@@ -3,6 +3,7 @@ package edu.skku.grabtable.controller;
 import edu.skku.grabtable.domain.request.ReviewRequest;
 import edu.skku.grabtable.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.domain.response.ReviewResponse;
+import edu.skku.grabtable.domain.response.ReviewSummaryResponse;
 import edu.skku.grabtable.service.ReviewService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -31,6 +32,11 @@ public class ReviewController {
     @GetMapping("/stores/{storeId}")
     public List<ReviewResponse> getAllReviewsByStore(@PathVariable Long storeId) {
         return reviewService.getAllReviewsByStore(storeId);
+    }
+
+    @GetMapping("stores/{storeId}/summary")
+    public ReviewSummaryResponse getReviewSummaryByStore(@PathVariable Long storeId) {
+        return reviewService.getReviewSummaryByStore(storeId);
     }
 
     //밑의 모든 엔드포인트는 AUTH 모듈과 통합 필요

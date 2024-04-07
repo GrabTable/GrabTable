@@ -10,6 +10,7 @@ import edu.skku.grabtable.domain.StoreCategory;
 import edu.skku.grabtable.domain.StoreStatus;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.domain.response.ReviewResponse;
+import edu.skku.grabtable.domain.response.ReviewSummaryResponse;
 import edu.skku.grabtable.repository.ReviewRepository;
 import edu.skku.grabtable.repository.StoreRepository;
 import edu.skku.grabtable.repository.UserRepository;
@@ -79,5 +80,29 @@ class ReviewServiceTest {
         assertThat(result.size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("가게 리뷰 요약을 조회할 수 있다.")
+    void getReviewSummary() {
+        //given
+        User user = new User(1L, "a", "b", "c", "d", new ArrayList<>());
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+                StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>());
+        Review review = Review.of(store, user, "a", 3.0);
+        Review review2 = Review.of(store, user, "b", 4.0);
+        store.getReviews().add(review);
+        store.getReviews().add(review2);
 
+        when(storeRepository.findById(any(Long.class))).thenReturn(Optional.of(store));
+
+        //when
+        ReviewSummaryResponse summary = reviewService.getReviewSummaryByStore(store.getId());
+
+        //then
+        assertThat(summary.getStoreId()).isEqualTo(1);
+        assertThat(summary.getStoreName()).isEqualTo("Ramen");
+        assertThat(summary.getManipulatedRisk()).isFalse();
+        assertThat(summary.getTotalAverageRating()).isEqualTo(3.5);
+        assertThat(summary.getPlatformRating()).containsEntry("GRABTABLE", 3.5);
+        assertThat(summary.getPlatformReviews().get("GRABTABLE").size()).isEqualTo(2);
+    }
 }

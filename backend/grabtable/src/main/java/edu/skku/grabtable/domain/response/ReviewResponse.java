@@ -4,9 +4,11 @@ import edu.skku.grabtable.domain.Review;
 import edu.skku.grabtable.domain.ReviewPlatform;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @AllArgsConstructor
 @Getter
+@ToString
 public class ReviewResponse {
     private Long id;
     private String username;

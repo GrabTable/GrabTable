@@ -12,9 +12,10 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "ORDERS")
-public class Order extends BaseTimeEntity{
+public class Order extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

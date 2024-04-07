@@ -9,9 +9,10 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Cart extends BaseTimeEntity{
+public class Cart extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne

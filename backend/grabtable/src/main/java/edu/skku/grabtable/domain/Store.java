@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class Store extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String storeName;

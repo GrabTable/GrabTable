@@ -25,10 +25,11 @@ import org.hibernate.annotations.SQLRestriction;
 public class Review extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "store_id")
     private Store store;
 
     @ManyToOne

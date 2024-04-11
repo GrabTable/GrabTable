@@ -1,6 +1,6 @@
 package edu.skku.grabtable.auth.service;
 
-import edu.skku.grabtable.common.annotation.AuthUser;
+import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.common.util.AuthHeaderParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @RequiredArgsConstructor
 public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final AuthService authService;
+    private final LoginService loginService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -31,6 +31,6 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     ) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String tokenStr = AuthHeaderParser.parseTokenString(request);
-        return authService.getUserByToken(tokenStr);
+        return loginService.getUserByToken(tokenStr);
     }
 }

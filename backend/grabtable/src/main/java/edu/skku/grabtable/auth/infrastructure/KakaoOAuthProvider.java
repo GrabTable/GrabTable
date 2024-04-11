@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -63,7 +64,7 @@ public class KakaoOAuthProvider {
                 params
         );
 
-        log.info("response={}", response.getBody());
+        log.info("KakaoOAuthProvider.getUserInfo response={}", response.getBody());
 
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
@@ -91,6 +92,8 @@ public class KakaoOAuthProvider {
                 KakaoAccessTokenResponse.class
         );
 
+        log.info("KakaoOAuthProvider.fetchAccessToken response={}", response.getBody());
+
         log.info("response={}", response.getBody());
 
         return Optional.ofNullable(response.getBody())
@@ -99,6 +102,7 @@ public class KakaoOAuthProvider {
     }
 
     @Getter
+    @ToString
     public static class KakaoAccessTokenResponse {
         @JsonProperty("access_token")
         private String accessToken;

@@ -1,4 +1,4 @@
-package edu.skku.grabtable.common.annotation;
+package edu.skku.grabtable.auth.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

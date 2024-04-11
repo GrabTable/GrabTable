@@ -50,9 +50,13 @@ public class LoginService {
     }
 
     private User createUser(String socialLoginId, String nickname, String profileImageUrl) {
-        String newNickname = nickname + "#" + socialLoginId;
+        String newNickname = generateNewUserNickname(socialLoginId, nickname);
         log.info("new nickname={}", newNickname);
         return userRepository.save(new User(socialLoginId, newNickname, profileImageUrl));
+    }
+
+    private String generateNewUserNickname(String socialLoginId, String nickname) {
+        return nickname + "#" + socialLoginId;
     }
 
     private UserTokens issueToken(User user) {

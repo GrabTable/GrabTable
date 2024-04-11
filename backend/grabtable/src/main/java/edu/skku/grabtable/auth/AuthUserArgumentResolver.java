@@ -1,4 +1,4 @@
-package edu.skku.grabtable.auth.service;
+package edu.skku.grabtable.auth;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.repository.UserRepository;
@@ -20,7 +20,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Slf4j
 public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final LoginService loginService;
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 

@@ -1,8 +1,7 @@
 package edu.skku.grabtable.config;
 
+import edu.skku.grabtable.auth.AuthUserArgumentResolver;
 import java.util.List;
-
-import edu.skku.grabtable.auth.service.AuthUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

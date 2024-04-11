@@ -5,7 +5,6 @@ import edu.skku.grabtable.auth.domain.RefreshToken;
 import edu.skku.grabtable.auth.domain.UserTokens;
 import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.domain.response.AccessTokenResponse;
-import edu.skku.grabtable.auth.domain.response.TokenResponseDto;
 import edu.skku.grabtable.auth.infrastructure.KakaoOAuthProvider;
 import edu.skku.grabtable.auth.infrastructure.KakaoUserInfo;
 import edu.skku.grabtable.auth.repository.RefreshTokenRepository;
@@ -56,12 +55,12 @@ public class LoginService {
         return userRepository.save(new User(socialLoginId, newNickname, profileImageUrl));
     }
 
-    private TokenResponseDto issueToken(User user) {
+    private UserTokens issueToken(User user) {
         AuthToken refreshToken = tokenService.createRefreshToken(user.getId());
         AuthToken accessToken = tokenService.createAccessToken(user.getId());
         refreshTokenRepository.save(new RefreshToken(user.getId(), refreshToken.getToken()));
 
-        return new TokenResponseDto(accessToken.getToken(), refreshToken.getToken());
+        return new UserTokens(accessToken.getToken(), refreshToken.getToken());
     }
 
 

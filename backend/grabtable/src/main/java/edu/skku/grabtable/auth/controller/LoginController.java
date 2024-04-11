@@ -2,12 +2,16 @@ package edu.skku.grabtable.auth.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.auth.annotation.UserOnly;
+import edu.skku.grabtable.auth.domain.UserTokens;
 import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.domain.response.AccessTokenResponse;
 import edu.skku.grabtable.auth.service.LoginService;
 import edu.skku.grabtable.domain.User;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,12 +28,26 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class LoginController {
 
+    private static final int ONE_WEEK_SECONDS = 604800;
+
     private final LoginService loginService;
 
     @PostMapping(value = "/login/kakao")
     public ResponseEntity<AccessTokenResponse> kakaoLogin(
-            @RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(loginService.login(loginRequest));
+            @RequestBody LoginRequest loginRequest,
+            HttpServletResponse response
+    ) {
+        UserTokens userTokens = loginService.login(loginRequest);
+
+        ResponseCookie cookie = ResponseCookie.from("refresh-token", userTokens.getRefreshToken())
+                .maxAge(ONE_WEEK_SECONDS)
+//                .secure(true)
+//                .httpOnly(true)
+                .path("/")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return ResponseEntity.ok(new AccessTokenResponse(userTokens.getAccessToken()));
     }
 
 

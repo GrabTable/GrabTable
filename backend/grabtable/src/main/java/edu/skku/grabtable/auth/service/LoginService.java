@@ -29,7 +29,7 @@ public class LoginService {
     private final TokenService tokenService;
 
     @Transactional
-    public AccessTokenResponse login(LoginRequest loginRequest) {
+    public UserTokens login(LoginRequest loginRequest) {
         KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(loginRequest.getCode());
 
         User user = findOrCreateUser(
@@ -41,7 +41,7 @@ public class LoginService {
         UserTokens userTokens = jwtUtil.createLoginToken(user.getId().toString());
         RefreshToken refreshToken = new RefreshToken(user.getId(), userTokens.getRefreshToken());
         refreshTokenRepository.save(refreshToken);
-        return new AccessTokenResponse(userTokens.getAccessToken());
+        return userTokens;
     }
 
     private User findOrCreateUser(String socialLoginId, String nickname, String profileImageUrl) {

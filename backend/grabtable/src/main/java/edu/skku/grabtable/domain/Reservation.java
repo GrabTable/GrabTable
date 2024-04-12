@@ -10,8 +10,9 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Reservation extends BaseTimeEntity{
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+public class Reservation extends BaseTimeEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Integer numberOfUser;

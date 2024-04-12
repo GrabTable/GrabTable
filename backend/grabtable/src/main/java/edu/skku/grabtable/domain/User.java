@@ -25,6 +25,10 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String socialLoginId;
+
+    private String profileImageUrl;
+
     private String username;
 
     private String password;
@@ -42,5 +46,11 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.email = email;
         this.phone = phone;
+    }
+
+    public User(String socialLoginId, String nickname, String profileImageUrl) {
+        this.socialLoginId = socialLoginId;
+        this.username = nickname;
+        this.profileImageUrl = profileImageUrl;
     }
 }

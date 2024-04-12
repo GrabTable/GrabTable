@@ -1,0 +1,3 @@
+[submodule "grabtable-server-yml-manager"]
+	path = grabtable-server-yml-manager
+	url = git@github.com:GrabTable/grabtable-server-yml-manager.git

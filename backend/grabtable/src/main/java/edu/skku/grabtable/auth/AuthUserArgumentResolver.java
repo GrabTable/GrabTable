@@ -1,6 +1,7 @@
 package edu.skku.grabtable.auth;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
+import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(
+    public User resolveArgument(
             MethodParameter parameter,
             ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest,
@@ -63,6 +64,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
         //Access Token으로 정보 추출
         Long userId = Long.valueOf(jwtUtil.getSubject(accessToken));
-        return userRepository.findById(userId);
+        return userRepository.findById(userId)
+                .orElseThrow(RuntimeException::new);
     }
 }

@@ -80,6 +80,7 @@ public class JwtUtil {
         try {
             parseToken(accessToken);
         } catch (ExpiredJwtException e) {
+            //Refresh token에 종속되어 있음
             return true;
         } catch (JwtException e) {
             return false;

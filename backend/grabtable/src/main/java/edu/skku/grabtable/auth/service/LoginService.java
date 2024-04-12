@@ -24,7 +24,6 @@ public class LoginService {
     private final JwtUtil jwtUtil;
     private final KakaoOAuthProvider kakaoOAuthProvider;
 
-    @Transactional
     public UserTokens login(LoginRequest loginRequest) {
         KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(loginRequest.getCode());
 
@@ -79,7 +78,7 @@ public class LoginService {
         if (isRefreshTokenValid && !isAccessTokenValid) {
             RefreshToken foundRefreshToken = refreshTokenRepository.findByValue(refreshToken)
                     .orElseThrow(() -> new RuntimeException("Refresh Token 유효하지 않음"));
-            return jwtUtil.reissueAccessToken(foundRefreshToken.getValue());
+            return jwtUtil.reissueAccessToken(foundRefreshToken.getUserId().toString());
         }
 
         throw new RuntimeException("토큰 검증 실패");

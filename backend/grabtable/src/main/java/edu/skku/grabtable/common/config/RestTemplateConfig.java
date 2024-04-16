@@ -1,4 +1,4 @@
-package edu.skku.grabtable.config;
+package edu.skku.grabtable.common.config;
 
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;

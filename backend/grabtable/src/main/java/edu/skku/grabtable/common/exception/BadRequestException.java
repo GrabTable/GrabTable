@@ -1,4 +1,4 @@
-package edu.skku.grabtable.exception;
+package edu.skku.grabtable.common.exception;
 
 import lombok.Getter;
 

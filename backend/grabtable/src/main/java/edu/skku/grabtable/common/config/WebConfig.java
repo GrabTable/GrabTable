@@ -1,4 +1,4 @@
-package edu.skku.grabtable.config;
+package edu.skku.grabtable.common.config;
 
 import edu.skku.grabtable.auth.AuthUserArgumentResolver;
 import java.util.List;

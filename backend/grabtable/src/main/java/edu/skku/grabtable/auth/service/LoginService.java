@@ -58,7 +58,7 @@ public class LoginService {
 
 
     // Refresh Token을 DB에서 제거
-    public void logout(User user, String token) {
+    public void logout(User user) {
         refreshTokenRepository.deleteById(user.getId());
     }
 
@@ -66,7 +66,6 @@ public class LoginService {
     public String reissueAccessToken(String refreshToken, String authHeader) {
         //Bearer 제거
         String accessToken = authHeader.split(" ")[1];
-        log.info("parsed token={}", accessToken);
 
         //토큰 만료, 비밀키 무결성 검사
         jwtUtil.validateRefreshToken(refreshToken);

@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-    public Optional<RefreshToken> findByValue(String value);
+    Optional<RefreshToken> findByValue(String value);
 }

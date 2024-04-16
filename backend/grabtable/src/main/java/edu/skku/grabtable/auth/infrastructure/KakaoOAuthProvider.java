@@ -65,9 +65,7 @@ public class KakaoOAuthProvider {
                 KakaoUserInfo.class,
                 params
         );
-
-        log.info("KakaoOAuthProvider.getUserInfo response={}", response.getBody());
-
+        
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         }
@@ -93,10 +91,6 @@ public class KakaoOAuthProvider {
                 requestEntity,
                 KakaoAccessTokenResponse.class
         );
-
-        log.info("KakaoOAuthProvider.fetchAccessToken response={}", response.getBody());
-
-        log.info("response={}", response.getBody());
 
         return Optional.ofNullable(response.getBody())
                 .orElseThrow(() -> new SocialLoginException(ExceptionCode.UNABLE_TO_GET_ACCESS_TOKEN))

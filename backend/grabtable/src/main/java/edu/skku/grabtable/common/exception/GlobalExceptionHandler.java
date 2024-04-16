@@ -36,7 +36,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(SocialLoginException.class)
-    public ResponseEntity<ExceptionResponse> handleInvalidJwtException(SocialLoginException e) {
+    public ResponseEntity<ExceptionResponse> handleSocialLoginException(SocialLoginException e) {
+        log.warn(e.getMessage(), e);
+        return ResponseEntity.badRequest()
+                .body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidJwtException(InvalidJwtException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ExceptionResponse(e.getCode(), e.getMessage()));

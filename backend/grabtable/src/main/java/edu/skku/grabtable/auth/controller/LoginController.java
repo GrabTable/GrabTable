@@ -62,11 +62,10 @@ public class LoginController {
 
     @DeleteMapping(value = "/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue("refresh-token") String token,
             @AuthUser User user
     ) {
 
-        loginService.logout(user, token);
+        loginService.logout(user);
         return ResponseEntity.noContent().build();
     }
 

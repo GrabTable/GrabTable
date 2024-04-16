@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,7 +59,7 @@ public class LoginController {
         return ResponseEntity.ok(new AccessTokenResponse(reissuedToken));
     }
 
-    @DeleteMapping(value = "/logout")
+    @PostMapping(value = "/logout")
     public ResponseEntity<Void> logout(
             @AuthUser User user
     ) {

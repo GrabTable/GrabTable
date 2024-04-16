@@ -7,6 +7,8 @@ import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.infrastructure.KakaoOAuthProvider;
 import edu.skku.grabtable.auth.infrastructure.KakaoUserInfo;
 import edu.skku.grabtable.auth.repository.RefreshTokenRepository;
+import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.InvalidJwtException;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,10 +79,10 @@ public class LoginService {
         //Access Token이 유효하지 않은 경우 -> Refresh Token 검사 후 재발급
         if (isRefreshTokenValid && !isAccessTokenValid) {
             RefreshToken foundRefreshToken = refreshTokenRepository.findByValue(refreshToken)
-                    .orElseThrow(() -> new RuntimeException("Refresh Token 유효하지 않음"));
+                    .orElseThrow(() -> new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN));
             return jwtUtil.reissueAccessToken(foundRefreshToken.getUserId().toString());
         }
 
-        throw new RuntimeException("토큰 검증 실패");
+        throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
     }
 }

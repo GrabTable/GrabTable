@@ -68,16 +68,16 @@ public class LoginService {
         String accessToken = authHeader.split(" ")[1];
         log.info("parsed token={}", accessToken);
 
-        boolean isAccessTokenValid = jwtUtil.validateAccessToken(accessToken);
-        boolean isRefreshTokenValid = jwtUtil.validateRefreshToken(refreshToken);
+        //토큰 만료, 비밀키 무결성 검사
+        jwtUtil.validateRefreshToken(refreshToken);
 
         //Access Token이 유효한 경우 -> 재반환
-        if (isRefreshTokenValid && isAccessTokenValid) {
+        if (jwtUtil.isAccessTokenValid(accessToken)) {
             return accessToken;
         }
 
-        //Access Token이 유효하지 않은 경우 -> Refresh Token 검사 후 재발급
-        if (isRefreshTokenValid && !isAccessTokenValid) {
+        //Access Token이 만료된 경우 -> Refresh Token DB 검증 후 재발급
+        if (jwtUtil.isAccessTokenExpired(accessToken)) {
             RefreshToken foundRefreshToken = refreshTokenRepository.findByValue(refreshToken)
                     .orElseThrow(() -> new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN));
             return jwtUtil.reissueAccessToken(foundRefreshToken.getUserId().toString());

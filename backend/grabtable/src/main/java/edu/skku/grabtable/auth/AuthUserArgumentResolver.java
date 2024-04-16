@@ -59,9 +59,8 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         log.info("AuthUserArgumentResolver access token={}", accessToken);
 
         //검증
-        boolean isAccessTokenValid = jwtUtil.validateAccessToken(accessToken);
-        boolean isRefreshTokenValid = jwtUtil.validateRefreshToken(refreshToken);
-        if (!isAccessTokenValid || !isRefreshTokenValid) {
+        jwtUtil.validateRefreshToken(refreshToken);
+        if (!jwtUtil.isAccessTokenValid(accessToken)) {
             throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
         }
 

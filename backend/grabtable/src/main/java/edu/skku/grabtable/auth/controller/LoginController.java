@@ -1,7 +1,6 @@
 package edu.skku.grabtable.auth.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.auth.annotation.UserOnly;
 import edu.skku.grabtable.auth.domain.UserTokens;
 import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.domain.response.AccessTokenResponse;
@@ -62,7 +61,6 @@ public class LoginController {
     }
 
     @DeleteMapping(value = "/logout")
-    @UserOnly
     public ResponseEntity<Void> logout(
             @CookieValue("refresh-token") String token,
             @AuthUser User user

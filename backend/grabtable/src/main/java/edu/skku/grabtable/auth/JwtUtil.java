@@ -1,6 +1,8 @@
 package edu.skku.grabtable.auth;
 
 import edu.skku.grabtable.auth.domain.UserTokens;
+import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.InvalidJwtException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
@@ -66,25 +68,31 @@ public class JwtUtil {
     }
 
     //===토큰 유효성 검사===//
-    //예외 처리 커스텀 TODO
-    public boolean validateRefreshToken(String refreshToken) {
+
+    //만료 여부, 비밀키 무결성 검사
+    public void validateRefreshToken(String refreshToken) {
         try {
             parseToken(refreshToken);
-        } catch (Exception e) {
+        } catch (JwtException e) {
+            throw new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
+    public boolean isAccessTokenValid(String accessToken) {
+        try {
+            parseToken(accessToken);
+        } catch (JwtException e) {
             return false;
         }
         return true;
     }
 
-    public boolean validateAccessToken(String accessToken) {
+    public boolean isAccessTokenExpired(String accessToken) {
         try {
             parseToken(accessToken);
         } catch (ExpiredJwtException e) {
-            //Refresh token에 종속되어 있음
             return true;
-        } catch (JwtException e) {
-            return false;
         }
-        return true;
+        return false;
     }
 }

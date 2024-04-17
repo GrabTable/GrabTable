@@ -1,13 +1,13 @@
 package edu.skku.grabtable.service;
 
+import edu.skku.grabtable.common.exception.BadRequestException;
+import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.domain.Review;
 import edu.skku.grabtable.domain.Store;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.domain.request.ReviewRequest;
 import edu.skku.grabtable.domain.response.ReviewResponse;
 import edu.skku.grabtable.domain.response.ReviewSummaryResponse;
-import edu.skku.grabtable.exception.BadRequestException;
-import edu.skku.grabtable.exception.ExceptionCode;
 import edu.skku.grabtable.repository.ReviewRepository;
 import edu.skku.grabtable.repository.StoreRepository;
 import edu.skku.grabtable.repository.UserRepository;

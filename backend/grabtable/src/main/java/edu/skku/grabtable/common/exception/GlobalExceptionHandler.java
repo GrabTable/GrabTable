@@ -1,4 +1,4 @@
-package edu.skku.grabtable.exception;
+package edu.skku.grabtable.common.exception;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +30,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException e) {
+        log.warn(e.getMessage(), e);
+        return ResponseEntity.badRequest()
+                .body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(SocialLoginException.class)
+    public ResponseEntity<ExceptionResponse> handleSocialLoginException(SocialLoginException e) {
+        log.warn(e.getMessage(), e);
+        return ResponseEntity.badRequest()
+                .body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<ExceptionResponse> handleInvalidJwtException(InvalidJwtException e) {
         log.warn(e.getMessage(), e);
         return ResponseEntity.badRequest()
                 .body(new ExceptionResponse(e.getCode(), e.getMessage()));

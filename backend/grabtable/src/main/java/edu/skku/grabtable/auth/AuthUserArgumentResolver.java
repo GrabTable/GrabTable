@@ -1,6 +1,9 @@
 package edu.skku.grabtable.auth;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
+import edu.skku.grabtable.common.exception.BadRequestException;
+import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.InvalidJwtException;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -41,13 +44,13 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         //refresh-token 추출
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new RuntimeException("Refresh Token Cookie 없음");
+            throw new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
 
         String refreshToken = Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals("refresh-token"))
                 .findFirst()
-                .orElseThrow(RuntimeException::new)
+                .orElseThrow(() -> new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN))
                 .getValue();
 
         //access token 추출
@@ -56,15 +59,14 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
         log.info("AuthUserArgumentResolver access token={}", accessToken);
 
         //검증
-        boolean isAccessTokenValid = jwtUtil.validateAccessToken(accessToken);
-        boolean isRefreshTokenValid = jwtUtil.validateRefreshToken(refreshToken);
-        if (!isAccessTokenValid || !isRefreshTokenValid) {
-            throw new RuntimeException("JWT 검증 실패");
+        jwtUtil.validateRefreshToken(refreshToken);
+        if (!jwtUtil.isAccessTokenValid(accessToken)) {
+            throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
         }
 
         //Access Token으로 정보 추출
         Long userId = Long.valueOf(jwtUtil.getSubject(accessToken));
         return userRepository.findById(userId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
     }
 }

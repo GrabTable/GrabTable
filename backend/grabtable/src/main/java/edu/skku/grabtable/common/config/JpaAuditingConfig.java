@@ -1,4 +1,4 @@
-package edu.skku.grabtable.config;
+package edu.skku.grabtable.common.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

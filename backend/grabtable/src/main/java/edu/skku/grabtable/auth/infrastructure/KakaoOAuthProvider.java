@@ -1,6 +1,8 @@
 package edu.skku.grabtable.auth.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.SocialLoginException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,14 +65,12 @@ public class KakaoOAuthProvider {
                 KakaoUserInfo.class,
                 params
         );
-
-        log.info("KakaoOAuthProvider.getUserInfo response={}", response.getBody());
-
+        
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         }
 
-        throw new RuntimeException();
+        throw new SocialLoginException(ExceptionCode.UNABLE_TO_GET_USER_INFO);
     }
 
     private String fetchAccessToken(String code) {
@@ -92,12 +92,8 @@ public class KakaoOAuthProvider {
                 KakaoAccessTokenResponse.class
         );
 
-        log.info("KakaoOAuthProvider.fetchAccessToken response={}", response.getBody());
-
-        log.info("response={}", response.getBody());
-
         return Optional.ofNullable(response.getBody())
-                .orElseThrow(RuntimeException::new)
+                .orElseThrow(() -> new SocialLoginException(ExceptionCode.UNABLE_TO_GET_ACCESS_TOKEN))
                 .getAccessToken();
     }
 

@@ -1,7 +1,6 @@
 package edu.skku.grabtable.auth.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.auth.annotation.UserOnly;
 import edu.skku.grabtable.auth.domain.UserTokens;
 import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.domain.response.AccessTokenResponse;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -61,14 +59,12 @@ public class LoginController {
         return ResponseEntity.ok(new AccessTokenResponse(reissuedToken));
     }
 
-    @DeleteMapping(value = "/logout")
-    @UserOnly
+    @PostMapping(value = "/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue("refresh-token") String token,
             @AuthUser User user
     ) {
 
-        loginService.logout(user, token);
+        loginService.logout(user);
         return ResponseEntity.noContent().build();
     }
 

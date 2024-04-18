@@ -5,4 +5,5 @@
 :toclevels: 2
 :seclinks:
 
-include::test.adoc[]
+include::review-controller-test.adoc[]
+include::login-controller-test.adoc[]

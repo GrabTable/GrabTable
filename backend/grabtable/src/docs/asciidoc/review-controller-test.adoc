@@ -1,6 +1,6 @@
 == ReviewController
 
-=== 유저의 모든 리뷰 조회 (GET /api/v1/reviews/\{userId\})
+=== 유저의 모든 리뷰 조회 (GET /v1/reviews/\{userId\})
 
 ==== 요청
 
@@ -10,7 +10,7 @@ include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-reque
 
 include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-response.adoc[]
 
-=== 가게의 모든 리뷰 조회 (GET /api/v1/reviews/\{storeId\})
+=== 가게의 모든 리뷰 조회 (GET /v1/reviews/\{storeId\})
 
 ==== 요청
 
@@ -20,7 +20,7 @@ include::{snippets}/review-controller-test/get-all-reviews-by-store-id/http-requ
 
 include::{snippets}/review-controller-test/get-all-reviews-by-store-id/http-response.adoc[]
 
-=== 리뷰 등록 (POST /api/v1/reviews/\{reviewId\})
+=== 리뷰 등록 (POST /v1/reviews/\{reviewId\})
 
 ==== 요청
 
@@ -30,7 +30,7 @@ include::{snippets}/review-controller-test/upload-review/http-request.adoc[]
 
 include::{snippets}/review-controller-test/upload-review/http-response.adoc[]
 
-=== 리뷰 수정 (PATCH /api/v1/reviews/\{reviewId\})
+=== 리뷰 수정 (PATCH /v1/reviews/\{reviewId\})
 
 ==== 요청
 
@@ -40,7 +40,7 @@ include::{snippets}/review-controller-test/update-review/http-request.adoc[]
 
 include::{snippets}/review-controller-test/update-review/http-response.adoc[]
 
-=== 리뷰 삭제 (DELETE /api/v1/reviews/\{reviewId\})
+=== 리뷰 삭제 (DELETE /v1/reviews/\{reviewId\})
 
 ==== 요청
 

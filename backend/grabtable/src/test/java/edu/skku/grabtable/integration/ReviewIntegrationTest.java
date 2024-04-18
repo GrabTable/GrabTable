@@ -21,11 +21,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 @Sql(value = {
         "classpath:data/stores.sql",
         "classpath:data/reviews.sql"
 })
-@Transactional
 public class ReviewIntegrationTest {
 
     @Autowired
@@ -58,13 +58,14 @@ public class ReviewIntegrationTest {
         User findUser = userRepository.findById(savedUser.getId()).get();
         Store store = storeRepository.findByStoreName("봉수육").get();
         reviewService.upload(findUser.getId(), new ReviewRequest(store.getId(), "맛있어요", 4.0));
-        ReviewResponse reviewResponse = reviewService.getAllReviewsByUser(findUser.getId()).get(0);
 
         //when
+        ReviewResponse reviewResponse = reviewService.getAllReviewsByUser(findUser.getId()).get(0);
+        System.out.println("findUser = " + findUser.getId());
+        System.out.println("reviewResponse = " + reviewResponse);
         reviewService.delete(findUser.getId(), reviewResponse.getId());
 
         //then
-
         //NativeQuery를 통해 JPA 설정을 우회할 수 있다.
         Review deletedReview = (Review) em.createNativeQuery("select * from review where status = 'INVALID'",
                         Review.class)

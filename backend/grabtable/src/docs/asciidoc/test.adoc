@@ -39,3 +39,13 @@ include::{snippets}/review-controller-test/update-review/http-request.adoc[]
 ==== 응답
 
 include::{snippets}/review-controller-test/update-review/http-response.adoc[]
+
+=== 리뷰 삭제 (DELETE /api/v1/reviews/\{reviewId\})
+
+==== 요청
+
+include::{snippets}/review-controller-test/delete-review/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/review-controller-test/delete-review/http-response.adoc[]

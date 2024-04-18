@@ -5,67 +5,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.skku.grabtable.auth.AuthUserArgumentResolver;
-import edu.skku.grabtable.common.config.RestDocsConfiguration;
+import edu.skku.grabtable.common.ControllerTest;
 import edu.skku.grabtable.review.domain.ReviewPlatform;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;
 import edu.skku.grabtable.review.service.ReviewService;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
-import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(ReviewController.class)
-@ExtendWith(RestDocumentationExtension.class)
-@Import(RestDocsConfiguration.class)
 @AutoConfigureRestDocs
-class ReviewControllerTest {
+class ReviewControllerTest extends ControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private ReviewService reviewService;
 
-    @MockBean
-    private AuthUserArgumentResolver authUserArgumentResolver;
-
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    RestDocumentationResultHandler restDocs;
-
-    @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider restDoc) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .apply(MockMvcRestDocumentation.documentationConfiguration(restDoc))
-                .alwaysDo(MockMvcResultHandlers.print())
-                .alwaysDo(restDocs)
-                .addFilter(new CharacterEncodingFilter("UTF-8", true))
-                .build();
-    }
 
     @Test
     @DisplayName("유저가 작성한 리뷰를 조회할 수 있다.")

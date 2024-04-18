@@ -50,7 +50,8 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_REVIEW_ID));
 
-        if (!Objects.equals(review.getUser().getId(), userId)) {
+        User user = review.getUser();
+        if (user == null || !Objects.equals(user.getId(), userId)) {
             throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
 
@@ -60,7 +61,8 @@ public class ReviewService {
     public void update(Long userId, Long reviewId, String message, Double rating) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
-        if (!Objects.equals(review.getUser().getId(), userId)) {
+        User user = review.getUser();
+        if (user == null || !Objects.equals(user.getId(), userId)) {
             throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
         review.update(message, rating);

@@ -1,5 +1,6 @@
 package edu.skku.grabtable.integration;
 
+import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.domain.Store;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.repository.StoreRepository;
@@ -17,12 +18,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Sql(value = {
         "classpath:data/stores.sql",
         "classpath:data/reviews.sql"
 })
+@Transactional
 public class ReviewIntegrationTest {
 
     @Autowired
@@ -68,5 +71,30 @@ public class ReviewIntegrationTest {
                 .getResultList().get(0);
 
         Assertions.assertThat(deletedReview.getStatus()).isEqualTo(ReviewStatus.INVALID);
+    }
+
+    @Test
+    @DisplayName("유저 자신이 작성하지 않은 리뷰를 삭제할 수 없다.")
+    void deleteReview_unauthorized() {
+        //given
+        User user = User.builder()
+                .username("userA")
+                .password("1234")
+                .email("userA@gmail.com")
+                .phone("01012345678")
+                .build();
+
+        userRepository.save(user);
+        Store store = storeRepository.findByStoreName("봉수육").get();
+
+        //when
+        Long reviewId = store.getReviews().get(0).getId();
+
+        //then
+        Assertions.assertThatThrownBy(() -> {
+                    reviewService.delete(user.getId(), reviewId);
+                }).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("유효하지 않은 요청입니다.");
+
     }
 }

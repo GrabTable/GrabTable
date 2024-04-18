@@ -1,5 +1,7 @@
 package edu.skku.grabtable.review.controller;
 
+import edu.skku.grabtable.auth.annotation.AuthUser;
+import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;
@@ -39,20 +41,28 @@ public class ReviewController {
         return reviewService.getReviewSummaryByStore(storeId);
     }
 
-    //밑의 모든 엔드포인트는 AUTH 모듈과 통합 필요
     @PostMapping
-    public void upload(@RequestBody @Valid ReviewRequest request) {
-        reviewService.upload(request);
+    public void upload(
+            @AuthUser User user,
+            @RequestBody @Valid ReviewRequest request
+    ) {
+        reviewService.upload(user.getId(), request);
     }
 
     @PatchMapping("/{reviewId}")
-    public void update(@RequestBody @Valid ReviewUpdateRequest request,
-                       @PathVariable Long reviewId) {
-        reviewService.update(reviewId, request.getMessage(), request.getRating());
+    public void update(
+            @AuthUser User user,
+            @RequestBody @Valid ReviewUpdateRequest request,
+            @PathVariable Long reviewId
+    ) {
+        reviewService.update(user.getId(), reviewId, request.getMessage(), request.getRating());
     }
 
     @DeleteMapping("/{reviewId}")
-    public void delete(@PathVariable Long reviewId) {
-        reviewService.delete(reviewId);
+    public void delete(
+            @AuthUser User user,
+            @PathVariable Long reviewId
+    ) {
+        reviewService.delete(user.getId(), reviewId);
     }
 }

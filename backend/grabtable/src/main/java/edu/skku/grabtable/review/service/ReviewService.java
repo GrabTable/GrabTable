@@ -14,6 +14,7 @@ import edu.skku.grabtable.review.repository.ReviewRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,22 +46,30 @@ public class ReviewService {
         return store.getReviews().stream().map(ReviewResponse::of).toList();
     }
 
-    public void delete(Long reviewId) {
+    public void delete(Long userId, Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_REVIEW_ID));
+
+        if (!Objects.equals(review.getUser().getId(), userId)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+        }
+
         reviewRepository.delete(review);
     }
 
-    public void update(Long reviewId, String message, Double rating) {
+    public void update(Long userId, Long reviewId, String message, Double rating) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
+        if (!Objects.equals(review.getUser().getId(), userId)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+        }
         review.update(message, rating);
     }
 
-    public void upload(ReviewRequest request) {
+    public void upload(Long userId, ReviewRequest request) {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
 
         Review review = Review.of(store, user, request.getMessage(), request.getRating());

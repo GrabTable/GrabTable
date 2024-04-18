@@ -54,11 +54,11 @@ public class ReviewIntegrationTest {
         User savedUser = userRepository.save(user);
         User findUser = userRepository.findById(savedUser.getId()).get();
         Store store = storeRepository.findByStoreName("봉수육").get();
-        reviewService.upload(new ReviewRequest(findUser.getId(), store.getId(), "맛있어요", 4.0));
+        reviewService.upload(findUser.getId(), new ReviewRequest(store.getId(), "맛있어요", 4.0));
         ReviewResponse reviewResponse = reviewService.getAllReviewsByUser(findUser.getId()).get(0);
 
         //when
-        reviewService.delete(reviewResponse.getId());
+        reviewService.delete(findUser.getId(), reviewResponse.getId());
 
         //then
 

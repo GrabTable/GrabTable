@@ -1,0 +1,41 @@
+== ReviewController
+
+=== 유저의 모든 리뷰 조회 (GET /api/v1/reviews/\{userId\})
+
+==== 요청
+
+include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-response.adoc[]
+
+=== 가게의 모든 리뷰 조회 (GET /api/v1/reviews/\{storeId\})
+
+==== 요청
+
+include::{snippets}/review-controller-test/get-all-reviews-by-store-id/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/review-controller-test/get-all-reviews-by-store-id/http-response.adoc[]
+
+=== 리뷰 등록 (POST /api/v1/reviews/\{reviewId\})
+
+==== 요청
+
+include::{snippets}/review-controller-test/upload-review/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/review-controller-test/upload-review/http-response.adoc[]
+
+=== 리뷰 수정 (PATCH /api/v1/reviews/\{reviewId\})
+
+==== 요청
+
+include::{snippets}/review-controller-test/update-review/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/review-controller-test/update-review/http-response.adoc[]

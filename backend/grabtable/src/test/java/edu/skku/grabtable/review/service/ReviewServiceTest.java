@@ -50,7 +50,8 @@ class ReviewServiceTest {
         user.getReviews().add(review);
         user.getReviews().add(review2);
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
+        when(reviewRepository.findByUserId(any(Long.class)))
+                .thenReturn(List.of(review, review2));
 
         //when
         List<ReviewResponse> result = reviewService.getAllReviewsByUser(user.getId());

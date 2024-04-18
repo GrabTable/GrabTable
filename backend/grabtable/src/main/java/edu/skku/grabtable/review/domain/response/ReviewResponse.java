@@ -1,7 +1,7 @@
-package edu.skku.grabtable.domain.response;
+package edu.skku.grabtable.review.domain.response;
 
-import edu.skku.grabtable.domain.Review;
-import edu.skku.grabtable.domain.ReviewPlatform;
+import edu.skku.grabtable.review.domain.Review;
+import edu.skku.grabtable.review.domain.ReviewPlatform;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;

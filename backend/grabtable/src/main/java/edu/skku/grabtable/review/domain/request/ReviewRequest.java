@@ -1,4 +1,4 @@
-package edu.skku.grabtable.domain.request;
+package edu.skku.grabtable.review.domain.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

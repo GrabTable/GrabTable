@@ -1,15 +1,15 @@
 package edu.skku.grabtable.integration;
 
-import edu.skku.grabtable.domain.Review;
-import edu.skku.grabtable.domain.ReviewStatus;
 import edu.skku.grabtable.domain.Store;
 import edu.skku.grabtable.domain.User;
-import edu.skku.grabtable.domain.request.ReviewRequest;
-import edu.skku.grabtable.domain.response.ReviewResponse;
-import edu.skku.grabtable.repository.ReviewRepository;
 import edu.skku.grabtable.repository.StoreRepository;
 import edu.skku.grabtable.repository.UserRepository;
-import edu.skku.grabtable.service.ReviewService;
+import edu.skku.grabtable.review.domain.Review;
+import edu.skku.grabtable.review.domain.ReviewStatus;
+import edu.skku.grabtable.review.domain.request.ReviewRequest;
+import edu.skku.grabtable.review.domain.response.ReviewResponse;
+import edu.skku.grabtable.review.repository.ReviewRepository;
+import edu.skku.grabtable.review.service.ReviewService;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

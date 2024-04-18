@@ -1,26 +1,45 @@
-package edu.skku.grabtable.controller;
+package edu.skku.grabtable.review.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.skku.grabtable.domain.ReviewPlatform;
-import edu.skku.grabtable.domain.request.ReviewRequest;
-import edu.skku.grabtable.domain.request.ReviewUpdateRequest;
-import edu.skku.grabtable.domain.response.ReviewResponse;
-import edu.skku.grabtable.service.ReviewService;
+import edu.skku.grabtable.auth.AuthUserArgumentResolver;
+import edu.skku.grabtable.common.config.RestDocsConfiguration;
+import edu.skku.grabtable.review.domain.ReviewPlatform;
+import edu.skku.grabtable.review.domain.request.ReviewRequest;
+import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
+import edu.skku.grabtable.review.domain.response.ReviewResponse;
+import edu.skku.grabtable.review.service.ReviewService;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 @WebMvcTest(ReviewController.class)
+@ExtendWith(RestDocumentationExtension.class)
+@Import(RestDocsConfiguration.class)
+@AutoConfigureRestDocs
 class ReviewControllerTest {
 
     @Autowired
@@ -29,8 +48,24 @@ class ReviewControllerTest {
     @MockBean
     private ReviewService reviewService;
 
+    @MockBean
+    private AuthUserArgumentResolver authUserArgumentResolver;
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    RestDocumentationResultHandler restDocs;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider restDoc) {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(MockMvcRestDocumentation.documentationConfiguration(restDoc))
+                .alwaysDo(MockMvcResultHandlers.print())
+                .alwaysDo(restDocs)
+                .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .build();
+    }
 
     @Test
     @DisplayName("유저가 작성한 리뷰를 조회할 수 있다.")
@@ -50,9 +85,9 @@ class ReviewControllerTest {
         Mockito.when(reviewService.getAllReviewsByUser(USER_ID)).thenReturn(reviewResponses);
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/reviews/users/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(get("/v1/reviews/users/{id}", "1"))
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByUser(ArgumentMatchers.anyLong());
@@ -77,9 +112,9 @@ class ReviewControllerTest {
         Mockito.when(reviewService.getAllReviewsByStore(STORE_ID)).thenReturn(reviewResponses);
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/reviews/stores/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(get("/v1/reviews/stores/1"))
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByStore(ArgumentMatchers.anyLong());
@@ -97,8 +132,8 @@ class ReviewControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService).upload(ArgumentMatchers.any());
@@ -119,8 +154,8 @@ class ReviewControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.patch("/v1/reviews/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService).update(

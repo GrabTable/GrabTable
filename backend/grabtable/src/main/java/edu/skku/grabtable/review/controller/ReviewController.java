@@ -1,10 +1,10 @@
-package edu.skku.grabtable.controller;
+package edu.skku.grabtable.review.controller;
 
-import edu.skku.grabtable.domain.request.ReviewRequest;
-import edu.skku.grabtable.domain.request.ReviewUpdateRequest;
-import edu.skku.grabtable.domain.response.ReviewResponse;
-import edu.skku.grabtable.domain.response.ReviewSummaryResponse;
-import edu.skku.grabtable.service.ReviewService;
+import edu.skku.grabtable.review.domain.request.ReviewRequest;
+import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
+import edu.skku.grabtable.review.domain.response.ReviewResponse;
+import edu.skku.grabtable.review.domain.response.ReviewSummaryResponse;
+import edu.skku.grabtable.review.service.ReviewService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

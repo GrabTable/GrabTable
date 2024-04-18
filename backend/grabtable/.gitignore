@@ -42,3 +42,6 @@ out/
 
 ### application*.yml ###
 src/main/resources/*.yml
+
+### Spring REST docs ###
+src/main/resources/static/docs/*.html

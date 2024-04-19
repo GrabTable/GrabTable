@@ -1,4 +1,4 @@
-package edu.skku.grabtable.domain;
+package edu.skku.grabtable.review.domain;
 
 public enum ReviewStatus {
     VALID, INVALID

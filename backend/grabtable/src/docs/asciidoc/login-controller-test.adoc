@@ -1,0 +1,31 @@
+== LoginController
+
+=== 카카오 소셜 로그인 (POST /v1/auth/login/kakao)
+
+==== 요청
+
+include::{snippets}/login-controller-test/kakao-social-login/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/login-controller-test/kakao-social-login/http-response.adoc[]
+
+=== Access Token 재발급 (POST /v1/auth/reissue)
+
+==== 요청
+
+include::{snippets}/login-controller-test/reissue-token/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/login-controller-test/reissue-token/http-response.adoc[]
+
+=== 로그아웃 (POST /v1/auth/logout)
+
+==== 요청
+
+include::{snippets}/login-controller-test/logout/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/login-controller-test/logout/http-response.adoc[]

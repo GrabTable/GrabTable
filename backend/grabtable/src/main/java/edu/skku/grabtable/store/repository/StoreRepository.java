@@ -1,6 +1,6 @@
-package edu.skku.grabtable.repository;
+package edu.skku.grabtable.store.repository;
 
-import edu.skku.grabtable.domain.Store;
+import edu.skku.grabtable.store.domain.Store;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 

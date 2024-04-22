@@ -1,5 +1,7 @@
 package edu.skku.grabtable.domain;
 
+import edu.skku.grabtable.store.domain.Menu;
+import edu.skku.grabtable.store.domain.Store;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

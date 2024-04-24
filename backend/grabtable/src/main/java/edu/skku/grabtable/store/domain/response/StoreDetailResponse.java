@@ -13,7 +13,6 @@ public class StoreDetailResponse {
     private String storePictureUrl;
     private String phone;
     private String description;
-    private String status;
     private String category;
 
     public static StoreDetailResponse of(Store store) {
@@ -24,7 +23,6 @@ public class StoreDetailResponse {
                 store.getStorePictureUrl(),
                 store.getPhone(),
                 store.getDescription(),
-                store.getStatus().toString(),
                 store.getCategory().toString()
         );
     }

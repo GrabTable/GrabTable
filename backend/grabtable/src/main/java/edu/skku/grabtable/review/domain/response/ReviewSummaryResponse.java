@@ -1,4 +1,4 @@
-package edu.skku.grabtable.domain.response;
+package edu.skku.grabtable.review.domain.response;
 
 import java.util.List;
 import java.util.Map;

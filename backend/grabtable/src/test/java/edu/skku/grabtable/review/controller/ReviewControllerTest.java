@@ -1,30 +1,34 @@
-package edu.skku.grabtable.controller;
+package edu.skku.grabtable.review.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.skku.grabtable.domain.ReviewPlatform;
-import edu.skku.grabtable.domain.request.ReviewRequest;
-import edu.skku.grabtable.domain.request.ReviewUpdateRequest;
-import edu.skku.grabtable.domain.response.ReviewResponse;
-import edu.skku.grabtable.service.ReviewService;
+import edu.skku.grabtable.common.ControllerTest;
+import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.review.domain.ReviewPlatform;
+import edu.skku.grabtable.review.domain.request.ReviewRequest;
+import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
+import edu.skku.grabtable.review.domain.response.ReviewResponse;
+import edu.skku.grabtable.review.service.ReviewService;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @WebMvcTest(ReviewController.class)
-class ReviewControllerTest {
+@AutoConfigureRestDocs
+class ReviewControllerTest extends ControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockBean
     private ReviewService reviewService;
@@ -50,9 +54,9 @@ class ReviewControllerTest {
         Mockito.when(reviewService.getAllReviewsByUser(USER_ID)).thenReturn(reviewResponses);
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/reviews/users/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(get("/v1/reviews/users/{id}", "1"))
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByUser(ArgumentMatchers.anyLong());
@@ -77,9 +81,9 @@ class ReviewControllerTest {
         Mockito.when(reviewService.getAllReviewsByStore(STORE_ID)).thenReturn(reviewResponses);
 
         //when
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/reviews/stores/1"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(get("/v1/reviews/stores/1"))
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByStore(ArgumentMatchers.anyLong());
@@ -87,30 +91,32 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("유저는 리뷰를 등록할 수 있다.")
-    void UploadReview() throws Exception {
+    void uploadReview() throws Exception {
 
         //given
-        ReviewRequest request = new ReviewRequest(1L, 1L, "good", 3.5);
-        Mockito.doNothing().when(reviewService).upload(ArgumentMatchers.any());
+        User user = new User(1L, "userA", new ArrayList<>());
+        ReviewRequest request = new ReviewRequest(1L, "good", 3.5);
+        Mockito.doNothing().when(reviewService).upload(ArgumentMatchers.any(), ArgumentMatchers.any());
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
-        Mockito.verify(reviewService).upload(ArgumentMatchers.any());
+        Mockito.verify(reviewService).upload(ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
     @Test
     @DisplayName("유저는 리뷰를 수정할 수 있다.")
-    void UpdateReview() throws Exception {
+    void updateReview() throws Exception {
 
         //given
         ReviewUpdateRequest request = new ReviewUpdateRequest("good", 3.5);
         Mockito.doNothing().when(reviewService).update(
+                ArgumentMatchers.anyLong(),
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.anyDouble());
@@ -119,13 +125,34 @@ class ReviewControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.patch("/v1/reviews/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk());
 
         //then
         Mockito.verify(reviewService).update(
+                ArgumentMatchers.any(),
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.any(),
                 ArgumentMatchers.anyDouble());
+    }
+
+    @Test
+    @DisplayName("유저는 리뷰를 삭제할 수 있다.")
+    void deleteReview() throws Exception {
+        //given
+        Mockito.doNothing().when(reviewService).delete(
+                ArgumentMatchers.anyLong(),
+                ArgumentMatchers.anyLong());
+
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/reviews/{reviewId}", "1"))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        //then
+        Mockito.verify(reviewService).delete(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.anyLong()
+        );
     }
 }

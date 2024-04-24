@@ -1,5 +1,6 @@
 package edu.skku.grabtable.domain;
 
+import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -54,5 +55,11 @@ public class User extends BaseTimeEntity {
         this.socialLoginId = socialLoginId;
         this.username = nickname;
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public User(Long id, String username, List<Review> reviews) {
+        this.id = id;
+        this.username = username;
+        this.reviews = reviews;
     }
 }

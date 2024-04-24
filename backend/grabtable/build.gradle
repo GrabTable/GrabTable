@@ -37,8 +37,17 @@ dependencies {
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    //payment
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
 }

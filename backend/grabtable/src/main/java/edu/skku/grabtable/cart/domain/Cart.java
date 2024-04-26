@@ -1,7 +1,12 @@
 package edu.skku.grabtable.cart.domain;
 
-import edu.skku.grabtable.domain.*;
-import jakarta.persistence.*;
+import edu.skku.grabtable.store.domain.Menu;
+import edu.skku.grabtable.store.domain.Store;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 
 @Entity

@@ -17,6 +17,9 @@ public enum ExceptionCode {
 
     INVALID_REFRESH_TOKEN(3001, "유효하지 않은 Refresh Token입니다."),
     FAILED_TO_VALIDATE_TOKEN(3002, "토큰 검증에 실패했습니다."),
+
+    ALREADY_HOSTING_USER(4001, "이미 예약을 생성한 유저입니다."),
+    ALREADY_INVITED_USER(4002, "이미 예약에 초대된 유저입니다."),
     ;
 
     private final int code;

@@ -16,27 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final StoreRepository storeRepository;
     private final UserRepository userRepository;
 
 
-    public Reservation createNewReservation(Long userId) {
+    public void createNewReservation(Long userId, Long storeId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
 
-        //사용자가 이미 예약의 호스트인지
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
+
         if (reservationRepository.existsByHostId(userId)) {
             throw new BadRequestException(ExceptionCode.ALREADY_HOSTING_USER);
         }
 
-        //사용자가 다른 예약에 참여중인지
         if (user.getInvitedReservation() != null) {
             throw new BadRequestException(ExceptionCode.ALREADY_INVITED_USER);
         }
 
-        Reservation reservation = new Reservation(user);
+        Reservation reservation = new Reservation(user, store);
         reservationRepository.save(reservation);
-
-        return reservation;
     }
 
     public void joinExistingReservation(Long userId, String inviteCode) {

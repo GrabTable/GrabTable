@@ -50,6 +50,7 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
 
+
     @Builder
     public User(String username, String password, String email, String phone) {
         this.username = username;
@@ -72,5 +73,13 @@ public class User extends BaseTimeEntity {
 
     public void joinReservation(Reservation reservation) {
         this.invitedReservation = reservation;
+    }
+
+    public void clearCarts() {
+        //TODO
+    }
+
+    public void clearReservation() {
+        this.invitedReservation = null;
     }
 }

@@ -38,10 +38,14 @@ public class ReservationController {
         reservationService.joinExistingReservation(user.getId(), inviteCode);
     }
 
-//    @GetMapping("/{reservationId}")
-//    public ReservationDetailResponse findReservation(
-//            @PathVariable Long reservationId
-//    ) {
-//
-//    }
+    @GetMapping("/me")
+    public ReservationDetailResponse findCurrentReservation(@AuthUser User user) {
+        return reservationService.findByUserId(user.getId());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> cancelReservation(@AuthUser User user) {
+        reservationService.deleteByHostId(user.getId());
+        return ResponseEntity.noContent().build();
+    }
 }

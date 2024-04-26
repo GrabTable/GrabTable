@@ -20,7 +20,7 @@ public enum ExceptionCode {
 
     ALREADY_HOSTING_USER(4001, "이미 예약을 생성한 유저입니다."),
     ALREADY_INVITED_USER(4002, "이미 예약에 초대된 유저입니다."),
-    ;
+    NO_RESERVATION_USER(4003, "현재 진행 중인 예약이 존재하지 않는 유저입니다.");
 
     private final int code;
     private final String message;

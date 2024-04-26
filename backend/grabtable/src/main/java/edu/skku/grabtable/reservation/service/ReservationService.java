@@ -5,7 +5,11 @@ import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
+import edu.skku.grabtable.store.domain.Store;
+import edu.skku.grabtable.store.repository.StoreRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,5 +59,31 @@ public class ReservationService {
         }
 
         user.joinReservation(reservation);
+    }
+
+    public ReservationDetailResponse findByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+
+        if (user.getInvitedReservation() != null) {
+            return ReservationDetailResponse.of(user.getInvitedReservation());
+        }
+
+        Reservation reservation = reservationRepository.findByHostId(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+        return ReservationDetailResponse.of(reservation);
+    }
+
+    public void deleteByHostId(Long hostId) {
+        Reservation reservation = reservationRepository.findByHostId(hostId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+
+        reservationRepository.delete(reservation);
+
+        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        for (User invitee : invitees) {
+            invitee.clearCarts();
+            invitee.clearReservation();
+        }
     }
 }

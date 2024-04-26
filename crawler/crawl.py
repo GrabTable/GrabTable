@@ -15,6 +15,7 @@ class Crawler:
         self.place_name = ''
         self.naver_reviews = []
         self.kakao_reviews = []
+        self.menus = []
         self.naver_avg_rating = 0
         self.kakao_avg_rating = 0
     
@@ -93,41 +94,102 @@ class Crawler:
             else:
                 break
 
-    def generate_db_seed_file(self, store_id, review_start_id):
-        store_query = f"""
-        INSERT INTO STORE (id, created_at, last_modified_at, address, description, phone, store_name, store_picture_url, category, status)
-        VALUES ({store_id}, NULL, NULL, NULL, NULL, '{self.place_name}', NULL, 'KOREAN', 'VALID');
-        """
+    def fetch_menus(self, kakao_place_code: str):
+        url = f'https://place.map.kakao.com/main/v/{kakao_place_code}'
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        }
 
-        review_queries = []
+        response = requests.get(url, headers=headers).json()
+        menus = response['menuInfo']['menuList']
+        self.menus = menus
+        
+    def send_data(self, generator, category):
+        generator.add_store_query(self.place_name, category)
         for review in self.naver_reviews:
-            review_queries.append(f"""
-            INSERT INTO REVIEW (id, created_at, last_modified_at, message, rating, store_id, user_id, review_platform, status)
-            VALUES ({review_start_id}, NULL, NULL, '{review['content']}', NULL, {store_id}, NULL, 'NAVER', 'VALID');
-            """)
-            review_start_id += 1
+            generator.add_review_query(review['content'], None, 'NAVER')
         for review in self.kakao_reviews:
-            review_queries.append(f"""
-            INSERT INTO REVIEW (id, created_at, last_modified_at, message, rating, store_id, user_id, review_platform, status)
-            VALUES ({review_start_id}, NULL, NULL, '{review['content']}', {review['rating']}, {store_id}, NULL, 'KAKAO', 'VALID');
-            """)
-            review_start_id += 1
+            generator.add_review_query(review['content'], review['rating'], 'KAKAO')
+        for m in self.menus:
+            generator.add_menu_query(m['menu'], m['price'])
 
-        seed_content = store_query + '\n'.join(review_queries)
-        print(len(seed_content))
-        file_name = f'{self.place_name}.sql'
-        with open(file_name, 'w', encoding="utf-8") as f:
-            f.write(seed_content)
+    def clear(self):
+        self.place_name = ''
+        self.naver_reviews = []
+        self.kakao_reviews = []
+        self.menus = []
+        self.naver_avg_rating = 0
+        self.kakao_avg_rating = 0
 
+    def execute(self, generator, category, naver_place_code, kakao_place_code):
+        self.fetch_naver_reviews(naver_place_code)
+        self.fetch_kakao_reviews(kakao_place_code)
+        self.fetch_menus(kakao_place_code)
+        self.send_data(generator, category)
+        self.clear()
+
+class SeedGenerator:
+    def __init__(self):
+        self.store_queries = []
+        self.review_queries = []
+        self.menu_queries = []
+        self.store_id = 0
+        self.review_start_id = 0
+        self.menu_id = 0
+
+    def add_store_query(self, place_name, category):
+        self.store_id += 1
+        store_query = f"""
+        INSERT INTO store (id, created_at, last_modified_at, address, description, phone, store_name, store_picture_url, category, status)
+        VALUES ({self.store_id}, NULL, NULL, NULL, NULL, NULL, '{place_name}', NULL, '{category}', 'VALID');
+        """
+        self.store_queries.append(store_query)
+
+    def add_review_query(self, content, rating, platform):
+        self.review_start_id += 1
+        review_query = f"""
+        INSERT INTO review (id, created_at, last_modified_at, message, rating, store_id, user_id, review_platform, status)
+        VALUES ({self.review_start_id}, NULL, NULL, '{content}', {rating}, {self.store_id}, NULL, '{platform}', 'VALID');
+        """
+        self.review_queries.append(review_query)
+
+    def add_menu_query(self, menu_name, price):
+        self.menu_id += 1
+        price = price.replace(',', '')
+        menu_query = f"""
+        INSERT INTO menu (id, created_at, last_modified_at, menu_name, menu_picture_url, price, store_id, status)
+        VALUES ({self.menu_id}, NULL, NULL, '{menu_name}', NULL, {price}, {self.store_id}, 'VALID');
+        """
+        self.menu_queries.append(menu_query)
+
+    def generate_db_seed_files(self):
+        store_content = '\n'.join(self.store_queries)
+        review_content = '\n'.join(self.review_queries)
+        menu_content = '\n'.join(self.menu_queries)
+
+        store_file_name = f'stores.sql'
+        review_file_name = f'reviews.sql'
+        menu_file_name = f'menus.sql'
+
+        with open(store_file_name, 'w', encoding="utf-8") as f:
+            f.write(store_content)
+        with open(review_file_name, 'w', encoding="utf-8") as f:
+            f.write(review_content)
+        with open(menu_file_name, 'w', encoding="utf-8") as f:
+            f.write(menu_content)
 
 if __name__ == '__main__':
     #사용 예시
     crawler = Crawler()
-    crawler.fetch_naver_reviews('137557009')
-    print("Fetched Naver Reviews")
-    crawler.fetch_kakao_reviews('532875978')
-    print("Fetched Kakao Reviews")
-    crawler.generate_db_seed_file(3, 621)
+    generator = SeedGenerator()
+    crawler.execute(generator, 'KOREAN', '137557009', '532875978') #먹깨비김밥
+    crawler.execute(generator, 'KOREAN', '36827045', '22282335') #봉수육
+    crawler.execute(generator, 'KOREAN', '1048385575', '824423309') #모수밀면
+    crawler.execute(generator, 'KOREAN', '11701094', '11823509') #본찌돈가스
+    crawler.execute(generator, 'JAPANESE', '37620144', '1224099552') #미가라멘
+    crawler.execute(generator, 'ASIAN', '36988941', '21540583') #쟈스민
+    generator.generate_db_seed_files()
 
 
 

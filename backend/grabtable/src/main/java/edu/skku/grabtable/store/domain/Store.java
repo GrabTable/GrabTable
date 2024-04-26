@@ -1,5 +1,6 @@
-package edu.skku.grabtable.domain;
+package edu.skku.grabtable.store.domain;
 
+import edu.skku.grabtable.domain.BaseTimeEntity;
 import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,6 +44,9 @@ public class Store extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "store")
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store")
+    private List<Menu> menus = new ArrayList<>();
 
     public Store(String storeName, String address) {
         this.storeName = storeName;

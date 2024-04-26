@@ -46,6 +46,14 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_RESERVATION_ID));
 
+        if (reservationRepository.existsByHostId(userId)) {
+            throw new BadRequestException(ExceptionCode.ALREADY_HOSTING_USER);
+        }
+
+        if (user.getInvitedReservation() != null) {
+            throw new BadRequestException(ExceptionCode.ALREADY_INVITED_USER);
+        }
+
         user.joinReservation(reservation);
     }
 }

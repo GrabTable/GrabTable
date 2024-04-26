@@ -9,30 +9,20 @@ import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.payment.domain.Bill;
 import edu.skku.grabtable.payment.domain.request.PaymentRequestDto;
 import edu.skku.grabtable.payment.repository.BillRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class PaymentService {
-    @Value("${iamport.key}")
-    private String restApiKey;
 
-    @Value("${iamport.secret}")
-    private String restApiSecret;
-
-    private IamportClient iamportClient;
+    private final IamportClient iamportClient;
     private final BillRepository billRepository;
-    @PostConstruct
-    public void init(){
-        this.iamportClient = new IamportClient(restApiKey, restApiSecret);
-    }
+
     public Bill verify(PaymentRequestDto paymentDto) throws IamportResponseException, IOException {
         IamportResponse<Payment> paymentIamportResponse = iamportClient.paymentByImpUid(paymentDto.getImpUid());
         Payment receivedcPayment = paymentIamportResponse.getResponse();

@@ -47,7 +47,7 @@ public class Reservation extends BaseTimeEntity {
 
     public Reservation(User host) {
         this.host = host;
-        this.status = ReservationStatus.PENDING;
+        this.status = ReservationStatus.ONGOING;
         this.sharedOrder = new Order();
         this.inviteCode = createInviteCode();
     }

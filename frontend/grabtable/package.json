@@ -11,9 +11,21 @@
     "check": "prettier --check ."
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.0.2",
+    "add": "^2.0.6",
+    "button": "^1.1.1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cn": "^0.1.1",
+    "framer-motion": "^11.0.28",
+    "input": "^1.0.1",
+    "motion": "^10.17.0",
     "next": "14.1.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hot-toast": "^2.4.1",
+    "shadcn-ui": "^0.8.0",
+    "tailwind-merge": "^2.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -4,16 +4,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@ToString
 public class Bill {
 
     @Id
@@ -29,7 +30,7 @@ public class Bill {
     private BigDecimal amount;
 
     @Builder
-    public Bill(String impUid, String merchantUid, String receiptUrl, BigDecimal amount  ) {
+    public Bill(String impUid, String merchantUid, String receiptUrl, BigDecimal amount) {
         this.impUid = impUid;
         this.merchantUid = merchantUid;
         this.receiptUrl = receiptUrl;

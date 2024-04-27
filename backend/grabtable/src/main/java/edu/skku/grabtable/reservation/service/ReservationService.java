@@ -74,8 +74,16 @@ public class ReservationService {
         return ReservationDetailResponse.of(reservation);
     }
 
-    public void deleteByHostId(Long hostId) {
-        Reservation reservation = reservationRepository.findByHostId(hostId)
+    public void cancel(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+
+        if (user.getInvitedReservation() != null) {
+            user.clearReservation();
+            return;
+        }
+
+        Reservation reservation = reservationRepository.findByHostId(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         reservationRepository.delete(reservation);

@@ -50,7 +50,7 @@ public class ReservationController {
 
     @DeleteMapping
     public ResponseEntity<Void> cancelReservation(@AuthUser User user) {
-        reservationService.deleteByHostId(user.getId());
+        reservationService.cancel(user.getId());
         return ResponseEntity.noContent().build();
     }
 }

@@ -6,6 +6,7 @@ import edu.skku.grabtable.reservation.domain.request.ReservationRequest;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.service.ReservationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/reservation")
+@RequestMapping("/v1/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -27,15 +28,16 @@ public class ReservationController {
             ReservationRequest reservationRequest
     ) {
         reservationService.createNewReservation(user.getId(), reservationRequest.getStoreId());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/{inviteCode}")
-    public void join(
+    public ResponseEntity<Void> join(
             @AuthUser User user,
             @PathVariable String inviteCode
     ) {
         reservationService.joinExistingReservation(user.getId(), inviteCode);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/me")

@@ -86,4 +86,21 @@ public class ReservationService {
             invitee.clearReservation();
         }
     }
+
+    public void confirmCurrentReservation(Long userId) {
+        Reservation reservation = reservationRepository.findByHostId(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+
+        //예약의 모든 사용자의 현재 주문이 존재하는지 검사
+        //TODO
+
+        //예약을 확정 처리
+        reservation.confirm();
+
+        //invitee들의 예약 연관관계 해제
+        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        for (User invitee : invitees) {
+            invitee.clearReservation();
+        }
+    }
 }

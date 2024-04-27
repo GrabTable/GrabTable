@@ -43,6 +43,11 @@ public class ReservationController {
         return reservationService.findByUserId(user.getId());
     }
 
+    @PostMapping("/confirm")
+    public void confirm(@AuthUser User user) {
+        reservationService.confirmCurrentReservation(user.getId());
+    }
+
     @DeleteMapping
     public ResponseEntity<Void> cancelReservation(@AuthUser User user) {
         reservationService.deleteByHostId(user.getId());

@@ -2,34 +2,31 @@ import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
 import { FaReact } from "react-icons/fa";
 import { LuGraduationCap } from "react-icons/lu";
-// import corpcommentImg from "@/public/corpcomment.png";
-// import rmtdevImg from "@/public/rmtdev.png";
-// import wordanalyticsImg from "@/public/wordanalytics.png";
 
 export const links = [
   {
     name: "Home",
-    hash: "#home",
+    hash: "/#home",
   },
   {
     name: "About",
-    hash: "#about",
+    hash: "/#about",
   },
   {
-    name: "Projects",
-    hash: "#projects",
+    name: "Restaurants",
+    hash: "/restaurants",
   },
   {
-    name: "Skills",
-    hash: "#skills",
+    name: "Reservations",
+    hash: "/reservations",
   },
   {
-    name: "Experience",
-    hash: "#experience",
+    name: "My page",
+    hash: "/myPage",
   },
   {
     name: "Contact",
-    hash: "#contact",
+    hash: "/#contact",
   },
 ] as const;
 

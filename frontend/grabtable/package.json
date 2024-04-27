@@ -15,10 +15,11 @@
     "add": "^2.0.6",
     "button": "^1.1.1",
     "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
+    "clsx": "^2.1.1",
     "cn": "^0.1.1",
     "framer-motion": "^11.0.28",
     "input": "^1.0.1",
+    "lucide-react": "^0.376.0",
     "motion": "^10.17.0",
     "next": "14.1.4",
     "next-auth": "^4.24.7",
@@ -27,7 +28,8 @@
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.10.1",
     "shadcn-ui": "^0.8.0",
-    "tailwind-merge": "^2.2.2"
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",

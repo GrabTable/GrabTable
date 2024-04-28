@@ -9,12 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Cart extends BaseTimeEntity {
 
     @Id
@@ -24,8 +26,9 @@ public class Cart extends BaseTimeEntity {
     @ManyToOne
     private User user;
 
-    @ManyToOne
-    private Menu menu;
+    private String menuName;
+
+    private Integer price;
 
     @ManyToOne
     private Order order;
@@ -34,8 +37,19 @@ public class Cart extends BaseTimeEntity {
 
     public Cart(User user, Menu menu, Integer quantity) {
         this.user = user;
-        this.menu = menu;
+        this.menuName = menu.getMenuName();
+        this.price = menu.getPrice();
         this.quantity = quantity;
+    }
+
+    public void modifyCart(Menu menu, Integer quantity) {
+        this.menuName = menu.getMenuName();
+        this.price = menu.getPrice();
+        this.quantity = quantity;
+    }
+
+    public int calculateTotalPrice() {
+        return this.price * this.quantity;
     }
 
     public void disconnectUser() {
@@ -44,5 +58,9 @@ public class Cart extends BaseTimeEntity {
 
     public void connectOrder(Order order) {
         this.order = order;
+    }
+
+    public void disconnectOrder() {
+        this.order = null;
     }
 }

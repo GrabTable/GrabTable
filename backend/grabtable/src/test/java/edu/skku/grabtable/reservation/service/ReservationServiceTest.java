@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.ReservationStatus;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
@@ -14,6 +13,7 @@ import edu.skku.grabtable.store.domain.StoreCategory;
 import edu.skku.grabtable.store.domain.StoreStatus;
 import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

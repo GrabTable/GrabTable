@@ -1,8 +1,8 @@
 package edu.skku.grabtable.user.service;
 
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.domain.request.UserUpdateRequest;
+import edu.skku.grabtable.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

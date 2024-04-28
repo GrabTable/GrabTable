@@ -1,4 +1,4 @@
-package edu.skku.grabtable.repository;
+package edu.skku.grabtable.order.repository;
 
 import edu.skku.grabtable.order.domain.Order;
 import org.springframework.data.jpa.repository.JpaRepository;

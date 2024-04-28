@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.ReservationStatus;

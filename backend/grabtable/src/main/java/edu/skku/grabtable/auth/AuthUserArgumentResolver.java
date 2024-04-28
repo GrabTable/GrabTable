@@ -4,7 +4,7 @@ import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.common.exception.InvalidJwtException;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,7 +1,7 @@
 package edu.skku.grabtable.reservation.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.reservation.domain.request.ReservationRequest;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.service.ReservationService;

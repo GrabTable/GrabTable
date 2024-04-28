@@ -12,6 +12,7 @@ import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.repository.MenuRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ public class CartService {
         return cartRepository.findByUserId(id);
     }
 
-    public void createCart(Long userId, CartRequest cartRequest) {
+    public Cart createCart(Long userId, CartRequest cartRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
         Menu menu = menuRepository.findById(cartRequest.getMenuId())
@@ -37,6 +38,8 @@ public class CartService {
 
         Cart cart = new Cart(user, menu, cartRequest.getQuantity());
         cartRepository.save(cart);
+
+        return cart;
     }
 
     public Order confirmCurrentCarts(Long id) {
@@ -47,5 +50,28 @@ public class CartService {
         Order order = new Order(currentCarts);
         orderRepository.save(order);
         return order;
+    }
+
+    public void modifyCart(Long id, Long cartId, CartRequest cartRequest) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
+        if (!Objects.equals(cart.getUser().getId(), id)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+        }
+        Menu menu = menuRepository.findById(cartRequest.getMenuId())
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
+
+        cart.modifyCart(menu, cartRequest.getQuantity());
+    }
+
+
+    public void deleteCart(Long id, Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
+        if (!Objects.equals(cart.getUser().getId(), id)) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+        }
+        cart.disconnectUser();
+        cartRepository.deleteById(cart.getId());
     }
 }

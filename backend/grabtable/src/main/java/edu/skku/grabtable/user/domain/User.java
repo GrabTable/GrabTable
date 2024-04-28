@@ -1,7 +1,7 @@
 package edu.skku.grabtable.user.domain;
 
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.domain.BaseTimeEntity;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.CascadeType;

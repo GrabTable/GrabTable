@@ -1,9 +1,9 @@
 package edu.skku.grabtable.reservation.domain;
 
-import edu.skku.grabtable.domain.BaseTimeEntity;
-import edu.skku.grabtable.domain.Order;
-import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
+import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.store.domain.Store;
+import edu.skku.grabtable.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

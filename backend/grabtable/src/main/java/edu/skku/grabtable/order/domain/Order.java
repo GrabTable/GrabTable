@@ -1,7 +1,8 @@
-package edu.skku.grabtable.domain;
+package edu.skku.grabtable.order.domain;
 
 
 import edu.skku.grabtable.cart.domain.Cart;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

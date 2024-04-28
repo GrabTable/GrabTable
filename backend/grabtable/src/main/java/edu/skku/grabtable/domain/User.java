@@ -1,5 +1,6 @@
 package edu.skku.grabtable.domain;
 
+import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -42,6 +43,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "cart", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Cart> carts = new ArrayList<>();
 
     @Builder
     public User(String username, String password, String email, String phone) {

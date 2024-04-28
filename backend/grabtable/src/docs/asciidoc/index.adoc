@@ -8,3 +8,4 @@
 include::review-controller-test.adoc[]
 include::login-controller-test.adoc[]
 include::store-controller-test.adoc[]
+include::reservation-controller-test.adoc[]

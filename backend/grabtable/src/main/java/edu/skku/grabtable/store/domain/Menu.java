@@ -36,4 +36,5 @@ public class Menu extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private MenuStatus status;
+
 }

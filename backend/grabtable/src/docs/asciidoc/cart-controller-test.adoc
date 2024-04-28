@@ -1,0 +1,41 @@
+== CartController
+
+=== 내 장바구니 조회 (GET /v1/cart/me)
+
+==== 요청
+
+include::{snippets}/cart-controller-test/get-carts/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/cart-controller-test/get-carts/http-response.adoc[]
+
+=== 장바구니 물품 추가 (POST /v1/cart)
+
+==== 요청
+
+include::{snippets}/cart-controller-test/create-cart/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/cart-controller-test/create-cart/http-response.adoc[]
+
+=== 장바구니 물품 수정(PATCH /v1/cart/{cartId})
+
+==== 요청
+
+include::{snippets}/cart-controller-test/modify-cart/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/cart-controller-test/modify-cart/http-response.adoc[]
+
+=== 장바구니 물품 삭제(POST /v1/cart/{cartId})
+
+==== 요청
+
+include::{snippets}/cart-controller-test/delete-cart/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/cart-controller-test/delete-cart/http-response.adoc[]

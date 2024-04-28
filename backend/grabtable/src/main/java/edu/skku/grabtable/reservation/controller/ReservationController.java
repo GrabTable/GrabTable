@@ -27,7 +27,7 @@ public class ReservationController {
             @AuthUser User user,
             ReservationRequest reservationRequest
     ) {
-        reservationService.createNewReservation(user.getId(), reservationRequest.getStoreId());
+        reservationService.createNewReservation(user, reservationRequest.getStoreId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -36,23 +36,24 @@ public class ReservationController {
             @AuthUser User user,
             @PathVariable String inviteCode
     ) {
-        reservationService.joinExistingReservation(user.getId(), inviteCode);
+        reservationService.joinExistingReservation(user, inviteCode);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/me")
     public ReservationDetailResponse findCurrentReservation(@AuthUser User user) {
-        return reservationService.findByUserId(user.getId());
+        return reservationService.findReservationByUser(user);
     }
 
     @PostMapping("/confirm")
-    public void confirm(@AuthUser User user) {
-        reservationService.confirmCurrentReservation(user.getId());
+    public ResponseEntity<Void> confirm(@AuthUser User user) {
+        reservationService.confirmCurrentReservation(user);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> cancelReservation(@AuthUser User user) {
-        reservationService.cancel(user.getId());
+        reservationService.cancel(user);
         return ResponseEntity.noContent().build();
     }
 }

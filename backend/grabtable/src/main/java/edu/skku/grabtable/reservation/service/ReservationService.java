@@ -24,14 +24,11 @@ public class ReservationService {
     private final UserRepository userRepository;
 
 
-    public void createNewReservation(Long userId, Long storeId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
+    public void createNewReservation(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
 
-        if (reservationRepository.existsByHostId(userId)) {
+        if (reservationRepository.existsByHostId(user.getId())) {
             throw new BadRequestException(ExceptionCode.ALREADY_HOSTING_USER);
         }
 
@@ -43,14 +40,11 @@ public class ReservationService {
         reservationRepository.save(reservation);
     }
 
-    public void joinExistingReservation(Long userId, String inviteCode) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
+    public void joinExistingReservation(User user, String inviteCode) {
         Reservation reservation = reservationRepository.findByInviteCode(inviteCode)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_RESERVATION_ID));
 
-        if (reservationRepository.existsByHostId(userId)) {
+        if (reservationRepository.existsByHostId(user.getId())) {
             throw new BadRequestException(ExceptionCode.ALREADY_HOSTING_USER);
         }
 
@@ -61,29 +55,23 @@ public class ReservationService {
         user.joinReservation(reservation);
     }
 
-    public ReservationDetailResponse findByUserId(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
+    public ReservationDetailResponse findReservationByUser(User user) {
         if (user.getInvitedReservation() != null) {
             return ReservationDetailResponse.of(user.getInvitedReservation());
         }
 
-        Reservation reservation = reservationRepository.findByHostId(userId)
+        Reservation reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
         return ReservationDetailResponse.of(reservation);
     }
 
-    public void cancel(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
+    public void cancel(User user) {
         if (user.getInvitedReservation() != null) {
             user.clearReservation();
             return;
         }
 
-        Reservation reservation = reservationRepository.findByHostId(userId)
+        Reservation reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         reservationRepository.delete(reservation);
@@ -95,8 +83,8 @@ public class ReservationService {
         }
     }
 
-    public void confirmCurrentReservation(Long userId) {
-        Reservation reservation = reservationRepository.findByHostId(userId)
+    public void confirmCurrentReservation(User user) {
+        Reservation reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //예약의 모든 사용자의 현재 주문이 존재하는지 검사

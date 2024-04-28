@@ -30,12 +30,9 @@ public class CartService {
         return cartRepository.findByUserId(id);
     }
 
-    public Cart createCart(Long userId, CartRequest cartRequest) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+    public Cart createCart(User user, CartRequest cartRequest) {
         Menu menu = menuRepository.findById(cartRequest.getMenuId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-
         Cart cart = new Cart(user, menu, cartRequest.getQuantity());
         cartRepository.save(cart);
 

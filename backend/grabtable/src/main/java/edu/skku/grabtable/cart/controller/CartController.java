@@ -29,7 +29,7 @@ public class CartController {
 
     @PostMapping()
     void addCart(@AuthUser User user, CartRequest cartRequest) {
-        cartService.createCart(user.getId(), cartRequest);
+        cartService.createCart(user, cartRequest);
     }
 
     @PatchMapping("/{cartId}")

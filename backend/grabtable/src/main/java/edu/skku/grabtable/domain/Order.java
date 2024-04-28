@@ -26,7 +26,7 @@ public class Order extends BaseTimeEntity {
 
     private String paymentMethod;
 
-    private Long totalPrice;
+    private Integer totalPrice;
 
     private String request;
 
@@ -37,7 +37,7 @@ public class Order extends BaseTimeEntity {
     private OrderType type;
 
     public Order(List<Cart> carts) {
-        totalPrice = 0L;
+        totalPrice = 0;
         for (Cart cart : carts) {
             cart.connectOrder(this);
             totalPrice += cart.calculateTotalPrice();

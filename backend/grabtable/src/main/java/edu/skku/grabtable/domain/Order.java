@@ -26,7 +26,7 @@ public class Order extends BaseTimeEntity {
 
     private String paymentMethod;
 
-    private Integer totalPrice;
+    private Long totalPrice;
 
     private String request;
 
@@ -36,13 +36,14 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private OrderType type;
 
-
     public Order(List<Cart> carts) {
-        totalPrice = 0;
+        totalPrice = 0L;
         for (Cart cart : carts) {
             cart.connectOrder(this);
-            totalPrice += cart.getMenu().getPrice() * cart.getQuantity();
+            totalPrice += cart.calculateTotalPrice();
         }
+    }
 
+    public Order() {
     }
 }

@@ -44,11 +44,27 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private OrderType type;
 
+    public Order(Reservation reservation, List<Cart> carts) {
+        this.reservation = reservation;
+        changeCartsMapping(carts);
+        this.totalPrice = calculateTotalPrice(carts);
+        this.status = OrderStatus.PENDING;
+    }
+
+
     public Order(List<Cart> carts) {
-        totalPrice = 0;
+        changeCartsMapping(carts);
+        this.totalPrice = calculateTotalPrice(carts);
+    }
+
+    private void changeCartsMapping(List<Cart> carts) {
         for (Cart cart : carts) {
             cart.connectOrder(this);
-            totalPrice += cart.calculateTotalPrice();
+            cart.disconnectUser();
         }
+    }
+
+    private int calculateTotalPrice(List<Cart> carts) {
+        return carts.stream().mapToInt(Cart::calculateTotalPrice).sum();
     }
 }

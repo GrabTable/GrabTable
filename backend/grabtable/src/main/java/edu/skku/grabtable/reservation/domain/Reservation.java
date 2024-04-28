@@ -16,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import java.util.UUID;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
@@ -23,6 +24,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @SQLDelete(sql = "UPDATE reservation SET status = 'CANCELED' WHERE id = ?")
 public class Reservation extends BaseTimeEntity {
     @Id

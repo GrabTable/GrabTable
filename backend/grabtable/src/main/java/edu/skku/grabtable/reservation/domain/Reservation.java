@@ -14,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.util.ArrayList;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -53,7 +54,7 @@ public class Reservation extends BaseTimeEntity {
         this.host = host;
         this.store = store;
         this.status = ReservationStatus.ONGOING;
-        this.sharedOrder = new Order();
+        this.sharedOrder = new Order(new ArrayList<>());
         this.inviteCode = createInviteCode();
     }
 

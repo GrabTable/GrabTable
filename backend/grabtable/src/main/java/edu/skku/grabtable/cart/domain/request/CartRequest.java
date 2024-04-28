@@ -1,12 +1,11 @@
 package edu.skku.grabtable.cart.domain.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class CartRequest {
     Long menuId;
-    Long orderId;
     Integer quantity;
-
-//    Long reservationId;
 }

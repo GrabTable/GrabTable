@@ -1,6 +1,8 @@
 package edu.skku.grabtable.domain;
 
+
 import edu.skku.grabtable.cart.domain.Cart;
+import edu.skku.grabtable.reservation.domain.Reservation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,9 +13,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.List;
+import lombok.Getter;
 
 @Entity
 @Table(name = "ORDERS")
+@Getter
 public class Order extends BaseTimeEntity {
 
     @Id

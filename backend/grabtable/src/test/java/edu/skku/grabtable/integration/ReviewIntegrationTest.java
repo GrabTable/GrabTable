@@ -1,7 +1,7 @@
 package edu.skku.grabtable.integration;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.review.domain.Review;
 import edu.skku.grabtable.review.domain.ReviewStatus;

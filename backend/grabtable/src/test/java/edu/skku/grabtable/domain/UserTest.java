@@ -2,6 +2,7 @@ package edu.skku.grabtable.domain;
 
 import edu.skku.grabtable.common.config.JpaAuditingConfig;
 import edu.skku.grabtable.repository.UserRepository;
+import edu.skku.grabtable.user.domain.User;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

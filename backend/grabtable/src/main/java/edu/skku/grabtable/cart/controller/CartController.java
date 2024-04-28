@@ -4,7 +4,7 @@ import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartRequest;
 import edu.skku.grabtable.cart.service.CartService;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;

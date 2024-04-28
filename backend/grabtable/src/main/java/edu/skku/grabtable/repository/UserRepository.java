@@ -1,6 +1,6 @@
 package edu.skku.grabtable.repository;
 
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import java.util.List;
 import java.util.Optional;

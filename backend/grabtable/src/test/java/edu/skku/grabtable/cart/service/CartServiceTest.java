@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartRequest;
 import edu.skku.grabtable.cart.repository.CartRepository;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.domain.MenuStatus;

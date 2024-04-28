@@ -65,7 +65,7 @@ public class KakaoOAuthProvider {
                 KakaoUserInfo.class,
                 params
         );
-        
+
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         }

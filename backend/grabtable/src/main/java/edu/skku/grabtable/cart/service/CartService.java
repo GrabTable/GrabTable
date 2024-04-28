@@ -6,7 +6,7 @@ import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.domain.Order;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.repository.OrderRepository;
 import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.store.domain.Menu;

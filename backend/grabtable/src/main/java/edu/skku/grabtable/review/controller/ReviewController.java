@@ -1,7 +1,7 @@
 package edu.skku.grabtable.review.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;

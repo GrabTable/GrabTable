@@ -2,7 +2,7 @@ package edu.skku.grabtable.cart.domain;
 
 import edu.skku.grabtable.domain.BaseTimeEntity;
 import edu.skku.grabtable.domain.Order;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.store.domain.Menu;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

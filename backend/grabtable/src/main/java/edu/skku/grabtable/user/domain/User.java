@@ -1,6 +1,7 @@
-package edu.skku.grabtable.domain;
+package edu.skku.grabtable.user.domain;
 
 import edu.skku.grabtable.cart.domain.Cart;
+import edu.skku.grabtable.domain.BaseTimeEntity;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.CascadeType;
@@ -80,6 +81,13 @@ public class User extends BaseTimeEntity {
 
     public void clearCarts() {
         //TODO
+    }
+
+    public void update(String username, String email, String phone, String profileImageUrl) {
+        this.email = email;
+        this.profileImageUrl = profileImageUrl;
+        this.phone = phone;
+        this.username = username;
     }
 
     public void clearReservation() {

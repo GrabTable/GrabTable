@@ -1,5 +1,7 @@
 package edu.skku.grabtable.reservation.domain.response;
 
+import edu.skku.grabtable.order.domain.response.OrderResponse;
+import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import java.util.List;
 import lombok.AllArgsConstructor;

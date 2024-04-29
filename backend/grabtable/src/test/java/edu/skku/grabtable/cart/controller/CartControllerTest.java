@@ -45,8 +45,8 @@ public class CartControllerTest extends ControllerTest {
     @DisplayName("내 장바구니 목록을 조회할 수 있다")
     void getCarts() throws Exception {
         //given
-        Cart cart = new Cart(1L, null, "menuName", 10000, null, 1);
-        Cart cart2 = new Cart(2L, null, "menuName", 10000, null, 1);
+        Cart cart = new Cart(1L, null, "menuName", 10000, null, null, 1);
+        Cart cart2 = new Cart(2L, null, "menuName", 10000, null, null, 1);
         List<Cart> carts = List.of(cart, cart2);
         when(cartService.getCurrentCarts(any()))
                 .thenReturn(carts);
@@ -65,7 +65,7 @@ public class CartControllerTest extends ControllerTest {
     @DisplayName("장바구니에 주문 목록을 추가할 수 있다")
     void createCart() throws Exception {
         //given
-        final Cart cart = new Cart(1L, null, "menuName", 10000, null, 1);
+        final Cart cart = new Cart(1L, null, "menuName", 10000, null, null, 1);
 
         //when & then
         when(cartService.createCart(any(), any())).thenReturn(cart);

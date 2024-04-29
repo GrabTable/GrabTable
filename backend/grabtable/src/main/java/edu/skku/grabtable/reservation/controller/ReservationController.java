@@ -1,10 +1,12 @@
 package edu.skku.grabtable.reservation.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.reservation.domain.request.ReservationRequest;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.service.ReservationService;
+import edu.skku.grabtable.user.domain.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,5 +57,10 @@ public class ReservationController {
     public ResponseEntity<Void> cancelReservation(@AuthUser User user) {
         reservationService.cancel(user);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{reservationId}/orders")
+    public List<OrderResponse> findAllOrders(@PathVariable Long reservationId) {
+        return reservationService.findAllOrdersByReservationId(reservationId);
     }
 }

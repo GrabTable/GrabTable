@@ -1,4 +1,6 @@
-// TODO :로그인 상태 관리 -> 안되어 있으면 리다이랙트
-export default () => {
-  console.log('middle')
+import { NextRequest } from 'next/server'
+import { updateSession } from './lib/next-auth/session'
+
+export async function middleware(request: NextRequest) {
+  return await updateSession(request)
 }

@@ -20,7 +20,10 @@ public enum ExceptionCode {
 
     ALREADY_HOSTING_USER(4001, "이미 예약을 생성한 유저입니다."),
     ALREADY_INVITED_USER(4002, "이미 예약에 초대된 유저입니다."),
-    NO_RESERVATION_USER(4003, "현재 진행 중인 예약이 존재하지 않는 유저입니다.");
+    NO_RESERVATION_USER(4003, "현재 진행 중인 예약이 존재하지 않는 유저입니다."),
+
+    NOT_EXIST_CURRENT_CART(5001, "사용자의 장바구니가 비어 있습니다."),
+    FAILED_TO_VALIDATE_PAYMENT(5002, "결제 검증에 실패했습니다.");
 
     private final int code;
     private final String message;

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
@@ -34,12 +34,13 @@ import {
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { usePathname, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { getSession } from '@/lib/next-auth/session'
 
 
-const restaurant = {
+const restaurant_mock = {
   id: 1,
   name: '봉수육',
   address: '수원시 장안구 서부로 2066',
@@ -50,7 +51,7 @@ const restaurant = {
   category: '한식'
 }
 
-const reviews = [
+const reviews_mock = [
   {
     id: 1,
     profile_image: '/favicon.ico',
@@ -93,7 +94,30 @@ const reviews = [
   }
 ]
 
-export default function Project() {
+type Category = 'KOREAN' | 'ASIAN' | 'WESTERN' | 'CHINESE' | 'JAPANESE'
+
+type Restaurant = {
+  id: number
+  storeName: string
+  address: string
+  storePictureUrl: string
+  phone: string
+  description: string
+  category: Category
+}
+
+type Review = {
+  id : string
+  username: string
+  storeName: string
+  reviewPlatform: string
+  message: string
+  rating: number
+}
+
+type Reviews = Review[]
+
+export default function Restaurant() {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -102,9 +126,79 @@ export default function Project() {
   const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1])
   const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1])
   const [date, setDate] = React.useState<Date>()
-  const pathname = usePathname()
   const router = useRouter()
+  const params = useParams<{id: string}>()
+  const [restaurant, setRestaurant] = useState<Restaurant>()
+  const store_id = params['id']
 
+
+  // useEffect(() => {
+  //   fetchStore()
+  // }, [restaurant])
+
+  const fetchStore = async() => {
+    try {
+      const response = await fetch(`http://localhost:8000/v1/stores/${store_id}`)
+      if (!response.ok){
+        throw new Error('error')
+      }
+      const data: Restaurant = await response.json()
+      setRestaurant(data)
+    }catch(error){
+      console.error("error", error)
+    }
+
+  }
+
+  const [reviews, setReviews] = useState<Reviews>([])
+
+  const fetchReview = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/v1/reviews/stores/${store_id}`)
+      if (!response.ok){
+        throw new Error('error')
+      }
+      const data = await response.json()
+      setReviews(data)
+    }catch(error){
+      console.error("error", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchStore()
+    fetchReview()
+  }, [])
+
+  console.log(restaurant)
+  console.log(reviews)
+
+  const makeReservation = async () => {
+    const body= JSON.stringify({
+      storeId: store_id
+    })
+    try {
+      const response = await fetch(`http://localhost:8000/v1/reservations`, {
+        method: "POST",
+        body: body,
+        headers:{
+          "Authorization" : accessToken,
+        }
+      }
+      )
+      if (!response.ok){
+        throw new Error('error')
+      }
+      
+      router.push('/reservation')
+    }catch(error){
+      console.error("error", error)
+    }
+  }
+
+  if(!restaurant){
+    return <></>
+  }
   return (
     <motion.div
       ref={ref}
@@ -117,7 +211,7 @@ export default function Project() {
       <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
         <div className="pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 sm:max-w-[50%] flex flex-col h-full">
           <Badge className='w-fit'>{restaurant.category}</Badge>
-          <h3 className="text-2xl font-semibold">{restaurant.name}</h3>
+          <h3 className="text-2xl font-semibold">{restaurant.storeName}</h3>
           <p>{restaurant.address}</p>
           <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
             {restaurant.description}
@@ -125,9 +219,9 @@ export default function Project() {
           <p>{restaurant.phone}</p>
         </div>
 
-        <Image
-          src={restaurant.picture_url}
-          alt="Project I worked on"
+        {/* <Image
+          src={restaurant.storePictureUrl ? restaurant.storePictureUrl: ''}
+          alt="Restaurant I worked on"
           width={500}
           height={500}
           quality={95}
@@ -137,7 +231,7 @@ export default function Project() {
         group-hover:-translate-x-3
         group-hover:translate-y-3
         group-hover:-rotate-2"
-        />
+        /> */}
       </section>
 
       <Dialog>
@@ -157,7 +251,7 @@ export default function Project() {
             <Input type='number' min={0} defaultValue={1} className='w-[10rem]'/>
           </div>
           <DialogFooter>
-          <Button type="submit" onClick={() => router.push(pathname+'/selectmenu')}>Save changes</Button>
+          <Button type="submit" onClick={makeReservation}>Save changes</Button>
         </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -185,13 +279,13 @@ export default function Project() {
       </PopoverContent>
     </Popover>
       
-      <Table>
+      {/* <Table>
         <TableCaption>A list of your recent invoices.</TableCaption>
         <TableBody>
-          {reviews.map((review) => (
+          {reviews.map((review: Review) => (
             <TableRow key={review.id}>
               <TableCell className='w-[10rem]'>
-                <Image src={review.profile_image} width={100} height={100} alt={''} className='rounded-full' />
+                <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
               </TableCell>
               <TableCell className='flex items-start flex-col'>
                 <div className='flex items-center mt-4'>
@@ -201,12 +295,12 @@ export default function Project() {
                 <p className="mt-2">
                   {review.message}
                 </p>
-                <p className='mt-4 text-xs'>{review.review_platform}에서 작성된 리뷰입니다.</p>
+                <p className='mt-4 text-xs'>{review.reviewPlatform}에서 작성된 리뷰입니다.</p>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </Table> */}
 
     </motion.div>
   )

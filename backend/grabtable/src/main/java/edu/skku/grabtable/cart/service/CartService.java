@@ -30,13 +30,19 @@ public class CartService {
         return cartRepository.findByUserId(user.getId()).stream().map(CartResponse::of).toList();
     }
 
-    public Cart createCart(User user, CartRequest cartRequest) {
-        Menu menu = menuRepository.findById(cartRequest.getMenuId())
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        Cart cart = new Cart(user, menu, cartRequest.getQuantity());
-        cartRepository.save(cart);
+    public void createCart(User user, Long menuId, Integer quantity) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_MENU_ID));
 
-        return cart;
+        //사용자의 현재 카트에 이미 같은 이름의 메뉴가 존재하면 예외 처리
+        boolean alreadyExist = cartRepository.existsByUserIdAndMenuName(user.getId(), menu.getMenuName());
+
+        if (alreadyExist) {
+            throw new BadRequestException(ExceptionCode.ALREADY_EXISTING_CART);
+        }
+
+        Cart cart = new Cart(user, menu, quantity);
+        cartRepository.save(cart);
     }
 
     public void updateCart(User user, CartUpdateRequest cartUpdateRequest) {

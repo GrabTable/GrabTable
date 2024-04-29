@@ -24,7 +24,7 @@ public class CartController {
 
     @GetMapping("/me")
     List<Cart> getCart(@AuthUser User user) {
-        return cartService.getCurrentCarts(user.getId());
+        return cartService.getCurrentCarts(user);
     }
 
     @PostMapping()

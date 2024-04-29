@@ -1,9 +1,9 @@
 package edu.skku.grabtable.reservation.domain;
 
-import edu.skku.grabtable.domain.BaseTimeEntity;
-import edu.skku.grabtable.domain.Order;
-import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
+import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.store.domain.Store;
+import edu.skku.grabtable.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,7 +41,7 @@ public class Reservation extends BaseTimeEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "shared_order_id")
-    private Order sharedOrder;
+    private SharedOrder sharedOrder;
 
     private String inviteCode;
 
@@ -53,7 +53,7 @@ public class Reservation extends BaseTimeEntity {
         this.host = host;
         this.store = store;
         this.status = ReservationStatus.ONGOING;
-        this.sharedOrder = new Order();
+        this.sharedOrder = SharedOrder.of(this);
         this.inviteCode = createInviteCode();
     }
 

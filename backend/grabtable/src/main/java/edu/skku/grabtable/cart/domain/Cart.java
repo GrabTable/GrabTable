@@ -1,9 +1,10 @@
 package edu.skku.grabtable.cart.domain;
 
-import edu.skku.grabtable.domain.BaseTimeEntity;
-import edu.skku.grabtable.domain.Order;
-import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
+import edu.skku.grabtable.order.domain.Order;
+import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.store.domain.Menu;
+import edu.skku.grabtable.user.domain.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +34,9 @@ public class Cart extends BaseTimeEntity {
     @ManyToOne
     private Order order;
 
+    @ManyToOne
+    private SharedOrder sharedOrder;
+
     private Integer quantity;
 
     public Cart(User user, Menu menu, Integer quantity) {
@@ -58,9 +62,5 @@ public class Cart extends BaseTimeEntity {
 
     public void connectOrder(Order order) {
         this.order = order;
-    }
-
-    public void disconnectOrder() {
-        this.order = null;
     }
 }

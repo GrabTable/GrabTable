@@ -1,0 +1,11 @@
+== OrderController
+
+=== 신규 주문 생성 (POST /v1/orders)
+
+==== 요청
+
+include::{snippets}/order-controller-test/create/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/order-controller-test/create/http-response.adoc[]

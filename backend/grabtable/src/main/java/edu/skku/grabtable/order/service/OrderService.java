@@ -1,7 +1,7 @@
 package edu.skku.grabtable.order.service;
 
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.cart.domain.response.CartResponse;
+import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.order.domain.Order;
@@ -10,7 +10,6 @@ import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.user.domain.User;
-import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ReservationRepository reservationRepository;
-    private final UserRepository userRepository;
+    private final CartRepository cartRepository;
 
     public OrderResponse create(User user) {
         Reservation invitedReservation = user.getInvitedReservation();
@@ -38,10 +37,12 @@ public class OrderService {
     }
 
     private OrderResponse buildOrderResponse(User user, Reservation reservation) {
-        List<Cart> carts = user.getCarts();
-        Order order = new Order(reservation, carts);
+        List<Cart> carts = cartRepository.findByUserId(user.getId());
+        if (carts.isEmpty()) {
+            throw new BadRequestException(ExceptionCode.NOT_EXIST_CURRENT_CART);
+        }
+        Order order = new Order(user, reservation, carts);
         orderRepository.save(order);
-        List<CartResponse> cartDTOs = carts.stream().map(CartResponse::of).toList();
-        return OrderResponse.of(order, user.getId(), cartDTOs);
+        return OrderResponse.of(order);
     }
 }

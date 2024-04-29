@@ -1,12 +1,10 @@
 package edu.skku.grabtable.order.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.order.service.OrderService;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
+import edu.skku.grabtable.order.service.OrderService;
 import edu.skku.grabtable.user.domain.User;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +21,4 @@ public class OrderController {
         return orderService.create(user);
     }
 
-    @GetMapping
-    public List<OrderResponse> findAll() {
-
-    }
-
-    @GetMapping()
 }

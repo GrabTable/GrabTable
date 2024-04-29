@@ -26,8 +26,8 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
 
-    public final List<Cart> getCurrentCarts(Long id) {
-        return cartRepository.findByUserId(id);
+    public final List<Cart> getCurrentCarts(User user) {
+        return cartRepository.findByUserId(user.getId());
     }
 
     public Cart createCart(User user, CartRequest cartRequest) {

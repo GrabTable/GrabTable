@@ -1,9 +1,7 @@
 package edu.skku.grabtable.common;
 
 import edu.skku.grabtable.auth.AuthUserArgumentResolver;
-import edu.skku.grabtable.auth.JwtUtil;
 import edu.skku.grabtable.common.config.RestDocsConfiguration;
-import edu.skku.grabtable.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +26,6 @@ public abstract class ControllerTest {
 
     @MockBean
     protected AuthUserArgumentResolver authUserArgumentResolver;
-
-    @Autowired
-    protected JwtUtil jwtUtil;
-
-    @MockBean
-    protected UserRepository userRepository;
 
     @Autowired
     protected RestDocumentationResultHandler restDocs;

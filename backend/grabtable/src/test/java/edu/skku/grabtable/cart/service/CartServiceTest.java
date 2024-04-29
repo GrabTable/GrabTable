@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.domain.MenuStatus;
@@ -51,7 +52,7 @@ public class CartServiceTest {
                 .thenReturn(List.of(cart, cart2));
 
         //when
-        List<Cart> result = cartService.getCurrentCarts(user);
+        List<CartResponse> result = cartService.getCurrentCarts(user);
 
         //then
         assertThat(result.size()).isEqualTo(2);

@@ -2,6 +2,7 @@ package edu.skku.grabtable.cart.service;
 
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
@@ -26,8 +27,8 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
 
-    public List<Cart> getCurrentCarts(User user) {
-        return cartRepository.findByUserId(user.getId());
+    public List<CartResponse> getCurrentCarts(User user) {
+        return cartRepository.findByUserId(user.getId()).stream().map(CartResponse::of).toList();
     }
 
     public Cart createCart(User user, CartRequest cartRequest) {

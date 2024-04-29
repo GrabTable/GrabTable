@@ -1,8 +1,8 @@
 package edu.skku.grabtable.cart.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.service.CartService;
 import edu.skku.grabtable.user.domain.User;
 import java.util.List;
@@ -23,7 +23,7 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/me")
-    List<Cart> getCart(@AuthUser User user) {
+    List<CartResponse> getCart(@AuthUser User user) {
         return cartService.getCurrentCarts(user);
     }
 

@@ -1,6 +1,6 @@
 package edu.skku.grabtable.store.domain;
 
-import edu.skku.grabtable.domain.BaseTimeEntity;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.review.domain.Review;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

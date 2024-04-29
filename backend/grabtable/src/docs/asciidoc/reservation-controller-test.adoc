@@ -1,0 +1,59 @@
+== ReservationController
+
+=== 신규 예약 생성 (POST /v1/reservations)
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/create/http-request.adoc[]
+
+==== 요청 필
+
+include::{snippets}/reservation-controller-test/create/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/create/http-response.adoc[]
+
+=== 기존 예약 참여 (POST /v1/reservations/\{inviteCode\})
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/join/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/join/http-response.adoc[]
+
+=== 유저의 현재 예약 조회 (GET /v1/reservations/me)
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/me/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/me/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-controller-test/me/response-fields.adoc[]
+
+=== 호스트의 현재 예약 확정 (POST /v1/reservations/confirm)
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/confirm/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/confirm/http-response.adoc[]
+
+=== 유저의 현재 예약 취소/나가기 (DELETE /v1/reservations)
+
+==== 요청
+
+include::{snippets}/reservation-controller-test/cancel/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-controller-test/cancel/http-response.adoc[]

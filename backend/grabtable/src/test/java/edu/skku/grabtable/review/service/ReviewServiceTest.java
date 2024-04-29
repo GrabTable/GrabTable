@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import edu.skku.grabtable.domain.User;
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.review.domain.Review;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;
 import edu.skku.grabtable.review.domain.response.ReviewSummaryResponse;
@@ -14,6 +12,8 @@ import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.domain.StoreCategory;
 import edu.skku.grabtable.store.domain.StoreStatus;
 import edu.skku.grabtable.store.repository.StoreRepository;
+import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

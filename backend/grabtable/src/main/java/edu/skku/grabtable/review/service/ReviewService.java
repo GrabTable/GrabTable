@@ -2,8 +2,6 @@ package edu.skku.grabtable.review.service;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.domain.User;
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.review.domain.Review;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;
@@ -11,6 +9,8 @@ import edu.skku.grabtable.review.domain.response.ReviewSummaryResponse;
 import edu.skku.grabtable.review.repository.ReviewRepository;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.repository.StoreRepository;
+import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

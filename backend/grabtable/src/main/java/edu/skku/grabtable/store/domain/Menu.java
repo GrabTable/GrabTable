@@ -1,6 +1,6 @@
 package edu.skku.grabtable.store.domain;
 
-import edu.skku.grabtable.domain.BaseTimeEntity;
+import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,4 +36,5 @@ public class Menu extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private MenuStatus status;
+
 }

@@ -1,8 +1,6 @@
 package edu.skku.grabtable.integration;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
-import edu.skku.grabtable.domain.User;
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.review.domain.Review;
 import edu.skku.grabtable.review.domain.ReviewStatus;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
@@ -11,6 +9,8 @@ import edu.skku.grabtable.review.repository.ReviewRepository;
 import edu.skku.grabtable.review.service.ReviewService;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.repository.StoreRepository;
+import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

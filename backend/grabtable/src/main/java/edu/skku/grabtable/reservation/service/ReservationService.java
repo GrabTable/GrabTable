@@ -92,15 +92,22 @@ public class ReservationService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //예약의 모든 사용자의 현재 주문이 존재하는지 검사
-        //TODO
+        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        List<Order> orders = orderRepository.findByReservation(reservation);
+        validateLengthOfInviteesAndOrders(invitees, orders);
 
         //예약을 확정 처리
         reservation.confirm();
 
         //invitee들의 예약 연관관계 해제
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
             invitee.clearReservation();
+        }
+    }
+
+    private void validateLengthOfInviteesAndOrders(List<User> invitees, List<Order> orders) {
+        if (invitees.size() + 1 != orders.size()) {
+            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
         }
     }
 

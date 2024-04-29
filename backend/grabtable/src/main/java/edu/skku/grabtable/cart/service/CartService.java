@@ -1,12 +1,11 @@
 package edu.skku.grabtable.cart.service;
 
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.request.CartUpdateRequest;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.repository.MenuRepository;
@@ -40,26 +39,15 @@ public class CartService {
         return cart;
     }
 
-    public Order confirmCurrentCarts(Long id) {
-        List<Cart> currentCarts = cartRepository.findByUserId(id);
-        for (Cart currentCart : currentCarts) {
-            currentCart.disconnectUser();
-        }
-        Order order = new Order(currentCarts);
-        orderRepository.save(order);
-        return order;
-    }
+    public void updateCart(User user, CartUpdateRequest cartUpdateRequest) {
+        Cart cart = cartRepository.findById(cartUpdateRequest.getCartId())
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
-    public void modifyCart(Long id, Long cartId, CartRequest cartRequest) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        if (!Objects.equals(cart.getUser().getId(), id)) {
-            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+        if (!Objects.equals(cart.getUser().getId(), user.getId())) {
+            throw new BadRequestException(ExceptionCode.UNAUTHORIZED_ACCESS);
         }
-        Menu menu = menuRepository.findById(cartRequest.getMenuId())
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
 
-        cart.modifyCart(menu, cartRequest.getQuantity());
+        cart.changeQuantity(cartUpdateRequest.getQuantity());
     }
 
 

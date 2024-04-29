@@ -10,10 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("v1/user")
+@RequestMapping("/v1/user")
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PatchMapping()
-    ResponseEntity<Void> modifyUser(@AuthUser User user, @Valid UserUpdateRequest userRequest) {
+    ResponseEntity<Void> modifyUser(@AuthUser User user, @Valid @RequestBody UserUpdateRequest userRequest) {
         userService.modifyUser(user, userRequest);
         return ResponseEntity.ok().build();
     }

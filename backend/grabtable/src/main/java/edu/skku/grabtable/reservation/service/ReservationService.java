@@ -2,13 +2,16 @@ package edu.skku.grabtable.reservation.service;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.user.domain.User;
-import edu.skku.grabtable.repository.UserRepository;
+import edu.skku.grabtable.order.domain.Order;
+import edu.skku.grabtable.order.domain.response.OrderResponse;
+import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.repository.StoreRepository;
+import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
+    private final OrderRepository orderRepository;
 
 
     public void createNewReservation(User user, Long storeId) {
@@ -98,5 +102,12 @@ public class ReservationService {
         for (User invitee : invitees) {
             invitee.clearReservation();
         }
+    }
+
+    public List<OrderResponse> findAllOrdersByReservationId(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_RESERVATION_ID));
+        List<Order> orders = orderRepository.findByReservation(reservation);
+        return orders.stream().map(OrderResponse::of).toList();
     }
 }

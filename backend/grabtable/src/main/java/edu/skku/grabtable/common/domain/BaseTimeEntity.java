@@ -1,4 +1,4 @@
-package edu.skku.grabtable.domain;
+package edu.skku.grabtable.common.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

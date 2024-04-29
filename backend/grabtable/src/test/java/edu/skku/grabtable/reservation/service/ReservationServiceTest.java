@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import edu.skku.grabtable.common.exception.BadRequestException;
-import edu.skku.grabtable.user.domain.User;
-import edu.skku.grabtable.repository.UserRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.ReservationStatus;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
@@ -14,6 +12,8 @@ import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.domain.StoreCategory;
 import edu.skku.grabtable.store.domain.StoreStatus;
 import edu.skku.grabtable.store.repository.StoreRepository;
+import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +43,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("기존 예약의 호스트가 새로운 예약 생성 시 실패한다.")
     void host_create_fail() {
-        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>());
+        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
+                new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
@@ -64,7 +65,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("기존 예약의 호스트가 새로운 예약 참여 시 실패한다.")
     void host_participate_fail() {
-        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>());
+        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
+                new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
@@ -85,7 +87,8 @@ class ReservationServiceTest {
     @DisplayName("기존 예약의 참여자가 새로운 예약 생성 시 실패한다.")
     void invitee_create_fail() {
         Reservation reservation = new Reservation(1L, null, null, null, null, ReservationStatus.ONGOING);
-        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>());
+        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
+                new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
@@ -106,7 +109,8 @@ class ReservationServiceTest {
     void invitee_participate_fail() {
         Reservation reservation = new Reservation(1L, null, null, null, null, ReservationStatus.ONGOING);
         Reservation reservation2 = new Reservation(2L, null, null, null, null, ReservationStatus.ONGOING);
-        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>());
+        User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
+                new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());

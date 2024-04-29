@@ -25,6 +25,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.10.1",
     "shadcn-ui": "^0.8.0",
     "tailwind-merge": "^2.2.2"
   },

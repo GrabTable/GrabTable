@@ -13,7 +13,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,6 +36,9 @@ public class Reservation extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id")
     private User host;
+
+    @OneToMany(mappedBy = "invitedReservation")
+    private List<User> invitees;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")

@@ -27,7 +27,6 @@ public class ReservationIntegrationTest {
     @Test
     @DisplayName("유저 ID로 예약 찾을 시 현재 예약 정보를 확인할 수 있다.")
     void findReservationDetailInfo() {
-        //TODO: ReservationService.findReservationByUser의 반환 응답이 미구현 상태
     }
 
 }

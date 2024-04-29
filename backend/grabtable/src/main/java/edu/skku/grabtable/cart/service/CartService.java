@@ -26,7 +26,7 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
 
-    public final List<Cart> getCurrentCarts(User user) {
+    public List<Cart> getCurrentCarts(User user) {
         return cartRepository.findByUserId(user.getId());
     }
 

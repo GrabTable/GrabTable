@@ -60,13 +60,24 @@ public class ReservationService {
     }
 
     public ReservationDetailResponse findReservationByUser(User user) {
-        if (user.getInvitedReservation() != null) {
-            return ReservationDetailResponse.of(user.getInvitedReservation());
+        Reservation reservation = user.getInvitedReservation();
+
+        if (reservation != null) {
+            List<OrderResponse> orders = orderRepository.findByReservation(reservation)
+                    .stream()
+                    .map(OrderResponse::of)
+                    .toList();
+            return ReservationDetailResponse.of(reservation, orders);
         }
 
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+        reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
-        return ReservationDetailResponse.of(reservation);
+
+        List<OrderResponse> orders = orderRepository.findByReservation(reservation)
+                .stream()
+                .map(OrderResponse::of)
+                .toList();
+        return ReservationDetailResponse.of(reservation, orders);
     }
 
     public void cancel(User user) {

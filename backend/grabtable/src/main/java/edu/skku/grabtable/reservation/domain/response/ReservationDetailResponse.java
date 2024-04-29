@@ -12,20 +12,21 @@ import lombok.Getter;
 public class ReservationDetailResponse {
 
     private Long id;
-    private UserInfoResponse host;
-    private List<UserInfoResponse> invitees;
+    private UserCartsInfoResponse host;
+    private List<UserCartsInfoResponse> invitees;
     private String inviteCode;
     private SharedOrderResponse sharedOrder;
     private List<OrderResponse> orders;
 
-    public static ReservationDetailResponse of(Reservation reservation) {
+    public static ReservationDetailResponse of(Reservation reservation, List<OrderResponse> orders) {
         return new ReservationDetailResponse(
+                //TODO
                 reservation.getId(),
-                null,
-                null,
+                UserCartsInfoResponse.of(reservation.getHost()),
+                reservation.getInvitees().stream().map(UserCartsInfoResponse::of).toList(),
                 reservation.getInviteCode(),
                 null,
-                null
+                orders
         );
     }
 }

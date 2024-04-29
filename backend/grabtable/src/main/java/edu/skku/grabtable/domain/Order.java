@@ -1,5 +1,8 @@
 package edu.skku.grabtable.domain;
 
+
+import edu.skku.grabtable.cart.domain.Cart;
+import edu.skku.grabtable.reservation.domain.Reservation;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,9 +12,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.List;
+import lombok.Getter;
 
 @Entity
 @Table(name = "ORDERS")
+@Getter
 public class Order extends BaseTimeEntity {
 
     @Id
@@ -34,4 +40,14 @@ public class Order extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private OrderType type;
 
+    public Order(List<Cart> carts) {
+        totalPrice = 0;
+        for (Cart cart : carts) {
+            cart.connectOrder(this);
+            totalPrice += cart.calculateTotalPrice();
+        }
+    }
+
+    public Order() {
+    }
 }

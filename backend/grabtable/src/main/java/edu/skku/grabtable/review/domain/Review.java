@@ -1,7 +1,7 @@
 package edu.skku.grabtable.review.domain;
 
 import edu.skku.grabtable.domain.BaseTimeEntity;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.store.domain.Store;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

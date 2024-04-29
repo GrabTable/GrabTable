@@ -22,7 +22,7 @@ export const links = [
   },
   {
     name: "My page",
-    hash: "/myPage",
+    hash: "/mypage",
   },
   {
     name: "Contact",

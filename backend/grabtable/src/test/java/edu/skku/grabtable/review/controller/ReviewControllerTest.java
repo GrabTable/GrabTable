@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.common.ControllerTest;
-import edu.skku.grabtable.domain.User;
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.review.domain.ReviewPlatform;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;

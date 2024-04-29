@@ -1,4 +1,4 @@
-package edu.skku.grabtable.payment;
+package edu.skku.grabtable.order.config;
 
 import com.siot.IamportRestClient.IamportClient;
 import org.springframework.beans.factory.annotation.Value;

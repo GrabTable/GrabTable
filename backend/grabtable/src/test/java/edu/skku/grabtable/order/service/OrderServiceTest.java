@@ -8,7 +8,9 @@ import static org.mockito.BDDMockito.given;
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
+import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
+import edu.skku.grabtable.order.infrastructure.PaymentValidator;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.ReservationStatus;
@@ -39,6 +41,8 @@ class OrderServiceTest {
     @Mock
     CartRepository cartRepository;
 
+    @Mock
+    PaymentValidator paymentValidator;
     @InjectMocks
     OrderService orderService;
 
@@ -50,7 +54,7 @@ class OrderServiceTest {
         Cart cart = new Cart(1L, user, "coke", 2000, null, null, 1);
         user.getCarts().add(cart);
         Reservation reservation = new Reservation(1L, user, null, null, "code", ReservationStatus.ONGOING);
-
+        PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
         //given
         given(reservationRepository.findByHostId(any()))
                 .willReturn(Optional.of(reservation));
@@ -58,7 +62,7 @@ class OrderServiceTest {
                 .willReturn(List.of(cart));
 
         //when
-        OrderResponse orderResponse = orderService.create(user);
+        OrderResponse orderResponse = orderService.create(user, paymentRequest);
 
         //then
         assertThat(orderResponse.getStatus()).isEqualTo("PENDING");
@@ -70,14 +74,15 @@ class OrderServiceTest {
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
         Reservation reservation = new Reservation(1L, user, null, null, "code", ReservationStatus.ONGOING);
+        PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
 
         //given
         given(reservationRepository.findByHostId(any()))
                 .willReturn(Optional.of(reservation));
         given(cartRepository.findByUserId(any()))
                 .willReturn(List.of());
-        //when
-        assertThatThrownBy(() -> orderService.create(user))
+        //when,
+        assertThatThrownBy(() -> orderService.create(user, paymentRequest))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("사용자의 장바구니가 비어 있습니다.");
     }

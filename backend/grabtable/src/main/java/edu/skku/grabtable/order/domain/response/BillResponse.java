@@ -1,10 +1,9 @@
-package edu.skku.grabtable.payment.domain.response;
+package edu.skku.grabtable.order.domain.response;
 
-import edu.skku.grabtable.payment.domain.Bill;
+import edu.skku.grabtable.order.domain.Bill;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.math.BigDecimal;
 
 @AllArgsConstructor
 @Getter
@@ -21,6 +20,7 @@ public class BillResponse {
     private BigDecimal amount;
 
     public static BillResponse of(Bill bill) {
-        return new BillResponse(bill.getId(), bill.getImpUid(), bill.getMerchantUid(), bill.getReceiptUrl(), bill.getAmount());
+        return new BillResponse(bill.getId(), bill.getImpUid(), bill.getMerchantUid(), bill.getReceiptUrl(),
+                bill.getAmount());
     }
 }

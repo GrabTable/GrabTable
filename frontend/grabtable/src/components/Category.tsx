@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { Button } from './ui/Button'
+import { Button } from './ui/button'
 import Link from 'next/link'
 import { BsArrowRight } from 'react-icons/bs'
 import CategoryLink from './ui/CategoryLink'

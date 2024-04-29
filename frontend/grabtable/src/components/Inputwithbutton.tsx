@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, ChangeEvent } from 'react'
-import { Button, buttonVariants } from '@/components/ui/Button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { motion } from 'framer-motion'

@@ -1,0 +1,22 @@
+== UserController
+
+=== 내 정보 조회 (GET /v1/user/me)
+
+==== 요청
+
+include::{snippets}/user-controller-test/get-me-test/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/user-controller-test/get-me-test/http-response.adoc[]
+
+=== 내 정보 수정 (PATCH /v1/user)
+
+==== 요청
+
+include::{snippets}/user-controller-test/modify-my-info/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/user-controller-test/modify-my-info/http-response.adoc[]
+

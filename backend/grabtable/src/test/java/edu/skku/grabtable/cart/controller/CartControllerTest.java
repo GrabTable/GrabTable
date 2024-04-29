@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.request.CartCreateRequest;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.service.CartService;
 import edu.skku.grabtable.common.ControllerTest;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,7 +52,7 @@ public class CartControllerTest extends ControllerTest {
                 .map(CartResponse::of)
                 .toList();
 
-        when(cartService.getCurrentCarts(any()))
+        when(cartService.findCurrentCarts(any()))
                 .thenReturn(expected);
         //when
         MvcResult mvcResult = mockMvc.perform(get("/v1/cart/me")
@@ -75,10 +74,14 @@ public class CartControllerTest extends ControllerTest {
     void createCart() throws Exception {
         //given
         final Cart cart = new Cart(1L, null, "menuName", 10000, null, null, 1);
+        CartCreateRequest cartCreateRequest = new CartCreateRequest(1L, 1);
 
         //when & then
-        when(cartService.createCart(any(), any())).thenReturn(cart);
-        mockMvc.perform(post("/v1/cart").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+        doNothing().when(cartService).createCart(any(), any(), any());
+        mockMvc.perform(post("/v1/cart")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cartCreateRequest)))
+                .andExpect(status().isCreated())
                 .andReturn();
     }
 
@@ -86,9 +89,9 @@ public class CartControllerTest extends ControllerTest {
     @DisplayName("장바구니 주문 목록을 수정할 수 있다")
     void modifyCart() throws Exception {
         //given
-        CartRequest updateCartRequest = new CartRequest(1L, 2);
+        CartCreateRequest updateCartRequest = new CartCreateRequest(1L, 2);
         Long updateCartId = 1L;
-        doNothing().when(cartService).modifyCart(any(), any(), any());
+        doNothing().when(cartService).updateCart(any(), any());
 
         //when
         mockMvc.perform(patch("/v1/cart/1")
@@ -98,25 +101,19 @@ public class CartControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        verify(cartService).modifyCart(
-                ArgumentMatchers.any(),
-                anyLong(),
-                ArgumentMatchers.any()
-        );
+        verify(cartService).updateCart(any(), any());
     }
 
     @Test
     @DisplayName("장바구니 주문 목록을 삭제할 수 있다")
     void deleteCart() throws Exception {
         //given
-        doNothing().when(cartService).deleteCart(
-                anyLong(),
-                anyLong());
+        doNothing().when(cartService).deleteCart(any(), anyLong());
 
         //when
         mockMvc.perform(delete("/v1/cart/{cartId}", "1"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         //then
         verify(cartService).deleteCart(

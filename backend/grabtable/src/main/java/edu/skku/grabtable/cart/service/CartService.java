@@ -26,8 +26,8 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
 
-    public List<CartResponse> getCurrentCarts(User user) {
-        return cartRepository.findByUserId(user.getId()).stream().map(CartResponse::of).toList();
+    public List<CartResponse> findCurrentCarts(Long userId) {
+        return cartRepository.findByUserId(userId).stream().map(CartResponse::of).toList();
     }
 
     public void createCart(User user, Long menuId, Integer quantity) {
@@ -57,10 +57,10 @@ public class CartService {
     }
 
 
-    public void deleteCart(Long id, Long cartId) {
+    public void deleteCart(Long userId, Long cartId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        if (!Objects.equals(cart.getUser().getId(), id)) {
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
+        if (!Objects.equals(cart.getUser().getId(), userId)) {
             throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
         cart.disconnectUser();

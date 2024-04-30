@@ -2,8 +2,10 @@ package edu.skku.grabtable.user.domain.response;
 
 import edu.skku.grabtable.user.domain.User;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @AllArgsConstructor
+@Getter
 public class UserDetailResponse {
     private Long id;
 

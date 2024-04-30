@@ -39,5 +39,4 @@ public abstract class ControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .build();
     }
-
 }

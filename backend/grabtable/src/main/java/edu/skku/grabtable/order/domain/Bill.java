@@ -1,15 +1,14 @@
-package edu.skku.grabtable.payment.domain;
+package edu.skku.grabtable.order.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
-import java.math.BigDecimal;
 
 @Entity
 @Getter

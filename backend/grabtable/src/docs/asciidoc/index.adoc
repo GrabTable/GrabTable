@@ -11,3 +11,5 @@ include::store-controller-test.adoc[]
 include::cart-controller-test.adoc[]
 include::reservation-controller-test.adoc[]
 include::order-controller-test.adoc[]
+inlcude::user-controller-test.adoc[]
+

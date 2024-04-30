@@ -1,3 +1,4 @@
+import { login } from '@/lib/next-auth/session'
 import { NextRequest, NextResponse } from 'next/server'
 
 async function sendPostRequest(body_code: String | null) {
@@ -21,6 +22,7 @@ async function sendPostRequest(body_code: String | null) {
 
     const responseData = await response.json()
     console.log('Response:', responseData)
+    return responseData
   } catch (error) {
     console.error('Error during the fetch operation:', error)
   }
@@ -31,7 +33,16 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const code = url.searchParams.get('code')
   console.log(code)
 
-  await sendPostRequest(code)
+  const responseData = await sendPostRequest(code)
+  if (!responseData) {
+    return new NextResponse('Error fetching access token', { status: 500 });
+  }
+  const input = {
+    access_token: responseData
+  }
+  await login(input)
+  
+  
+  return NextResponse.redirect('http://localhost:3000/')
 
-  return NextResponse.redirect('http://localhost:3000')
 }

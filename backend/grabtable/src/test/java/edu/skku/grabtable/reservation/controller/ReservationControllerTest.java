@@ -2,7 +2,6 @@ package edu.skku.grabtable.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -51,7 +50,7 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("신규 예약을 생성할 수 있다.")
     void create() throws Exception {
         //given
-        doNothing().when(reservationService).createNewReservation(any(), anyLong());
+        doNothing().when(reservationService).createNewReservation(any(), any());
         ReservationRequest reservationRequest = new ReservationRequest(1L);
 
         //when

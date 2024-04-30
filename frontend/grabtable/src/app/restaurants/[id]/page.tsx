@@ -1,10 +1,7 @@
 'use client'
 
-<<<<<<< Updated upstream
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-=======
->>>>>>> Stashed changes
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import {

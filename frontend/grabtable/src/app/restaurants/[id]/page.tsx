@@ -233,7 +233,7 @@ export default function Restaurant() {
               <Input type='number' min={0} defaultValue={1} className='w-[10rem]'/>
             </div>
             <DialogFooter>
-            <Button variant='destructive' type="submit" onClick={makeReservation}>Confirm</Button>
+            <Button className='bg-violet-400' type="submit" onClick={makeReservation}>Confirm</Button>
           </DialogFooter>
           </DialogContent>
         </Dialog>

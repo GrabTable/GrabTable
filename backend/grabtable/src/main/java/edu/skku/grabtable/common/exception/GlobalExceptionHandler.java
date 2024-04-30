@@ -3,6 +3,7 @@ package edu.skku.grabtable.common.exception;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException e) {
         log.warn(e.getMessage(), e);
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ExceptionResponse(e.getCode(), e.getMessage()));
     }
 

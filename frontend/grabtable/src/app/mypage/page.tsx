@@ -50,7 +50,6 @@
 // import { Button } from '@/components/ui/Button'
 // import React from 'react'
 
-
 // export default async function Page() {
 //   // 버튼 클릭 시 호출될 함수
 //   const session = await getSession();
@@ -76,7 +75,7 @@
 //       throw new Error('Network response was not ok');
 //     }
 
-//     const data = await response.json(); 
+//     const data = await response.json();
 
 //     if (data.status) {
 //       console.log("User is verified");
@@ -90,15 +89,15 @@
 
 // export default async function Page() {
 //   checkUserStatus()
-  
+
 //   return (
 //     <section>
 //       <form
 //         action={async (formData) => {
 //           await fetch('http://localhost:3000/api/auth', { method: 'POST' })
-  
+
 //           redirect("https://kauth.kakao.com/oauth/authorize?client_id=bae0a9c1f20dfbc7d5f6776116a24ba4&redirect_uri=http://localhost:3000/api/login&response_type=code");
-          
+
 //         }}
 //       >
 //         <input type="email" placeholder="Email" />
@@ -119,17 +118,19 @@
 //   );
 // }
 
-import { redirect } from "next/navigation";
-import { getSession, login, logout } from "@/lib/next-auth/session";
+import { redirect } from 'next/navigation'
+import { getSession, login, logout } from '@/lib/next-auth/session'
 
 export default async function Page() {
-  const session = await getSession();
+  const session = await getSession()
   return (
     <section>
       <form
         action={async (formData) => {
-          "use server";
-          redirect("https://kauth.kakao.com/oauth/authorize?client_id=bae0a9c1f20dfbc7d5f6776116a24ba4&redirect_uri=http://localhost:3000/api/login&response_type=code");
+          'use server'
+          redirect(
+            `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_CLIENT_ID}&redirect_uri=${process.env.KAKAO_REDIRECT_URI}`,
+          )
         }}
       >
         <input type="email" placeholder="Email" />
@@ -138,14 +139,14 @@ export default async function Page() {
       </form>
       <form
         action={async () => {
-          "use server";
-          await logout();
-          redirect("/");
+          'use server'
+          await logout()
+          redirect('/')
         }}
       >
         <button type="submit">Logout</button>
       </form>
       <pre>{JSON.stringify(session, null, 2)}</pre>
     </section>
-  );
+  )
 }

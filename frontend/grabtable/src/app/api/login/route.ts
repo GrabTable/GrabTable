@@ -1,5 +1,7 @@
-import { login } from '@/lib/next-auth/session'
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
+import { parseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
+import { login } from '@/lib/next-auth/session'
 
 async function sendPostRequest(body_code: String | null) {
   const url = 'http://localhost:8000/v1/auth/login/kakao' // 요청할 URL
@@ -20,9 +22,29 @@ async function sendPostRequest(body_code: String | null) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const responseData = await response.json()
-    console.log('Response:', responseData)
-    return responseData
+    const refresh_token =
+      parseCookie(response.headers.get('set-cookie') || '').get(
+        'refresh-token',
+      ) || ''
+    cookies().set('refresh-token', refresh_token)
+
+    const access_token = (await response.json())?.accessToken
+
+    const res = await fetch('http://localhost:8000/v1/user/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: cookies().toString(),
+        Authorization: 'Bearer ' + access_token,
+      },
+    })
+    const userInfo = await res.json()
+    const input = {
+      access_token: access_token,
+      userInfo: userInfo,
+    }
+
+    return input
   } catch (error) {
     console.error('Error during the fetch operation:', error)
   }
@@ -31,18 +53,10 @@ async function sendPostRequest(body_code: String | null) {
 export async function GET(req: NextRequest, res: NextResponse) {
   const url = new URL(req.url)
   const code = url.searchParams.get('code')
-  console.log(code)
 
-  const responseData = await sendPostRequest(code)
-  if (!responseData) {
-    return new NextResponse('Error fetching access token', { status: 500 });
-  }
-  const input = {
-    access_token: responseData
-  }
-  await login(input)
-  
-  
-  return NextResponse.redirect('http://localhost:3000/')
+  const userSession = await sendPostRequest(code)
 
+  await login(userSession)
+
+  return NextResponse.redirect('http://localhost:3000')
 }

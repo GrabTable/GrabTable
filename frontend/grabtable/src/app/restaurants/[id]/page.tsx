@@ -134,11 +134,6 @@ export default function Restaurant() {
   const [restaurant, setRestaurant] = useState<Restaurant>()
   const store_id = params['id']
 
-
-  // useEffect(() => {
-  //   fetchStore()
-  // }, [restaurant])
-
   const fetchStore = async() => {
     try {
       const response = await fetch(`http://localhost:8000/v1/stores/${store_id}`)

@@ -242,7 +242,7 @@ export default function Restaurant() {
     >
       <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
         <div className="pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 sm:max-w-[50%] flex flex-col h-full">
-          <Badge className='w-fit mb-2'>{restaurant.category}</Badge>
+          <Badge className="w-fit mb-2">{restaurant.category}</Badge>
           <h3 className="text-2xl font-semibold">{restaurant.storeName}</h3>
           <p>{restaurant.address}</p>
           <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
@@ -266,11 +266,11 @@ export default function Restaurant() {
         />
       </section>
 
-      <div className='flex justify-end'>
+      <div className="flex justify-end">
         <Dialog>
           <DialogTrigger asChild>
-            <Button className='bg-violet-500 dark:text-white flex items-end rounded-full'>
-             GRAB <PiHandGrabbingDuotone size={25}/>
+            <Button className="bg-violet-500 dark:text-white flex items-end rounded-full">
+              GRAB <PiHandGrabbingDuotone size={25} />
             </Button>
           </DialogTrigger>
           <DialogContent>
@@ -281,15 +281,26 @@ export default function Restaurant() {
               </DialogDescription>
             </DialogHeader>
             <div className="flex items-center justify-center space-x-2">
-              <Input type='number' min={0} defaultValue={1} className='w-[10rem]'/>
+              <Input
+                type="number"
+                min={0}
+                defaultValue={1}
+                className="w-[10rem]"
+              />
             </div>
             <DialogFooter>
-            <Button className='bg-violet-400' type="submit" onClick={makeReservation}>Confirm</Button>
-          </DialogFooter>
+              <Button
+                className="bg-violet-400"
+                type="submit"
+                onClick={makeReservation}
+              >
+                Confirm
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
-      
+
       {/* <Popover>
       <PopoverTrigger asChild>
         <Button
@@ -312,7 +323,7 @@ export default function Restaurant() {
         />
       </PopoverContent>
     </Popover> */}
-      
+
       <Table>
         <TableBody>
           {reviews.map((review: Review) => (
@@ -320,15 +331,17 @@ export default function Restaurant() {
               {/* <TableCell className='w-[10rem]'>
                 <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
               </TableCell> */}
-              <TableCell className='flex items-start flex-col'>
-                <div className='flex items-center mt-4'>
-                  <div>{review.username || 'anonymous user' }</div>
-                  <div><StarRating rating={review.rating} /></div>
+              <TableCell className="flex items-start flex-col">
+                <div className="flex items-center mt-4">
+                  <div>{review.username || 'anonymous user'}</div>
+                  <div>
+                    <StarRating rating={review.rating} />
+                  </div>
                 </div>
-                <p className="mt-2">
-                  {review.message}
+                <p className="mt-2">{review.message}</p>
+                <p className="mt-4 text-xs">
+                  This review was written on {review.reviewPlatform}.
                 </p>
-                <p className='mt-4 text-xs'>This review was written on {review.reviewPlatform}.</p>
               </TableCell>
             </TableRow>
           ))}

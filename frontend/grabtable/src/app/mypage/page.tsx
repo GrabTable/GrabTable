@@ -9,12 +9,7 @@ export default async function Page() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Image
-        src="/big-icon.svg"
-        alt={'no image'}
-        width={500}
-        height={500}
-      />
+      <Image src="/big-icon.svg" alt={'no image'} width={500} height={500} />
       {session ? (
         <form
           action={async () => {
@@ -23,8 +18,13 @@ export default async function Page() {
             redirect('/')
           }}
         >
-          <Button type="submit" variant="default" className='bg-purple-300 hover:bg-purple-500 text-primary'>
-            <Image src="/logout.png" alt="Logout" width={20} height={20} />Logout
+          <Button
+            type="submit"
+            variant="default"
+            className="bg-purple-300 hover:bg-purple-500 text-primary"
+          >
+            <Image src="/logout.png" alt="Logout" width={20} height={20} />
+            Logout
           </Button>
         </form>
       ) : (
@@ -38,12 +38,17 @@ export default async function Page() {
         >
           <br />
           <button type="submit" style={{ border: 'none', background: 'none' }}>
-            <Image src="/kakao_login_logo.png" alt="Login" width={200} height={200} />
+            <Image
+              src="/kakao_login_logo.png"
+              alt="Login"
+              width={200}
+              height={200}
+            />
           </button>
         </form>
       )}
       {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
-      <SectionDivider/>
+      <SectionDivider />
     </main>
   )
 }

@@ -41,26 +41,31 @@ public class CartService {
             throw new BadRequestException(ExceptionCode.ALREADY_EXISTING_CART);
         }
 
+        //사용자가 현재 예약 중인 가게에 없는 메뉴라면 예외처리 TODO
+        //사용자가 예약 상태가 아니면 예외처리 TODO
+
         Cart cart = new Cart(user, menu, quantity);
         cartRepository.save(cart);
     }
 
-    public void updateCart(User user, CartUpdateRequest cartUpdateRequest) {
-        Cart cart = cartRepository.findById(cartUpdateRequest.getCartId())
+    public void updateCart(User user, Long cartId, CartUpdateRequest cartUpdateRequest) {
+        Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
-        if (!Objects.equals(cart.getUser().getId(), user.getId())) {
+        if (cart.getUser() == null || !Objects.equals(cart.getUser().getId(), user.getId())) {
             throw new BadRequestException(ExceptionCode.UNAUTHORIZED_ACCESS);
         }
 
         cart.changeQuantity(cartUpdateRequest.getQuantity());
+        cartRepository.save(cart);
     }
 
 
     public void deleteCart(Long userId, Long cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
-        if (!Objects.equals(cart.getUser().getId(), userId)) {
+
+        if (cart.getUser() == null || !Objects.equals(cart.getUser().getId(), userId)) {
             throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
         cart.disconnectUser();

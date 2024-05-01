@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
     private final AuthUserArgumentResolver authUserArgumentResolver;
 
     @Override
-    public void addCorsMapping(CorsRegistry corsRegistry) {
+    public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .allowedOrigins("*")
                 .allowedMethods("*");

@@ -1,5 +1,5 @@
 'use client'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
@@ -10,7 +10,7 @@ interface InputWithButtonProps {
   onClick: () => void
 }
 
-export function InputWithButton({
+export function InvitationInput({
   inputValue,
   onInputChange,
   onClick,
@@ -27,7 +27,7 @@ export function InputWithButton({
         transition={{ delay: 0.125 }}
       >
         <Input
-          placeholder="초대 코드를 입력하세요."
+          placeholder="Enter the invitation code"
           value={inputValue}
           onChange={onInputChange}
           className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-100
@@ -36,7 +36,7 @@ export function InputWithButton({
 
         <Button
           asChild
-          className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
+          className="group bg-violet-400 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack"
           onClick={onClick}
         >
           <Link

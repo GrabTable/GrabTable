@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
+import { UserCard } from './UserCard'
 
 interface CartItem {
   menuName: string
@@ -69,41 +70,14 @@ const defaultUsers: User[] = [
   },
 ]
 
-export function UserListView({
-  host = defaultHost,
-  invitees = defaultUsers,
-}: UserListViewProps): any {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+export function UserListView(): any {
+  return (
+    <div className="flex flex-col space-y-4">
+      <UserCard key={defaultHost.username} user={defaultHost} />
 
-  {
-    defaultUsers.map((item) => (
-      <motion.div
-        layoutId={item.username}
-        onClick={() => setSelectedId(item.username)}
-      >
-        <motion.h5>{item.orderCompleted}</motion.h5>
-        <motion.h2>{item.username}</motion.h2>
-      </motion.div>
-    ))
-  }
-
-  ;<AnimatePresence>
-    {selectedId && (
-      <motion.div layoutId={selectedId}>
-        <motion.h5>123</motion.h5>
-        <motion.h2>21</motion.h2>
-        <motion.button onClick={() => setSelectedId(null)} />
-      </motion.div>
-    )}
-  </AnimatePresence>
-
-  // return (
-  //   <div className="flex flex-col space-y-4">
-  //     <UserCard user={host} />
-
-  //     {invitees.map((invitee, index) => (
-  //       <UserCard key={index} user={invitee} />
-  //     ))}
-  //   </div>
-  // )
+      {defaultUsers.map((invitee, index) => (
+        <UserCard key={index} user={invitee} />
+      ))}
+    </div>
+  )
 }

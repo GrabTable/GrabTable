@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
+import { Button } from './ui/button'
+import { FaPlus, FaMinus } from 'react-icons/fa6'
 
 interface CartItem {
   menuName: string
@@ -39,16 +41,16 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
         style={{ cursor: 'pointer' }}
       >
         <h3>{user.username}</h3>
-        <p>{user.orderCompleted ? '주문 완료' : '주문 미완료'}</p>
+        <p>{user.orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
 
         <motion.button
           onClick={toggleCard}
-          className="text-lg font-bold p-1 rounded-full bg-gray-200 hover:bg-gray-300 transition duration-150 ease-in-out"
+          className="text-lg font-bold p-1 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 transition duration-150 ease-in-out"
           initial={{ rotate: 0 }}
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.1 }}
         >
-          {isOpen ? '-' : '+'}
+          {isOpen ? <FaMinus /> : <FaPlus />}
         </motion.button>
       </div>
       <motion.div

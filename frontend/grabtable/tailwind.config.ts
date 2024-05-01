@@ -1,5 +1,4 @@
 import type { Config } from 'tailwindcss'
-import colors from 'tailwindcss/colors'
 
 const config = {
   darkMode: ['class'],
@@ -20,10 +19,6 @@ const config = {
     },
     extend: {
       colors: {
-        blue: '#4C4C6D',
-        green: '#1B9C85',
-        yellow: '#FBD36B',
-        'gray-light': colors.neutral[100],
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',

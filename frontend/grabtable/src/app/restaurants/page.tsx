@@ -51,6 +51,7 @@ export default function Home() {
       console.error('Failed to fetch stores:', error)
     }
   }
+  console.log(stores)
   return (
     <div className='mx-48'>
       <InputWithButton input={search || category || ''} />

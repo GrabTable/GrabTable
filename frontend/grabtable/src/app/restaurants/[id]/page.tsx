@@ -24,11 +24,17 @@ import { StarRating } from '@/components/StarRating'
 import { Input } from '@/components/ui/Input'
 import * as React from 'react'
 import {
+  redirect,
   useParams,
   useRouter,
 } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { PiHandGrabbingDuotone } from "react-icons/pi";
+import { getSession } from '@/lib/next-auth/session'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { Toaster } from '@/components/ui/toaster'
+import { useToast } from '@/components/ui/use-toast'
+import Spinner from '@/components/spinner'
 
 const restaurant_mock = {
   id: 1,
@@ -118,7 +124,8 @@ export default function Restaurant() {
   const [date, setDate] = React.useState<Date>()
   const router = useRouter()
   const store_id = useParams<{ id: string }>()['id']
-
+  const { toast } = useToast() 
+  const [ loading, setLoading] = useState(false)
   const [restaurant, setRestaurant] = useState<Restaurant>()
   const fetchStore = async () => {
     try {
@@ -157,30 +164,74 @@ export default function Restaurant() {
   }, [])
 
   const makeReservation = async () => {
-    const body = JSON.stringify({
-      storeId: store_id,
-    })
-    try {
-      const response = await fetch(`http://localhost:8000/v1/reservations`, {
-        method: 'POST',
-        body: body,
-        headers: {
-          Authorization: accessToken,
-        },
-      })
-      if (!response.ok) {
-        throw new Error('error')
+    setLoading(true)
+    const session = await getSessionFromClient()
+    console.log("session:", session)
+    setTimeout(async () => {
+      setLoading(false); // 스피너 종료
+  
+      if (!session) {
+        // 스피너 종료 후 토스트 메시지 표시
+        toast({
+          title: "Login first",
+          description: "You need to log in to continue.",
+          duration: 1000, // 1초 동안 토스트 띄우기
+        });
+  
+        // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
+        setTimeout(() => {
+          router.push('/mypage');
+          return
+        }, 1300);
       }
-      router.push('/reservation')
-    } catch (error) {
-      console.error('error', error)
-    }
+      const body = JSON.stringify({
+        storeId: store_id,
+      })
+      console.log("session access token:",session.formData['access_token'])
+      try { 
+        const response = await fetch(`http://localhost:8000/v1/reservations`, {
+          method: "POST",
+          body: body,
+          mode: "cors",
+          headers: {
+            "Access-Control-Allow-Origin": 'http://localhost:3000',
+            "Access-Control-Allow-Methods": "POST",
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Expose-Headers":
+              "date, etag, access-control-allow-origin, access-control-allow-credentials, access-control-allow-headers",
+            'Content-Type': 'application/json',
+            Cookie: session.formData['cookie'],
+            
+            Authorization: "Bearer " + session.formData['access_token'],
+          },
+          credentials: 'include',
+        })
+        console.log()
+        if (!response.ok) {
+          throw new Error('error')
+        }
+        toast({
+          title: "Reservation",
+          description: "You need to log in to continue.",
+          duration: 1000
+        });setTimeout(() => {
+          router.push('/reservation');
+        }, 1300); 
+      } catch (error) {
+        console.error('error', error)
+      }
+    }, 500);
+
+    
   }
 
   if (!restaurant) {
     return <></>
   }
   return (
+    <>
+    {loading && <Spinner/>}
     <motion.div
       ref={ref}
       style={{
@@ -283,7 +334,8 @@ export default function Restaurant() {
           ))}
         </TableBody>
       </Table>
-
     </motion.div>
+    <Toaster/>
+    </>
   )
 }

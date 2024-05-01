@@ -41,7 +41,7 @@ public class LoginController {
         ResponseCookie cookie = ResponseCookie.from("refresh-token", userTokens.getRefreshToken())
                 .maxAge(ONE_WEEK_SECONDS)
 //                .secure(true)
-//                .httpOnly(true)
+                .httpOnly(true)
                 .path("/")
                 .build();
 

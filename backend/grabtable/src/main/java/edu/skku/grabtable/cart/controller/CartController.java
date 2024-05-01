@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("v1/cart")
+@RequestMapping("v1/carts")
 @RestController
 @RequiredArgsConstructor
 public class CartController {
@@ -43,9 +43,10 @@ public class CartController {
     @PatchMapping("/{cartId}")
     public ResponseEntity<Void> updateCart(
             @AuthUser User user,
+            @PathVariable Long cartId,
             @RequestBody CartUpdateRequest cartRequest
     ) {
-        cartService.updateCart(user, cartRequest);
+        cartService.updateCart(user, cartId, cartRequest);
         return ResponseEntity.ok().build();
     }
 

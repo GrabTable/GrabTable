@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.request.CartCreateRequest;
+import edu.skku.grabtable.cart.domain.request.CartUpdateRequest;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.service.CartService;
 import edu.skku.grabtable.common.ControllerTest;
@@ -55,7 +56,7 @@ public class CartControllerTest extends ControllerTest {
         when(cartService.findCurrentCarts(any()))
                 .thenReturn(expected);
         //when
-        MvcResult mvcResult = mockMvc.perform(get("/v1/cart/me")
+        MvcResult mvcResult = mockMvc.perform(get("/v1/carts/me")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -78,7 +79,7 @@ public class CartControllerTest extends ControllerTest {
 
         //when & then
         doNothing().when(cartService).createCart(any(), any(), any());
-        mockMvc.perform(post("/v1/cart")
+        mockMvc.perform(post("/v1/carts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cartCreateRequest)))
                 .andExpect(status().isCreated())
@@ -89,19 +90,19 @@ public class CartControllerTest extends ControllerTest {
     @DisplayName("장바구니 주문 목록을 수정할 수 있다")
     void modifyCart() throws Exception {
         //given
-        CartCreateRequest updateCartRequest = new CartCreateRequest(1L, 2);
+        CartUpdateRequest updateRequest = new CartUpdateRequest(10);
         Long updateCartId = 1L;
-        doNothing().when(cartService).updateCart(any(), any());
+        doNothing().when(cartService).updateCart(any(), any(), any());
 
         //when
-        mockMvc.perform(patch("/v1/cart/1")
+        mockMvc.perform(patch("/v1/carts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updateCartRequest)))
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
         //then
-        verify(cartService).updateCart(any(), any());
+        verify(cartService).updateCart(any(), any(), any());
     }
 
     @Test
@@ -111,7 +112,7 @@ public class CartControllerTest extends ControllerTest {
         doNothing().when(cartService).deleteCart(any(), anyLong());
 
         //when
-        mockMvc.perform(delete("/v1/cart/{cartId}", "1"))
+        mockMvc.perform(delete("/v1/carts/{cartId}", "1"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
 

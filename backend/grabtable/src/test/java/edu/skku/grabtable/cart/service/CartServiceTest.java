@@ -62,7 +62,7 @@ public class CartServiceTest {
     @DisplayName("UserId와 CartId로 유저의 장바구니를 수정할 수 있다")
     void modifyCartByUserIdAndCartId() {
         //given
-        CartUpdateRequest updateCartRequest = new CartUpdateRequest(1L, 2);
+        CartUpdateRequest updateCartRequest = new CartUpdateRequest(2);
         Menu menu = new Menu(1L, null, "menuName", 10000, "url", MenuStatus.VALID);
         User user = new User(1L, "userA", new ArrayList<>());
         Cart cart = new Cart(1L, user, "menuName", 10000, null, null, 1);
@@ -71,7 +71,7 @@ public class CartServiceTest {
                 .thenReturn(Optional.of(cart));
 
         //when
-        cartService.updateCart(user, updateCartRequest);
+        cartService.updateCart(user, 1L, updateCartRequest);
 
         //then
         assertThat(cart.getQuantity()).isEqualTo(2);

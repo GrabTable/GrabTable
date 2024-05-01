@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSession, logout } from '@/lib/next-auth/session'
 import Image from 'next/image'
 import SectionDivider from '../section-divider'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 
 export default async function Page() {
   const session = await getSession()

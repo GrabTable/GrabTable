@@ -20,7 +20,7 @@ export default function Home() {
         style={{ maxWidth: '50rem' }}
       >
         <div className="pb-10" />
-        <InputWithButton />
+        <InputWithButton input={''} />
         <div className="pb-16" />
       </section>
 

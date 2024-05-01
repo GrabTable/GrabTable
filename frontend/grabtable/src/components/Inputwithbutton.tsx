@@ -1,12 +1,16 @@
 'use client'
 import React, { useState, ChangeEvent } from 'react'
-import { Button, buttonVariants } from '@/components/ui/Button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 
-export function InputWithButton(): JSX.Element {
-  const [inputValue, setInputValue] = useState<string>('')
+type Props = {
+  input: string
+}
+
+export function InputWithButton(props ?: Props): JSX.Element {
+  const [inputValue, setInputValue] = useState<string>(props?.input || '')
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setInputValue(event.target.value)
@@ -33,7 +37,7 @@ export function InputWithButton(): JSX.Element {
 
         <Button
           asChild
-          className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
+          className="group bg-violet-400 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
         >
           <Link href={`/restaurants?search=${encodeURIComponent(inputValue)}`}>
             search

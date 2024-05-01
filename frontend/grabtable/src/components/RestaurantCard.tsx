@@ -1,36 +1,35 @@
-"use client";
+'use client'
 
-import { useRef } from "react";
-import { projectsData } from "@/lib/data";
-import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Badge } from "@/components/ui/badge"
-
+import { useRef } from 'react'
+import { projectsData } from '@/lib/data'
+import Image from 'next/image'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { Badge } from '@/components/ui/badge'
 
 type Restaurant = {
-    address: string
-    averageRating: number
-    category: string
-    id: number
-    storeName: string
-    storePictureUrl: string
+  address: string
+  averageRating: number
+  category: string
+  id: number
+  storeName: string
+  storePictureUrl: string
 }
 
 export default function Project({
-    id,
-    address,
-    averageRating,
-    category,
-    storeName,
-    storePictureUrl
+  id,
+  address,
+  averageRating,
+  category,
+  storeName,
+  storePictureUrl,
 }: Restaurant) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["0 1", "1.33 1"],
-  });
-  const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
-  const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1]);
+    offset: ['0 1', '1.33 1'],
+  })
+  const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.9, 1])
+  const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1])
 
   return (
     <motion.div
@@ -50,7 +49,6 @@ export default function Project({
           <div className="mt-4">
             <Badge>{category}</Badge>
           </div>
-
         </div>
 
         <Image
@@ -64,5 +62,5 @@ export default function Project({
         />
       </section>
     </motion.div>
-  );
+  )
 }

@@ -9,7 +9,7 @@ type Props = {
   input: string
 }
 
-export function InputWithButton(props ?: Props): JSX.Element {
+export function InputWithButton(props?: Props): JSX.Element {
   const [inputValue, setInputValue] = useState<string>(props?.input || '')
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {

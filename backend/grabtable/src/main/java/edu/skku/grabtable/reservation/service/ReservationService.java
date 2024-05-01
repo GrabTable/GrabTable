@@ -1,5 +1,7 @@
 package edu.skku.grabtable.reservation.service;
 
+import edu.skku.grabtable.cart.domain.response.CartResponse;
+import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.order.domain.Order;
@@ -7,6 +9,7 @@ import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
+import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.repository.StoreRepository;
@@ -26,6 +29,7 @@ public class ReservationService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final CartRepository cartRepository;
 
 
     public void createNewReservation(User user, Long storeId) {
@@ -57,16 +61,82 @@ public class ReservationService {
         }
 
         user.joinReservation(reservation);
+        userRepository.save(user);
     }
 
     public ReservationDetailResponse findReservationByUser(User user) {
-        if (user.getInvitedReservation() != null) {
-            return ReservationDetailResponse.of(user.getInvitedReservation());
+        Reservation reservation = user.getInvitedReservation();
+
+        if (reservation != null) {
+            List<OrderResponse> orders = orderRepository.findByReservation(reservation)
+                    .stream()
+                    .map(order -> new OrderResponse(
+                            order.getId(),
+                            order.getUser().getId(),
+                            order.getCarts().stream().map(CartResponse::of).toList(),
+                            order.getStatus().toString()))
+                    .toList();
+
+            UserCartsInfoResponse hostInfo = UserCartsInfoResponse.of(
+                    reservation.getHost().getId(),
+                    reservation.getHost().getUsername(),
+                    reservation.getHost().getProfileImageUrl(),
+                    cartRepository.findHostCurrentCartsByReservationId(reservation.getId())
+                            .stream().map(CartResponse::of).toList()
+            );
+
+            List<UserCartsInfoResponse> inviteesInfo = userRepository.findAllByInvitedReservation(reservation)
+                    .stream().map(invitee -> UserCartsInfoResponse.of(
+                            invitee.getId(),
+                            invitee.getUsername(),
+                            invitee.getProfileImageUrl(),
+                            invitee.getCarts().stream().map(CartResponse::of).toList()
+                    )).toList();
+
+            return ReservationDetailResponse.of(
+                    reservation.getId(),
+                    reservation.getStore().getId(),
+                    hostInfo,
+                    inviteesInfo,
+                    reservation.getInviteCode(),
+                    orders);
         }
 
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+        reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
-        return ReservationDetailResponse.of(reservation);
+
+        List<OrderResponse> orders = orderRepository.findByReservation(reservation)
+                .stream()
+                .map(order -> new OrderResponse(
+                        order.getId(),
+                        order.getUser().getId(),
+                        order.getCarts().stream().map(CartResponse::of).toList(),
+                        order.getStatus().toString()))
+                .toList();
+
+        UserCartsInfoResponse hostInfo = UserCartsInfoResponse.of(
+                reservation.getHost().getId(),
+                reservation.getHost().getUsername(),
+                reservation.getHost().getProfileImageUrl(),
+                cartRepository.findHostCurrentCartsByReservationId(reservation.getId())
+                        .stream().map(CartResponse::of).toList()
+        );
+
+        List<UserCartsInfoResponse> inviteesInfo = userRepository.findAllByInvitedReservation(reservation)
+                .stream().map(invitee -> UserCartsInfoResponse.of(
+                        invitee.getId(),
+                        invitee.getUsername(),
+                        invitee.getProfileImageUrl(),
+                        invitee.getCarts().stream().map(CartResponse::of).toList()
+                )).toList();
+
+        return ReservationDetailResponse.of(
+                reservation.getId(),
+                reservation.getStore().getId(),
+                hostInfo,
+                inviteesInfo,
+                reservation.getInviteCode(),
+                orders);
     }
 
     public void cancel(User user) {
@@ -92,22 +162,35 @@ public class ReservationService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //예약의 모든 사용자의 현재 주문이 존재하는지 검사
-        //TODO
+        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        List<Order> orders = orderRepository.findByReservation(reservation);
+        validateLengthOfInviteesAndOrders(invitees, orders);
 
         //예약을 확정 처리
         reservation.confirm();
 
         //invitee들의 예약 연관관계 해제
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
             invitee.clearReservation();
+        }
+    }
+
+    private void validateLengthOfInviteesAndOrders(List<User> invitees, List<Order> orders) {
+        if (invitees.size() + 1 != orders.size()) {
+            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
         }
     }
 
     public List<OrderResponse> findAllOrdersByReservationId(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_RESERVATION_ID));
-        List<Order> orders = orderRepository.findByReservation(reservation);
-        return orders.stream().map(OrderResponse::of).toList();
+        return orderRepository.findByReservation(reservation)
+                .stream()
+                .map(order -> new OrderResponse(
+                        order.getId(),
+                        order.getUser().getId(),
+                        order.getCarts().stream().map(CartResponse::of).toList(),
+                        order.getStatus().toString()))
+                .toList();
     }
 }

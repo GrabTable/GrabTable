@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CartRequest {
+public class CartCreateRequest {
     Long menuId;
     Integer quantity;
 }

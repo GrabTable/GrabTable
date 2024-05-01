@@ -1,11 +1,11 @@
 package edu.skku.grabtable.cart.service;
 
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.request.CartUpdateRequest;
+import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.repository.MenuRepository;
@@ -26,46 +26,45 @@ public class CartService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
 
-    public final List<Cart> getCurrentCarts(User user) {
-        return cartRepository.findByUserId(user.getId());
+    public List<CartResponse> findCurrentCarts(Long userId) {
+        return cartRepository.findByUserId(userId).stream().map(CartResponse::of).toList();
     }
 
-    public Cart createCart(User user, CartRequest cartRequest) {
-        Menu menu = menuRepository.findById(cartRequest.getMenuId())
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        Cart cart = new Cart(user, menu, cartRequest.getQuantity());
+    public void createCart(User user, Long menuId, Integer quantity) {
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_MENU_ID));
+
+        //사용자의 현재 카트에 이미 같은 이름의 메뉴가 존재하면 예외 처리
+        boolean alreadyExist = cartRepository.existsByUserIdAndMenuName(user.getId(), menu.getMenuName());
+
+        if (alreadyExist) {
+            throw new BadRequestException(ExceptionCode.ALREADY_EXISTING_CART);
+        }
+
+        //사용자가 현재 예약 중인 가게에 없는 메뉴라면 예외처리 TODO
+        //사용자가 예약 상태가 아니면 예외처리 TODO
+
+        Cart cart = new Cart(user, menu, quantity);
         cartRepository.save(cart);
-
-        return cart;
     }
 
-    public Order confirmCurrentCarts(Long id) {
-        List<Cart> currentCarts = cartRepository.findByUserId(id);
-        for (Cart currentCart : currentCarts) {
-            currentCart.disconnectUser();
-        }
-        Order order = new Order(currentCarts);
-        orderRepository.save(order);
-        return order;
-    }
-
-    public void modifyCart(Long id, Long cartId, CartRequest cartRequest) {
+    public void updateCart(User user, Long cartId, CartUpdateRequest cartUpdateRequest) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        if (!Objects.equals(cart.getUser().getId(), id)) {
-            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
-        }
-        Menu menu = menuRepository.findById(cartRequest.getMenuId())
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
-        cart.modifyCart(menu, cartRequest.getQuantity());
+        if (cart.getUser() == null || !Objects.equals(cart.getUser().getId(), user.getId())) {
+            throw new BadRequestException(ExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+
+        cart.changeQuantity(cartUpdateRequest.getQuantity());
     }
 
 
-    public void deleteCart(Long id, Long cartId) {
+    public void deleteCart(Long userId, Long cartId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.INVALID_REQUEST));
-        if (!Objects.equals(cart.getUser().getId(), id)) {
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
+
+        if (cart.getUser() == null || !Objects.equals(cart.getUser().getId(), userId)) {
             throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
         cart.disconnectUser();

@@ -86,7 +86,7 @@ class ReservationServiceTest {
     @Test
     @DisplayName("기존 예약의 참여자가 새로운 예약 생성 시 실패한다.")
     void invitee_create_fail() {
-        Reservation reservation = new Reservation(1L, null, null, null, null, ReservationStatus.ONGOING);
+        Reservation reservation = new Reservation(1L, null, null, null, null, null, ReservationStatus.ONGOING);
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
                 new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
@@ -107,8 +107,8 @@ class ReservationServiceTest {
     @Test
     @DisplayName("기존 예약의 참여자가 다른 예약에 참여 시도 시 실패한다")
     void invitee_participate_fail() {
-        Reservation reservation = new Reservation(1L, null, null, null, null, ReservationStatus.ONGOING);
-        Reservation reservation2 = new Reservation(2L, null, null, null, null, ReservationStatus.ONGOING);
+        Reservation reservation = new Reservation(1L, null, null, null, null, null, ReservationStatus.ONGOING);
+        Reservation reservation2 = new Reservation(2L, null, null, null, null, null, ReservationStatus.ONGOING);
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
                 new ArrayList<>());
         Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,

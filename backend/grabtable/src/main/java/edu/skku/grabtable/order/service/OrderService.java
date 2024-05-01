@@ -30,6 +30,8 @@ public class OrderService {
     public OrderResponse create(User user, PaymentRequest paymentRequest) {
         Reservation invitedReservation = user.getInvitedReservation();
         if (invitedReservation != null) {
+            validateUserCarts(user);
+            validator.verify(paymentRequest);
             return buildOrderResponse(user, invitedReservation);
         }
 
@@ -37,9 +39,7 @@ public class OrderService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         validateUserCarts(user);
-
         validator.verify(paymentRequest);
-
         return buildOrderResponse(user, reservation);
     }
 
@@ -53,7 +53,7 @@ public class OrderService {
     private void validateUserCarts(User user) {
         List<Cart> carts = cartRepository.findByUserId(user.getId());
         if (carts.isEmpty()) {
-            throw new BadRequestException(ExceptionCode.NOT_EXIST_CURRENT_CART);
+            throw new BadRequestException(ExceptionCode.CUREENT_CARTS_EMPTY);
         }
     }
 }

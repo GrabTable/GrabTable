@@ -22,4 +22,9 @@ public class UserCartsInfoResponse {
                 user.getCarts().stream().map(CartResponse::of).toList()
         );
     }
+
+    public static UserCartsInfoResponse of(Long userId, String username, String profileImageUrl,
+                                           List<CartResponse> carts) {
+        return new UserCartsInfoResponse(userId, username, profileImageUrl, carts);
+    }
 }

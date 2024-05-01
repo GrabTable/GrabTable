@@ -3,7 +3,7 @@ import { FaRegCopyright } from 'react-icons/fa6'
 
 export default function Footer() {
   return (
-    <footer className="w-full h-24 bg-gray-light p-4 flex items-center">
+    <footer className="w-full h-24 bg-gray-light dark:bg-black/30 p-4 flex items-center">
       <div className="w-full flex justify-end items-center gap-2 text-gray-500">
         <FaRegCopyright />
         <p className="text-center text-medium font-bold">Grab Table</p>

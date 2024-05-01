@@ -12,6 +12,7 @@ import lombok.Getter;
 public class ReservationDetailResponse {
 
     private Long id;
+    private Long storeId;
     private UserCartsInfoResponse host;
     private List<UserCartsInfoResponse> invitees;
     private String inviteCode;
@@ -22,9 +23,30 @@ public class ReservationDetailResponse {
         return new ReservationDetailResponse(
                 //TODO
                 reservation.getId(),
+                reservation.getStore().getId(),
                 UserCartsInfoResponse.of(reservation.getHost()),
                 reservation.getInvitees().stream().map(UserCartsInfoResponse::of).toList(),
                 reservation.getInviteCode(),
+                null,
+                orders
+        );
+    }
+
+    public static ReservationDetailResponse of(
+            Long reservationId,
+            Long storeId,
+            UserCartsInfoResponse hostInfo,
+            List<UserCartsInfoResponse> inviteesInfo,
+            String inviteCode,
+            List<OrderResponse> orders
+    ) {
+        return new ReservationDetailResponse(
+                //TODO
+                reservationId,
+                storeId,
+                hostInfo,
+                inviteesInfo,
+                inviteCode,
                 null,
                 orders
         );

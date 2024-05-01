@@ -4,9 +4,8 @@ import Image from 'next/image'
 import SectionDivider from '../section-divider'
 import { Button } from '@/components/ui/button'
 
-export default async function Page() {
+export default async function KakaoPayment() {
   const session = await getSession()
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Image src="/big-icon.svg" alt={'no image'} width={500} height={500} />

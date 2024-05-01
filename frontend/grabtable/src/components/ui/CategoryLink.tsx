@@ -31,7 +31,6 @@ const CategoryLink: React.FC<CategoryLinkProps> = ({ categoryName }) => {
         e.currentTarget.style.color = 'white'
       }}
       onClick={() => {
-        console.log('hi')
       }}
     >
       {categoryName}{' '}

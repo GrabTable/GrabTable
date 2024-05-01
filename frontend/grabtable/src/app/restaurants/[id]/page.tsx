@@ -166,7 +166,6 @@ export default function Restaurant() {
   const makeReservation = async () => {
     setLoading(true)
     const session = await getSessionFromClient()
-    console.log("session:", session)
     setTimeout(async () => {
       setLoading(false); // 스피너 종료
   
@@ -181,45 +180,45 @@ export default function Restaurant() {
         // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
         setTimeout(() => {
           router.push('/mypage');
-          return
         }, 1300);
+        return
       }
-      const body = JSON.stringify({
-        storeId: store_id,
-      })
-      console.log("session access token:",session.formData['access_token'])
+
       try { 
         const response = await fetch(`http://localhost:8000/v1/reservations`, {
           method: "POST",
-          body: body,
-          mode: "cors",
+          body: JSON.stringify({
+            storeId: store_id,
+          }),
           headers: {
-            "Access-Control-Allow-Origin": 'http://localhost:3000',
-            "Access-Control-Allow-Methods": "POST",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Expose-Headers":
-              "date, etag, access-control-allow-origin, access-control-allow-credentials, access-control-allow-headers",
             'Content-Type': 'application/json',
-            Cookie: session.formData['cookie'],
-            
             Authorization: "Bearer " + session.formData['access_token'],
           },
           credentials: 'include',
         })
-        console.log()
-        if (!response.ok) {
-          throw new Error('error')
-        }
-        toast({
-          title: "Reservation",
-          description: "You need to log in to continue.",
-          duration: 1000
-        });setTimeout(() => {
-          router.push('/reservation');
-        }, 1300); 
+        if (response.ok) {
+          toast({
+            title: "You have successfully grab!",
+            description: "Invite your friends and order some food!",
+            duration: 1000, // 1초 동안 토스트 띄우기
+          });
+          setTimeout(() => {
+            router.push('/reservation');
+          }, 1300);
+          return
+        }else{
+          toast({
+            title: "There is an ongoing reservation",
+            description: "Please continue with your order!",
+            duration: 1000, // 1초 동안 토스트 띄우기
+          });
+    
+          // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
+          setTimeout(() => {
+            router.push('/reservation');
+          }, 1300);}   
       } catch (error) {
-        console.error('error', error)
+        console.error('error occurred!', error)
       }
     }, 500);
 
@@ -301,36 +300,10 @@ export default function Restaurant() {
         </Dialog>
       </div>
 
-      {/* <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <FaHand className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover> */}
-
       <Table>
         <TableBody>
           {reviews.map((review: Review) => (
             <TableRow key={review.id}>
-              {/* <TableCell className='w-[10rem]'>
-                <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
-              </TableCell> */}
               <TableCell className="flex items-start flex-col">
                 <div className="flex items-center mt-4">
                   <div>{review.username || 'anonymous user'}</div>

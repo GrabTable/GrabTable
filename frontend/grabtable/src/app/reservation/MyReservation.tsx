@@ -1,3 +1,4 @@
+'use client'
 import { UserListView } from '@/components/UserListView'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/button'
@@ -5,6 +6,7 @@ import Image from 'next/image'
 import { RiKakaoTalkFill } from "react-icons/ri"
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { useQuery } from "@tanstack/react-query";
 import {
   Table,
   TableBody,
@@ -13,76 +15,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { useRouter } from 'next/navigation'
+import Page from './payment/page'
+import { UserCard } from '@/components/UserCard'
+import { Toaster } from '@/components/ui/toaster'
+import { useToast } from '@/components/ui/use-toast'
 
 interface CartItem {
   menuName: string
   quantity: number
   unitPrice: number
 }
-
-interface User {
-  username: string
-  orderCompleted: boolean
-  cartItems: CartItem[]
-}
-
-interface MyReservationProps {
-  store_id: number
-  host: User
-  invitees: User[]
-}
-
-const defaultHost: User = {
-  username: '호스트',
-  orderCompleted: true,
-  cartItems: [
-    {
-      menuName: '치킨',
-      quantity: 1,
-      unitPrice: 10000,
-    },
-    {
-      menuName: '삼다수',
-      quantity: 1,
-      unitPrice: 5000,
-    },
-  ],
-}
-const defaultUsers: User[] = [
-  {
-    username: '참여자1',
-    orderCompleted: false,
-    cartItems: [
-      {
-        menuName: '버거',
-        quantity: 2,
-        unitPrice: 10000,
-      },
-      {
-        menuName: '감튀',
-        quantity: 1,
-        unitPrice: 5000,
-      },
-    ],
-  },
-  {
-    username: '참여자2',
-    orderCompleted: true,
-    cartItems: [
-      {
-        menuName: '피자',
-        quantity: 3,
-        unitPrice: 15000,
-      },
-      {
-        menuName: 'Salad',
-        quantity: 1,
-        unitPrice: 8000,
-      },
-    ],
-  },
-]
 
 type Menu = {
   id: number
@@ -91,69 +36,13 @@ type Menu = {
   menuPictureUrl: string
 }
 
-const defaultMenus: Menu[] = [
-  {
-    id: 1,
-    menuName: '수육나베',
-    price: 20000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 2,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 3,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 4,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 5,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 6,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 7,
-    menuName: '수육나베',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 8,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 9,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-  {
-    id: 10,
-    menuName: '수육튀김',
-    price: 10000,
-    menuPictureUrl: '',
-  },
-]
-
+type MyCart = {
+  id: number
+  quantity: number
+  menuName : string
+  price: number
+  totalPrice: number
+}
 type Cart = {
   id: number
   user: null
@@ -164,40 +53,177 @@ type Cart = {
   quantity: number
 }
 
-const MyCart: Cart[] = [
-  {
-    id: 1,
-    user: null,
-    menuName: '수육나베',
-    price: 10000,
-    order: null,
-    sharedOrder: null,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    user: null,
-    menuName: 'menuName',
-    price: 10000,
-    order: null,
-    sharedOrder: null,
-    quantity: 1,
-  },
-]
+interface CartItem {
+  menuName: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
 
+type UserCartsInfo = {
+  id: number
+  username: string
+  profileImageUrl: string
+  currentCarts: Cart[]
+}
+type Orders = {
+  id: number
+  storeId: number
+  host: UserCartsInfo
+  invitees: UserCartsInfo[]
+  inviteCode: string
+  orders: string[]
+}
 type MenuQuantity = {
   menuId: number
   quantity: number
+  menuName: string
 }
 
-export default function MyReservation() {
-  const addCart = (body: MenuQuantity) => {
-    console.log('Add Cart', body)
+interface MyReservationProps {
+  storeID: number;
+  menus: Menu[];
+  isHost: boolean
+}
+
+export default function MyReservation(props: MyReservationProps) {
+  const { menus,storeID,isHost } = props
+
+  const { toast } = useToast()
+  const router = useRouter()
+  const addCart = async (body: MenuQuantity) => {
+    const session = await getSessionFromClient()
+    const {menuId, quantity, menuName } = body
+  
+    if(quantity === 0){ // 0개를 추가하면 그냥 무시
+      return
+    }
+    const response = await fetch(`http://localhost:8000/v1/carts`, {
+            method:"POST",
+            body:JSON.stringify({            
+              "menuId" : menuId,
+              "quantity" : quantity
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: "Bearer " + session.formData['access_token'],
+            },
+            credentials: 'include',
+    })
+    toast({
+      title: "Successfully added!",
+      description: "grab more!",
+      duration: 1000,
+    });
   }
 
-  const editCart = (cartId: number, quantity: number) => {
-    console.log('Edit Cart', cartId, quantity)
+  const editCart = async (cartId: number, quantity: number) => {
+
+    const session = await getSessionFromClient()
+    if(quantity === 0){ // 삭제하기
+      const response = await fetch(`http://localhost:8000/v1/carts/${cartId}`, {
+              method:"DELETE",
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + session.formData['access_token'],
+              },
+              credentials: 'include',
+      })
+      toast({
+        variant: "destructive",
+        description: "Successfully deleted!",
+        duration: 1000,
+      });
+     return
+    }
+
+    // 0개가 아니라면, 수정
+    const response = await fetch(`http://localhost:8000/v1/carts/${cartId}`, {
+              method:"PATCH",
+              body:JSON.stringify({
+                quantity: quantity,
+              }),
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: "Bearer " + session.formData['access_token'],
+              },
+              credentials: 'include',
+      })
+      toast({
+        title: "Successfully modified!",
+        description: "grab more!",
+        duration: 1000,
+      });
+     return
   }
+  
+  const getOrders = async () => {
+    const session = await getSessionFromClient()
+    const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: "Bearer " + session.formData['access_token'],
+          },
+          credentials: 'include',
+        })
+        const data = await response.json()
+        if (!response.ok) throw new Error('Failed to fetch orders');
+        return data
+      };
+
+  const getMyCart = async () => {
+    const session = await getSessionFromClient()
+    const response = await fetch(`http://localhost:8000/v1/carts/me`, {
+            method:"GET",
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: "Bearer " + session.formData['access_token'],
+            },
+            credentials: 'include',
+    })
+
+    if (!response.ok) throw new Error('Failed to fetch Mycart');
+    return await response.json();
+  }
+
+  // 0.5초 마다 팀원 전체의 order를 폴링
+  const { data: orders, isLoading, error } = useQuery<any>({
+    queryKey: ['orders'],
+    queryFn: getOrders, 
+    refetchInterval: 500
+  });
+
+  const { data: myCart} = useQuery<MyCart[]>({
+    queryKey: ['myCarts'],
+    queryFn: getMyCart,
+    refetchInterval:500
+  })
+
+  const handlePayment = () => {
+    router.push('/reservation/payment');
+  };
+  const hostUser = {
+    username: orders?.host.username,
+    profileImageUrl: orders?.host.profileImageUrl,
+    cartItems: orders?.host.currentCarts.map((cart: { menuName: any; quantity: any; price: any; totalPrice: any }) => ({
+      menuName: cart.menuName,
+      quantity: cart.quantity,
+      unitPrice: cart.price,
+      totalPrice: cart.totalPrice,
+    })),
+  };
+
+  const inviteesUsers = orders?.invitees.map((invitee: { username: any; profileImageUrl: any; currentCarts: any[] }) => ({
+    username: invitee.username,
+    profileImageUrl: invitee.profileImageUrl,
+    cartItems: invitee.currentCarts.map(cart => ({
+      menuName: cart.menuName,
+      quantity: cart.quantity,
+      unitPrice: cart.price,
+      totalPrice: cart.totalPrice,
+    })),
+  }));
+
 
   return (
     <div className="flex justify-between">
@@ -212,12 +238,18 @@ export default function MyReservation() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {defaultMenus.map((menu) => {
-                const cartItem: Cart | undefined = MyCart.find(
-                  (cart) => cart.menuName === menu.menuName,
-                )
-                const [quantity, setQuantity] = useState(cartItem?.quantity || 0)
-
+              {menus.map((menu) => {
+                const cartItem: MyCart | undefined = myCart?.find(
+                  (cart: MyCart) => cart.menuName === menu.menuName,
+                );
+                const getInitialQuantity = () => {
+                  return cartItem?.quantity ? cartItem?.quantity : 0;
+                };
+                
+                const [quantity, setQuantity] = useState(getInitialQuantity);
+                useEffect(() => {
+                  setQuantity(cartItem?.quantity || 0);
+                }, [cartItem?.quantity || 0]);
                 return (
                   <TableRow key={menu.id}>
                     <TableCell>
@@ -235,32 +267,46 @@ export default function MyReservation() {
                     <TableCell className="w-fit">
                       <div className="flex justify-end">
                       <div className="flex items-center justify-center space-x-2">
-                        <Input
-                          type="number"
-                          min={0}
-                          defaultValue={quantity}
-                          onChange={(e) =>
-                            setQuantity(parseInt(e.target.value))
-                          }
-                          className="w-[4rem]"
-                        />
-                        {cartItem ? (
+                        
+                        {cartItem ? (<>
+                            <Input
+                            type="number"
+                            min={0}
+                            value={quantity}
+                            onChange={(e) =>{
+                              setQuantity(parseInt(e.target.value))
+                            }
+                            }
+                            className="w-[4rem]"
+                          />
                             <Button
                               className="bg-yellow-300 hover:bg-yellow-500 text-black rounded-full"
                               onClick={() => editCart(cartItem.id, quantity)}
                             >
                               Edit
                             </Button>
-                          
+                          </>
                         ) : (
+                          <>
+                          <Input
+                          type="number"
+                          min={0}
+                          defaultValue={0}
+                          onChange={(e) =>{
+                            setQuantity(parseInt(e.target.value))
+                          }
+                          }
+                          className="w-[4rem]"
+                        />
                           <Button
                             className="bg-green-400 hover:bg-green-600 rounded-full"
                             onClick={() =>
-                              addCart({ menuId: menu.id, quantity: quantity })
+                              addCart({ menuId: menu.id, quantity: quantity, menuName: menu.menuName })
                             }
                           >
                             Add
                           </Button>
+                          </>
                         )}
                         </div>
                       </div>
@@ -271,21 +317,31 @@ export default function MyReservation() {
             </TableBody>
           </Table>
         </ScrollArea>
-        <Button className='w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl'>
-          <RiKakaoTalkFill className='mr-2'/> Pay
+        <Button className='w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl' onClick={handlePayment}>
+          <RiKakaoTalkFill className='mr-2' /> Pay
         </Button>
+        {/* <Page/> */}
       </div>
 
       <div className='w-[50rem] p-4'>
         <div className="border-2 bg-white/50 dark:bg-black/50 rounded-xl p-4 h-fit">
           <div className="text-xl font-bold mb-4">Group Order</div>
           <Separator className="mb-4 h-[2px]" />
-          <UserListView />
+          {/* <UserListView orders={orders} /> */}
+          <div className="flex flex-col space-y-4">
+          {hostUser && inviteesUsers && (
+              <UserCard key={hostUser.username} user={hostUser} />
+            )}
+            {(inviteesUsers || []).map((invitee: any, index: any) => (
+            <UserCard key={invitee.username + index} user={invitee} />
+          ))}
+          </div>
           <div className='flex justify-end mt-4'>
-            <Button className='w-full bg-violet-500'>Order</Button>
+            {isHost && (<Button className='w-full bg-violet-500'>Order</Button>)}
           </div>
         </div>
       </div>
+      <Toaster/>
     </div>
   )
 }

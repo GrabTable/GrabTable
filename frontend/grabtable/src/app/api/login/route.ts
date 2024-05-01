@@ -29,7 +29,6 @@ async function sendPostRequest(body_code: String | null) {
     cookies().set('refresh-token', refresh_token)
 
     const access_token = (await response.json())?.accessToken
-
     const res = await fetch('http://localhost:8000/v1/user/me', {
       method: 'GET',
       headers: {
@@ -37,10 +36,12 @@ async function sendPostRequest(body_code: String | null) {
         Cookie: cookies().toString(),
         Authorization: 'Bearer ' + access_token,
       },
+      credentials: 'include',
     })
     const userInfo = await res.json()
     const input = {
       access_token: access_token,
+      cookie: cookies().toString(),
       userInfo: userInfo,
     }
 

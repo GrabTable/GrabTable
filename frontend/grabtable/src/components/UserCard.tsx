@@ -2,16 +2,18 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { FaPlus, FaMinus } from 'react-icons/fa6'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 
 interface CartItem {
   menuName: string
   quantity: number
   unitPrice: number
+  totalPrice: number
 }
 
 interface User {
   username: string
-  orderCompleted: boolean
+  profileImageUrl: string
   cartItems: CartItem[]
 }
 
@@ -40,9 +42,13 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
         className="flex justify-between items-center"
         style={{ cursor: 'pointer' }}
       >
+        <Avatar>
+      <AvatarImage src={user.profileImageUrl} alt="@shadcn" />
+        <AvatarFallback>{user.username}</AvatarFallback>
+      </Avatar>
         <h3>{user.username}</h3>
-        <p>{user.orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
 
+        
         <motion.button
           onClick={toggleCard}
           className="text-lg font-bold p-1 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 transition duration-150 ease-in-out"
@@ -68,7 +74,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           {user.cartItems.map((item, index) => (
             <li
               key={index}
-            >{`${item.menuName}: ${item.quantity} x ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
+            >{`${item.menuName}: ${item.quantity} X ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
           ))}
         </ul>
         <p>Total Price: ₩{calculateTotalPrice()}</p>

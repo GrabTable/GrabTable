@@ -57,7 +57,6 @@ public class CartService {
         }
 
         cart.changeQuantity(cartUpdateRequest.getQuantity());
-        cartRepository.save(cart);
     }
 
 

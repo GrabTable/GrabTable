@@ -17,8 +17,8 @@ export const links = [
     hash: '/restaurants',
   },
   {
-    name: 'Reservations',
-    hash: '/reservations',
+    name: 'Reservation',
+    hash: '/reservation',
   },
   {
     name: 'My page',

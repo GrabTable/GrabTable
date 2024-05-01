@@ -1,5 +1,6 @@
 package edu.skku.grabtable.cart.domain;
 
+import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;

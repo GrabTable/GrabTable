@@ -57,6 +57,7 @@ public class ReservationService {
         }
 
         user.joinReservation(reservation);
+        userRepository.save(user);
     }
 
     public ReservationDetailResponse findReservationByUser(User user) {

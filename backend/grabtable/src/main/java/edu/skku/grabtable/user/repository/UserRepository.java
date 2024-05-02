@@ -18,8 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             SELECT u
             FROM User u
             join fetch u.invitedReservation r
-            join fetch u.carts c
-            where u.invitedReservation = :reservation
+            left join fetch u.carts c
+            where u.invitedReservation = :reservation and r.host != u
             """)
     List<User> findAllByInvitedReservation(Reservation reservation);
 }

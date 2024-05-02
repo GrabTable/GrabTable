@@ -65,7 +65,7 @@ class OrderServiceTest {
         OrderResponse orderResponse = orderService.create(user, paymentRequest);
 
         //then
-        assertThat(orderResponse.getStatus()).isEqualTo("PENDING");
+        assertThat(orderResponse.getStatus()).isEqualTo("PAID");
     }
 
     @Test

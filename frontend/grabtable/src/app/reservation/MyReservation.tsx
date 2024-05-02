@@ -86,6 +86,7 @@ interface MyReservationProps {
 
 export default function MyReservation(props: MyReservationProps) {
   const { menus, storeID, isHost } = props
+  const [ allPaid, setAllPaid ] = useState(false)
 
   const { toast } = useToast()
   const router = useRouter()
@@ -166,6 +167,11 @@ export default function MyReservation(props: MyReservationProps) {
       credentials: 'include',
     })
     const data = await response.json()
+
+    if(data?.invitees.filter((invitee: any) => invitee.currentCarts.length > 0).length == 0 && data?.host.currentCarts.length == 0){
+      setAllPaid(true)
+    }
+
     if (!response.ok) throw new Error('Failed to fetch orders')
     return data
   }
@@ -208,7 +214,6 @@ export default function MyReservation(props: MyReservationProps) {
   const hostUser = {
     username: orders?.host.username,
     profileImageUrl: orders?.host.profileImageUrl,
-    orderCompleted: orders?.host.orderCompleted,
     cartItems: orders?.host.currentCarts.map(
       (cart: {
         menuName: any
@@ -358,7 +363,7 @@ export default function MyReservation(props: MyReservationProps) {
             ))}
           </div>
           <div className="flex justify-end mt-4">
-            {isHost && <Button className="w-full bg-violet-500">Order</Button>}
+            {isHost && allPaid && <Button className="w-full bg-violet-500">Order</Button>}
           </div>
         </div>
       </div>

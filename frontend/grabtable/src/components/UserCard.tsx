@@ -14,7 +14,6 @@ interface CartItem {
 interface User {
   username: string
   profileImageUrl: string
-  orderCompleted: boolean
   cartItems: CartItem[]
 }
 
@@ -48,7 +47,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           <AvatarFallback>{user.username}</AvatarFallback>
         </Avatar>
         <h3>{user.username}</h3>
-        <p>{user.orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
+        <p>{user.orderCompleted === 'PAID' ? 'Order Completed' : 'Order Incompleted'}</p>
 
         <motion.button
           onClick={toggleCard}

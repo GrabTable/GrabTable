@@ -113,9 +113,6 @@ export default function Page() {
 
   return (
     <>
-      <Script 
-        src="https://cdn.iamport.kr/v1/iamport.js"
-        strategy="beforeInteractive"/>
       <div>
       {myCart.length > 0 ? (
         <ul>
@@ -133,6 +130,10 @@ export default function Page() {
           <RiKakaoTalkFill className='mr-2' /> Pay
       </Button>) : ""}
     
+      <Script
+        src="https://cdn.iamport.kr/v1/iamport.js"
+        strategy="beforeInteractive"
+      />
     </>
   )
 }

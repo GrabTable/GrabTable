@@ -61,7 +61,7 @@ public class Order extends BaseTimeEntity {
         this.carts = carts;
         changeCartsMapping(carts);
         this.totalPrice = calculateTotalPrice(carts);
-        this.status = OrderStatus.PENDING;
+        this.status = OrderStatus.PAID;
     }
 
 

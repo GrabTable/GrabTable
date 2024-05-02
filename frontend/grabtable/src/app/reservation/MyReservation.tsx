@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
+import Spinner from '@/components/spinner'
 
 interface CartItem {
   menuName: string
@@ -70,7 +71,11 @@ type Orders = {
   host: UserCartsInfo
   invitees: UserCartsInfo[]
   inviteCode: string
-  orders: string[]
+  orders: {
+    id: number
+    userId: number
+    carts: CartItem[]
+  }[]
 }
 type MenuQuantity = {
   menuId: number
@@ -86,10 +91,10 @@ interface MyReservationProps {
 
 export default function MyReservation(props: MyReservationProps) {
   const { menus, storeID, isHost } = props
-  const [allPaid, setAllPaid] = useState(false)
-
   const { toast } = useToast()
   const router = useRouter()
+  const [orderConfirm, setOrderConfirm] = useState(false);
+  const [loading, setLoading] = useState(false)
   const addCart = async (body: MenuQuantity) => {
     const session = await getSessionFromClient()
     const { menuId, quantity, menuName } = body
@@ -168,15 +173,12 @@ export default function MyReservation(props: MyReservationProps) {
     })
     const data = await response.json()
 
-    if (
-      data?.invitees.filter((invitee: any) => invitee.currentCarts.length > 0)
-        .length == 0 &&
-      data?.host.currentCarts.length == 0
-    ) {
-      setAllPaid(true)
-    }
-
     if (!response.ok) throw new Error('Failed to fetch orders')
+    const orderIds = data.orders.map((order: { id: any }) => order.id); // 주문들의 ID 배열 생성
+    const allParticipants = [data.host.id, ...data.invitees.map((invitee: { id: any }) => invitee.id)];
+    const allMatched = allParticipants.every(participantId => orderIds.includes(participantId));
+
+    setOrderConfirm(allMatched);
     return data
   }
 
@@ -218,6 +220,7 @@ export default function MyReservation(props: MyReservationProps) {
   const hostUser = {
     username: orders?.host.username,
     profileImageUrl: orders?.host.profileImageUrl,
+    id: orders?.host.id,
     cartItems: orders?.host.currentCarts.map(
       (cart: {
         menuName: any
@@ -237,9 +240,11 @@ export default function MyReservation(props: MyReservationProps) {
     (invitee: {
       username: any
       profileImageUrl: any
+      id: number
       currentCarts: any[]
     }) => ({
       username: invitee.username,
+      id: invitee.id,
       profileImageUrl: invitee.profileImageUrl,
       cartItems: invitee.currentCarts.map((cart) => ({
         menuName: cart.menuName,
@@ -248,11 +253,38 @@ export default function MyReservation(props: MyReservationProps) {
         totalPrice: cart.totalPrice,
       })),
     }),
-  )
+    )
+  const confimation = async () => {
+    setLoading(true)
+    const session = await getSessionFromClient()
+    const response = await fetch(`http://localhost:8000/v1/reservations/confirm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
+      },
+      credentials: 'include',
+    })
 
+    setTimeout(() => {
+      toast({
+        title: 'Confirmed',
+        description: 'Enjoy!',
+        duration: 1000, 
+      });
+
+      setTimeout(() => {
+        router.push('/');
+      }, 1500); 
+
+      setLoading(false); 
+    }, 1000);
+  }
   return (
     <div className="flex justify-between">
       <div className="w-full mr-4 ">
+
+      {loading && <Spinner />}
         <ScrollArea className="h-[50rem]">
           <Table>
             <TableHeader>
@@ -367,9 +399,7 @@ export default function MyReservation(props: MyReservationProps) {
             ))}
           </div>
           <div className="flex justify-end mt-4">
-            {isHost && allPaid && (
-              <Button className="w-full bg-violet-500">Order</Button>
-            )}
+            {isHost && orderConfirm && <Button className="w-full bg-violet-500" onClick={confimation}>Reservation confirmation</Button>}
           </div>
         </div>
       </div>

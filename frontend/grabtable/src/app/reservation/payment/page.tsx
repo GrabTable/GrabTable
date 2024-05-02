@@ -6,8 +6,10 @@ import Script from 'next/script'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import { RequestPayParams, RequestPayResponse } from '../portone'
+import { useRouter } from 'next/navigation'
 
 export default function Page() {
+  const router = useRouter()
   type MyCart = {
     id: number
     quantity: number
@@ -52,6 +54,7 @@ export default function Page() {
     }
 
     IMP.request_pay(data, callback)
+
   }
 
   async function callback(response: RequestPayResponse) {
@@ -70,6 +73,7 @@ export default function Page() {
       body: JSON.stringify(request),
     })
     const postResponse: Promise<PostOrderResponse> = res.json()
+    router.push('/reservation')
   }
   const [myCart, setMyCart] = useState<MyCart[]>([])
 

@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { FaPlus, FaMinus } from 'react-icons/fa6'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 
 interface CartItem {
   menuName: string
@@ -14,16 +15,45 @@ interface CartItem {
 interface User {
   username: string
   profileImageUrl: string
+  id: number
   cartItems: CartItem[]
 }
 
 interface UserCardProps {
   user: User
 }
+type Cart = {
+  id: number
+  user: null
+  menuName: string
+  price: number
+  order: any
+  sharedOrder: any
+  quantity: number
+}
 
+type UserCartsInfo = {
+  id: number
+  username: string
+  profileImageUrl: string
+  currentCarts: Cart[]
+}
+
+type Orders = {
+  id: number
+  storeId: number
+  host: UserCartsInfo
+  invitees: UserCartsInfo[]
+  inviteCode: string
+  orders: {
+    id: number
+    userId: number
+    carts: CartItem[]
+  }[]
+}
 export function UserCard({ user }: UserCardProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
-
+  const [orderCompleted, setOrderCompleted] = useState(false)
   const toggleCard = () => {
     setIsOpen(!isOpen)
   }
@@ -34,7 +64,24 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
       0,
     )
   }
+  useEffect(() => {
+    async function checkOrderStatus() {
+      const session = await getSessionFromClient()
+      const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + session.formData['access_token'],
+        },
+        credentials: 'include',
+      });
+      const data = await response.json();
 
+      const isOrderCompleted = data.orders.some((order: Orders) => order.id === user.id);
+      setOrderCompleted(isOrderCompleted);
+    }
+    checkOrderStatus();
+  }, []);
+  
   return (
     <div className="border p-4 mb-4 rounded shadow">
       <div
@@ -47,7 +94,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           <AvatarFallback>{user.username}</AvatarFallback>
         </Avatar>
         <h3>{user.username}</h3>
-        <p>'Order Completed' : 'Order Incompleted'</p>
+        <p>{orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
 
         <motion.button
           onClick={toggleCard}

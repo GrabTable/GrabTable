@@ -1,18 +1,17 @@
 'use client'
 
-import Script from 'next/script'
-import { RequestPayParams, RequestPayResponse } from '../portone'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { Button } from '@/components/ui/button'
-import { RiKakaoTalkFill } from 'react-icons/ri'
-import { useQuery } from "@tanstack/react-query";
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import Script from 'next/script'
 import { useEffect, useState } from 'react'
+import { RiKakaoTalkFill } from 'react-icons/ri'
+import { RequestPayParams, RequestPayResponse } from '../portone'
 
 export default function Page() {
   type MyCart = {
     id: number
     quantity: number
-    menuName : string
+    menuName: string
     price: number
     totalPrice: number
   }
@@ -57,46 +56,46 @@ export default function Page() {
 
   async function callback(response: RequestPayResponse) {
     let request: any = {
-      imp_uid: response.imp_uid,
-      paid_amount: response.paid_amount,
+      impUid: response.imp_uid,
+      amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
     const res = await fetch('http://localhost:8000/v1/orders', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: "Bearer " + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['access_token'],
       },
       credentials: 'include',
       body: JSON.stringify(request),
     })
     const postResponse: Promise<PostOrderResponse> = res.json()
   }
-  const [myCart, setMyCart] = useState<MyCart[]>([]);
+  const [myCart, setMyCart] = useState<MyCart[]>([])
 
   const getMyCart = async () => {
     try {
-      const session = await getSessionFromClient();
+      const session = await getSessionFromClient()
       const response = await fetch(`http://localhost:8000/v1/carts/me`, {
-        method: "GET",
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: "Bearer " + session.formData['access_token'],
+          Authorization: 'Bearer ' + session.formData['access_token'],
         },
         credentials: 'include',
-      });
+      })
 
-      if (!response.ok) throw new Error('Failed to fetch my cart');
-      const cartData = await response.json();
-      setMyCart(cartData);
+      if (!response.ok) throw new Error('Failed to fetch my cart')
+      const cartData = await response.json()
+      setMyCart(cartData)
     } catch (error) {
-      console.error('Error fetching cart:', error);
+      console.error('Error fetching cart:', error)
     }
-  };
+  }
 
   useEffect(() => {
-    getMyCart();
-  }, []); 
+    getMyCart()
+  }, [])
 
   // useEffect(() => {
   //   // 페이지 로드 시 'alreadyRefreshed' 키를 확인
@@ -110,26 +109,33 @@ export default function Page() {
   //   }
   // }, []);
 
-
   return (
     <>
       <div>
+        {myCart.length > 0 ? (
+          <ul>
+            {myCart.map((item) => (
+              <li key={item.id}>
+                {item.menuName} - Quantity: {item.quantity} - Price:{' '}
+                {item.price} - Total Price: {item.totalPrice}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No items in your cart.</p>
+        )}
+      </div>
       {myCart.length > 0 ? (
-        <ul>
-          {myCart.map(item => (
-            <li key={item.id}>
-              {item.menuName} - Quantity: {item.quantity} - Price: {item.price} - Total Price: {item.totalPrice}
-            </li>
-          ))}
-        </ul>
+        <Button
+          className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
+          onClick={onClickPayment}
+          type="submit"
+        >
+          <RiKakaoTalkFill className="mr-2" /> Pay
+        </Button>
       ) : (
-        <p>No items in your cart.</p>
+        ''
       )}
-    </div>
-    { myCart.length > 0 ? (<Button className='w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl' onClick={onClickPayment} type="submit">
-          <RiKakaoTalkFill className='mr-2' /> Pay
-      </Button>) : ""}
-    
       <Script
         src="https://cdn.iamport.kr/v1/iamport.js"
         strategy="beforeInteractive"
@@ -137,4 +143,3 @@ export default function Page() {
     </>
   )
 }
-

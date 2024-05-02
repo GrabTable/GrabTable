@@ -1,9 +1,8 @@
 'use client'
 
-import React from 'react'
-import SectionHeading from './section-heading'
-import { motion } from 'framer-motion'
 import { useSectionInView } from '@/lib/hooks'
+import { motion } from 'framer-motion'
+import SectionHeading from './section-heading'
 
 export default function Contact() {
   const { ref } = useSectionInView('About', 0.5)
@@ -19,31 +18,29 @@ export default function Contact() {
       >
         <SectionHeading>Contact</SectionHeading>
         <p className="mb-3">
-          After graduating with a degree in{' '}
-          <span className="font-medium">Accounting</span>, I decided to pursue
-          my passion for programming. I enrolled in a coding bootcamp and
-          learned{' '}
-          <span className="font-medium">full-stack web development</span>.{' '}
-          <span className="italic">My favorite part of programming</span> is the
-          problem-solving aspect. I <span className="underline">love</span> the
-          feeling of finally figuring out a solution to a problem. My core stack
-          is{' '}
-          <span className="font-medium">
-            React, Next.js, Node.js, and MongoDB
-          </span>
-          . I am also familiar with TypeScript and Prisma. I am always looking
-          to learn new technologies. I am currently looking for a{' '}
-          <span className="font-medium">full-time position</span> as a software
-          developer.
+          GrabTable에서는 새로운 식당과 카페의 정보 등록을 적극 환영합니다!
+          여러분의 매장을 GrabTable 애플리케이션에 등록함으로써 더 많은 고객과의
+          만남을 가질 수 있습니다. 저희 플랫폼을 통해 매장을 홍보하고, 새로운
+          고객층을 끌어들이세요. 등록 절차는 간단하며, 매장 정보, 메뉴, 위치,
+          사진 등을 포함하여 상세히 소개할 수 있습니다. GrabTable은 매장의
+          가시성을 높이고, 고객들에게 새로운 식사 경험을 제공할 수 있는 기회를
+          제공합니다. 지금 바로 <b>grabtable@gmail.com</b>으로 연락하여 매장을
+          등록하세요. 여러분의 매장이 GrabTable 커뮤니티의 일원이 되길
+          기대합니다!
         </p>
 
         <p>
-          <span className="italic">When I'm not coding</span>, I enjoy playing
-          video games, watching movies, and playing with my dog. I also enjoy{' '}
-          <span className="font-medium">learning new things</span>. I am
-          currently learning about{' '}
-          <span className="font-medium">history and philosophy</span>. I'm also
-          learning how to play the guitar.
+          GrabTable warmly welcomes the registration of new restaurants and
+          cafes! By listing your establishment on the GrabTable app, you can
+          connect with more customers. Promote your business through our
+          platform and attract a new clientele. The registration process is
+          simple, allowing you to comprehensively showcase your establishment
+          with details such as menu, location, photos, and more. GrabTable
+          enhances the visibility of your restaurant and offers an opportunity
+          to provide new dining experiences to customers. Contact us now at
+          <b> grabtable@gmail.com</b> to register your establishment. We look
+          forward to seeing your restaurant become a part of the GrabTable
+          community!
         </p>
       </motion.section>
     </section>

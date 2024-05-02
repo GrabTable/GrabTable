@@ -1,9 +1,8 @@
 'use client'
 
-import React from 'react'
-import SectionHeading from './section-heading'
-import { motion } from 'framer-motion'
 import { useSectionInView } from '@/lib/hooks'
+import { motion } from 'framer-motion'
+import SectionHeading from './section-heading'
 
 export default function About() {
   const { ref } = useSectionInView('About', 0.5)
@@ -19,31 +18,27 @@ export default function About() {
       >
         <SectionHeading>About Grabtable</SectionHeading>
         <p className="mb-3">
-          After graduating with a degree in{' '}
-          <span className="font-medium">Accounting</span>, I decided to pursue
-          my passion for programming. I enrolled in a coding bootcamp and
-          learned{' '}
-          <span className="font-medium">full-stack web development</span>.{' '}
-          <span className="italic">My favorite part of programming</span> is the
-          problem-solving aspect. I <span className="underline">love</span> the
-          feeling of finally figuring out a solution to a problem. My core stack
-          is{' '}
-          <span className="font-medium">
-            React, Next.js, Node.js, and MongoDB
-          </span>
-          . I am also familiar with TypeScript and Prisma. I am always looking
-          to learn new technologies. I am currently looking for a{' '}
-          <span className="font-medium">full-time position</span> as a software
-          developer.
+          고민 중이신가요? 직장에서 메뉴 선택으로 고민하고 계시나요? 정산 문제로
+          상사와 마찰을 겪고 계신가요? 높은 평점의 식당에서 실망스러운 경험을
+          하셨나요? GrabTable은 이러한 문제를 해결해 드리는 단체 예약에 특화된
+          애플리케이션입니다. 회사 점심 회의나 팀 빌딩 저녁 식사 등, 모든 단체
+          식사 예약을 손쉽게 관리해드립니다. 맛집 정보와 리뷰 검증을 통해 신뢰할
+          수 있는 식당 선택을 도와드리며, 예약부터 결제까지 한 번에 처리할 수
+          있는 편리한 기능을 제공합니다. GrabTable과 함께라면 식사 계획이 한결
+          간편해집니다.
         </p>
 
         <p>
-          <span className="italic">When I'm not coding</span>, I enjoy playing
-          video games, watching movies, and playing with my dog. I also enjoy{' '}
-          <span className="font-medium">learning new things</span>. I am
-          currently learning about{' '}
-          <span className="font-medium">history and philosophy</span>. I'm also
-          learning how to play the guitar.
+          Are you wrestling with menu selections at work? Are you dealing with
+          conflicts over payment issues with your boss? Have high-rated
+          restaurants left you disappointed? Introducing GrabTable, the app
+          designed to streamline your group dining experiences. Perfect for
+          company lunch meetings or team-building dinners, GrabTable makes it
+          easy to handle all your group reservations. With our curated selection
+          of verified restaurant reviews, we guide you to trustworthy dining
+          options. Our app simplifies your planning with features that manage
+          everything from booking to payment in a single step. Simplify your
+          dining plans with GrabTable, where good food meets convenience.
         </p>
       </motion.section>
     </section>

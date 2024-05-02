@@ -14,6 +14,7 @@ interface CartItem {
 interface User {
   username: string
   profileImageUrl: string
+  orderCompleted: boolean
   cartItems: CartItem[]
 }
 
@@ -47,8 +48,8 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
         <AvatarFallback>{user.username}</AvatarFallback>
       </Avatar>
         <h3>{user.username}</h3>
+        <p>{user.orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
 
-        
         <motion.button
           onClick={toggleCard}
           className="text-lg font-bold p-1 rounded-full bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 transition duration-150 ease-in-out"
@@ -74,7 +75,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           {user.cartItems.map((item, index) => (
             <li
               key={index}
-            >{`${item.menuName}: ${item.quantity} X ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
+            >{`${item.menuName}: ${item.quantity} x ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
           ))}
         </ul>
         <p>Total Price: ₩{calculateTotalPrice()}</p>

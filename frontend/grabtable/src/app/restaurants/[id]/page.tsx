@@ -304,6 +304,9 @@ export default function Restaurant() {
         <TableBody>
           {reviews.map((review: Review) => (
             <TableRow key={review.id}>
+              {/* <TableCell className='w-[10rem]'>
+                <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
+              </TableCell> */}
               <TableCell className="flex items-start flex-col">
                 <div className="flex items-center mt-4">
                   <div>{review.username || 'anonymous user'}</div>

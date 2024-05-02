@@ -31,9 +31,15 @@ export default function Home() {
 
   const filterStores = (stores: Restaurant[]) => {
     if (search) {
-      setStores(stores.filter(store => store.storeName.toLowerCase().includes(search.toLowerCase())))
+      setStores(
+        stores.filter((store) =>
+          store.storeName.toLowerCase().includes(search.toLowerCase()),
+        ),
+      )
     } else if (category) {
-      setStores(stores.filter(store => store.category === category.toUpperCase()))
+      setStores(
+        stores.filter((store) => store.category === category.toUpperCase()),
+      )
     } else {
       setStores(stores)
     }
@@ -53,12 +59,16 @@ export default function Home() {
   }
   console.log(stores)
   return (
-    <div className='mx-48'>
+    <div className="mx-48">
       <InputWithButton input={search || category || ''} />
       <section className="flex min-h-screen flex-col items-center justify-between scroll-mt-[0rem]">
-        <div className='w-full'>
+        <div className="w-full">
           {stores.map((store: Restaurant) => (
-            <Link key={store.id} href={`/restaurants/${store['id']}`} className='hover:cursor-pointer'>
+            <Link
+              key={store.id}
+              href={`/restaurants/${store['id']}`}
+              className="hover:cursor-pointer"
+            >
               <RestaurantCard key={store.id} {...store} />
             </Link>
           ))}

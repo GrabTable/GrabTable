@@ -2,7 +2,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 import { UserCard } from './UserCard'
 
-
 interface CartItem {
   menuName: string;
   quantity: number;
@@ -12,6 +11,7 @@ interface CartItem {
 interface User {
   username: string
   profileImageUrl: string
+  orderCompleted: boolean
   cartItems: CartItem[]
 }
 
@@ -63,6 +63,7 @@ export function UserListView(orders: any): any {
       unitPrice: cart.price,
       totalPrice: cart.totalPrice,
     })),
+    orderCompleted: false
   };
 
   // Parsing the invitees data

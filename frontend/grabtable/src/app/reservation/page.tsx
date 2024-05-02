@@ -7,10 +7,12 @@ import { useRouter } from 'next/navigation'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
+import InviteCode from './InvitateCode'
 
 export default function Page() {
   const router = useRouter()
   const [hasReservation, setHasReservation] = useState(false)
+  const [inviteCode, setInviteCode] = useState('')
   const [storeID, setStoreID] = useState(0)
   const [menus, setMenus] = useState([])
   const [isHost, setisHost] = useState(false)
@@ -45,6 +47,7 @@ export default function Page() {
         )
         const data = await response.json()
         if (response.ok) {
+          setInviteCode(data.inviteCode)
           setStoreID(data.storeId)
           if (data.host.id === session.formData['userInfo'].id) {
             setisHost(true)
@@ -74,7 +77,10 @@ export default function Page() {
       <Suspense fallback={<div>Loading...</div>}>
         <ReactQueryProvider>
           {hasReservation ? (
-            <MyReservation menus={menus} storeID={storeID} isHost={isHost} />
+            <div>
+              <InviteCode inviteCode={inviteCode} />
+              <MyReservation menus={menus} storeID={storeID} isHost={isHost} />
+            </div>
           ) : (
             <NoReservation />
           )}

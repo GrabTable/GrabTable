@@ -2,7 +2,6 @@
 import { UserCard } from '@/components/UserCard'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/button'
-import { UserListView } from '@/components/UserListView'
 import Image from 'next/image'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'

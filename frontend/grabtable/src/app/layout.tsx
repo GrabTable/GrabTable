@@ -7,6 +7,7 @@ import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
+import { Suspense } from 'react'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ export default function RootLayout({
         <ThemeContextProvider>
           <ActiveSectionContextProvider>
             <Header />
+            <Suspense>
             {children}
+            </Suspense>
             <Footer />
 
             <Toaster position="top-right" />

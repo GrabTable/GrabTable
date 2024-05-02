@@ -44,9 +44,9 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
         style={{ cursor: 'pointer' }}
       >
         <Avatar>
-      <AvatarImage src={user.profileImageUrl} alt="@shadcn" />
-        <AvatarFallback>{user.username}</AvatarFallback>
-      </Avatar>
+          <AvatarImage src={user.profileImageUrl} alt="@shadcn" />
+          <AvatarFallback>{user.username}</AvatarFallback>
+        </Avatar>
         <h3>{user.username}</h3>
         <p>{user.orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
 

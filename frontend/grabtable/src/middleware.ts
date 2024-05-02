@@ -6,5 +6,4 @@ export const config = {
 }
 export async function middleware(req: NextRequest) {
   const session = await getSession()
-  
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 function Spinner() {
   return (
@@ -38,7 +38,7 @@ function Spinner() {
         }
       `}</style>
     </div>
-  );
+  )
 }
 
-export default Spinner;
+export default Spinner

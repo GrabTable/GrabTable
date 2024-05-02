@@ -3,10 +3,10 @@ import { useState } from 'react'
 import { UserCard } from './UserCard'
 
 interface CartItem {
-  menuName: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+  menuName: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
 }
 interface User {
   username: string
@@ -27,7 +27,6 @@ type UserCartsInfo = {
   currentCarts: Cart[]
 }
 
-
 type Cart = {
   id: number
   user: null
@@ -38,45 +37,65 @@ type Cart = {
   quantity: number
 }
 interface CartItem {
-  menuName: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
+  menuName: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
 }
 interface Orders {
-  id: number;
-  storeId: number;
-  host: User;
-  invitees: User[];
-  inviteCode: string;
-  sharedOrder: null;
-  order: [];
+  id: number
+  storeId: number
+  host: User
+  invitees: User[]
+  inviteCode: string
+  sharedOrder: null
+  order: []
 }
 
 export function UserListView(orders: any): any {
   const hostUser: User = {
     username: orders.host.username,
     profileImageUrl: orders.host.profileImageUrl,
-    cartItems: orders.host.currentCarts.map((cart: { menuName: any; quantity: any; price: any; totalPrice: any; }) => ({
-      menuName: cart.menuName,
-      quantity: cart.quantity,
-      unitPrice: cart.price,
-      totalPrice: cart.totalPrice,
-    })),
-    orderCompleted: false
-  };
+    cartItems: orders.host.currentCarts.map(
+      (cart: {
+        menuName: any
+        quantity: any
+        price: any
+        totalPrice: any
+      }) => ({
+        menuName: cart.menuName,
+        quantity: cart.quantity,
+        unitPrice: cart.price,
+        totalPrice: cart.totalPrice,
+      }),
+    ),
+    orderCompleted: false,
+  }
 
   // Parsing the invitees data
-  const inviteesUsers: User[] = orders.invitees.map((invitee: { username: any; profileImageUrl: any; currentCarts: any[]; }) => ({
-    username: invitee.username,
-    profileImageUrl: invitee.profileImageUrl,
-    cartItems: invitee.currentCarts.map((cart: { menuName: any; quantity: any; price: any; totalPrice: any; }) => ({
-      menuName: cart.menuName,
-      quantity: cart.quantity,
-      unitPrice: cart.price,
-      totalPrice: cart.totalPrice,
-    })),
-  }));
+  const inviteesUsers: User[] = orders.invitees.map(
+    (invitee: {
+      username: any
+      profileImageUrl: any
+      currentCarts: any[]
+    }) => ({
+      username: invitee.username,
+      profileImageUrl: invitee.profileImageUrl,
+      cartItems: invitee.currentCarts.map(
+        (cart: {
+          menuName: any
+          quantity: any
+          price: any
+          totalPrice: any
+        }) => ({
+          menuName: cart.menuName,
+          quantity: cart.quantity,
+          unitPrice: cart.price,
+          totalPrice: cart.totalPrice,
+        }),
+      ),
+    }),
+  )
 
   return (
     <div className="flex flex-col space-y-4">
@@ -86,5 +105,5 @@ export function UserListView(orders: any): any {
         <UserCard key={invitee.username + index} user={invitee} />
       ))}
     </div>
-  );
+  )
 }

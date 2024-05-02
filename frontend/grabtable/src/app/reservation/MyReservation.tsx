@@ -209,6 +209,7 @@ export default function MyReservation(props: MyReservationProps) {
   const hostUser = {
     username: orders?.host.username,
     profileImageUrl: orders?.host.profileImageUrl,
+    orderCompleted: orders?.host.orderCompleted,
     cartItems: orders?.host.currentCarts.map(
       (cart: {
         menuName: any

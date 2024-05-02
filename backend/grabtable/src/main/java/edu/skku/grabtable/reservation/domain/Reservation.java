@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class Reservation extends BaseTimeEntity {
     @OneToMany(mappedBy = "invitedReservation")
     private List<User> invitees = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
 

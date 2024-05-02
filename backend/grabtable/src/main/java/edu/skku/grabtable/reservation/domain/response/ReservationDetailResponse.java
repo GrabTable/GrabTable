@@ -2,7 +2,6 @@ package edu.skku.grabtable.reservation.domain.response;
 
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
-import edu.skku.grabtable.reservation.domain.Reservation;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,20 +11,30 @@ import lombok.Getter;
 public class ReservationDetailResponse {
 
     private Long id;
-    private UserInfoResponse host;
-    private List<UserInfoResponse> invitees;
+    private Long storeId;
+    private UserCartsInfoResponse host;
+    private List<UserCartsInfoResponse> invitees;
     private String inviteCode;
     private SharedOrderResponse sharedOrder;
     private List<OrderResponse> orders;
 
-    public static ReservationDetailResponse of(Reservation reservation) {
+    public static ReservationDetailResponse of(
+            Long reservationId,
+            Long storeId,
+            UserCartsInfoResponse hostInfo,
+            List<UserCartsInfoResponse> inviteesInfo,
+            String inviteCode,
+            List<OrderResponse> orders
+    ) {
         return new ReservationDetailResponse(
-                reservation.getId(),
+                //TODO
+                reservationId,
+                storeId,
+                hostInfo,
+                inviteesInfo,
+                inviteCode,
                 null,
-                null,
-                reservation.getInviteCode(),
-                null,
-                null
+                orders
         );
     }
 }

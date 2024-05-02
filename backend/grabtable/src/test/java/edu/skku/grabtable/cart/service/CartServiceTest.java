@@ -6,7 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.skku.grabtable.cart.domain.Cart;
-import edu.skku.grabtable.cart.domain.request.CartRequest;
+import edu.skku.grabtable.cart.domain.request.CartUpdateRequest;
+import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.store.domain.Menu;
 import edu.skku.grabtable.store.domain.MenuStatus;
@@ -51,7 +52,7 @@ public class CartServiceTest {
                 .thenReturn(List.of(cart, cart2));
 
         //when
-        List<Cart> result = cartService.getCurrentCarts(user);
+        List<CartResponse> result = cartService.findCurrentCarts(user.getId());
 
         //then
         assertThat(result.size()).isEqualTo(2);
@@ -61,19 +62,16 @@ public class CartServiceTest {
     @DisplayName("UserId와 CartId로 유저의 장바구니를 수정할 수 있다")
     void modifyCartByUserIdAndCartId() {
         //given
-        CartRequest updateCartRequest = new CartRequest(1L, 2);
+        CartUpdateRequest updateCartRequest = new CartUpdateRequest(2);
         Menu menu = new Menu(1L, null, "menuName", 10000, "url", MenuStatus.VALID);
-        Long updateCartId = 1L;
         User user = new User(1L, "userA", new ArrayList<>());
         Cart cart = new Cart(1L, user, "menuName", 10000, null, null, 1);
         user.getCarts().add(cart);
         when(cartRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(cart));
-        when(menuRepository.findById(any(Long.class)))
-                .thenReturn(Optional.of(menu));
 
         //when
-        cartService.modifyCart(user.getId(), updateCartId, updateCartRequest);
+        cartService.updateCart(user, 1L, updateCartRequest);
 
         //then
         assertThat(cart.getQuantity()).isEqualTo(2);

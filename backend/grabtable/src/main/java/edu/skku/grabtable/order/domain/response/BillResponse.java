@@ -20,7 +20,11 @@ public class BillResponse {
     private BigDecimal amount;
 
     public static BillResponse of(Bill bill) {
-        return new BillResponse(bill.getId(), bill.getImpUid(), bill.getMerchantUid(), bill.getReceiptUrl(),
+        return new BillResponse(
+                bill.getId(),
+                bill.getImpUid(),
+                bill.getMerchantUid(),
+                bill.getReceiptUrl(),
                 bill.getAmount());
     }
 }

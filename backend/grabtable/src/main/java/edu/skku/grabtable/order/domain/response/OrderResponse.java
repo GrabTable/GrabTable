@@ -24,4 +24,8 @@ public class OrderResponse {
                 order.getStatus().toString()
         );
     }
+
+    public static OrderResponse of(Long orderId, Long userId, List<CartResponse> carts, String status) {
+        return new OrderResponse(orderId, userId, carts, status);
+    }
 }

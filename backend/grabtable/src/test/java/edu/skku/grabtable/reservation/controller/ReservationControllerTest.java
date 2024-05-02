@@ -99,7 +99,7 @@ class ReservationControllerTest extends ControllerTest {
     @DisplayName("유저의 현재 예약을 조회할 수 있다.")
     void me() throws Exception {
         //given
-        ReservationDetailResponse response = new ReservationDetailResponse(1L, null, null,
+        ReservationDetailResponse response = new ReservationDetailResponse(1L, 1L, null, null,
                 "invite-code", null, null);
         when(reservationService.findReservationByUser(any()))
                 .thenReturn(response);
@@ -118,6 +118,9 @@ class ReservationControllerTest extends ControllerTest {
                                 fieldWithPath("id")
                                         .type(JsonFieldType.NUMBER)
                                         .description("예약 ID"),
+                                fieldWithPath("storeId")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("가게 ID"),
                                 fieldWithPath("host")
                                         .type(JsonFieldType.NULL)
                                         .description("호스트 정보"),

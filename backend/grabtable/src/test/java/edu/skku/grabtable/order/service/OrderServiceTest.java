@@ -53,7 +53,7 @@ class OrderServiceTest {
                 new ArrayList<>());
         Cart cart = new Cart(1L, user, "coke", 2000, null, null, 1);
         user.getCarts().add(cart);
-        Reservation reservation = new Reservation(1L, user, null, null, "code", ReservationStatus.ONGOING);
+        Reservation reservation = new Reservation(1L, user, null, null, null, "code", ReservationStatus.ONGOING);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
         //given
         given(reservationRepository.findByHostId(any()))
@@ -73,7 +73,7 @@ class OrderServiceTest {
     void createOrder_fail_ifEmptyCart() {
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
-        Reservation reservation = new Reservation(1L, user, null, null, "code", ReservationStatus.ONGOING);
+        Reservation reservation = new Reservation(1L, user, null, null, null, "code", ReservationStatus.ONGOING);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
 
         //given

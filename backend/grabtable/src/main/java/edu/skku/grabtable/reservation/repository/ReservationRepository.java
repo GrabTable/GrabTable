@@ -16,6 +16,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByHostId(Long hostId);
 
     Optional<Reservation> findByHostId(Long userId);
-    
+
     Optional<Reservation> findByInviteCode(String inviteCode);
 }

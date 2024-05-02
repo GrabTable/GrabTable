@@ -47,9 +47,7 @@ public class Cart extends BaseTimeEntity {
         this.quantity = quantity;
     }
 
-    public void modifyCart(Menu menu, Integer quantity) {
-        this.menuName = menu.getMenuName();
-        this.price = menu.getPrice();
+    public void changeQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

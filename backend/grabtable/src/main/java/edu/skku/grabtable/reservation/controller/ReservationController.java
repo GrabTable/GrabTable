@@ -43,6 +43,7 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    //select 6개 나감 (TODO)
     @GetMapping("/me")
     public ReservationDetailResponse findCurrentReservation(@AuthUser User user) {
         return reservationService.findReservationByUser(user);

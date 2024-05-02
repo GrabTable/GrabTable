@@ -209,7 +209,7 @@ export default function MyReservation(props: MyReservationProps) {
   })
 
   const handlePayment = () => {
-    router.push('/reservation/payment')
+    window.location.href = '/reservation/payment'
   }
   const hostUser = {
     username: orders?.host.username,

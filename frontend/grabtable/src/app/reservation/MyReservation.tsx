@@ -86,7 +86,7 @@ interface MyReservationProps {
 
 export default function MyReservation(props: MyReservationProps) {
   const { menus, storeID, isHost } = props
-  const [ allPaid, setAllPaid ] = useState(false)
+  const [allPaid, setAllPaid] = useState(false)
 
   const { toast } = useToast()
   const router = useRouter()
@@ -168,7 +168,11 @@ export default function MyReservation(props: MyReservationProps) {
     })
     const data = await response.json()
 
-    if(data?.invitees.filter((invitee: any) => invitee.currentCarts.length > 0).length == 0 && data?.host.currentCarts.length == 0){
+    if (
+      data?.invitees.filter((invitee: any) => invitee.currentCarts.length > 0)
+        .length == 0 &&
+      data?.host.currentCarts.length == 0
+    ) {
       setAllPaid(true)
     }
 
@@ -363,7 +367,9 @@ export default function MyReservation(props: MyReservationProps) {
             ))}
           </div>
           <div className="flex justify-end mt-4">
-            {isHost && allPaid && <Button className="w-full bg-violet-500">Order</Button>}
+            {isHost && allPaid && (
+              <Button className="w-full bg-violet-500">Order</Button>
+            )}
           </div>
         </div>
       </div>

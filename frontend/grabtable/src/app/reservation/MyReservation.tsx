@@ -1,8 +1,8 @@
 'use client'
 import { UserCard } from '@/components/UserCard'
+import Spinner from '@/components/spinner'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/button'
-import Image from 'next/image'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import {
@@ -17,10 +17,10 @@ import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
-import Spinner from '@/components/spinner'
 
 interface CartItem {
   menuName: string
@@ -83,6 +83,36 @@ type MenuQuantity = {
   menuName: string
 }
 
+export type CartResponse = {
+  id: number
+  menuName: string
+  price: number
+  quantity: number
+  totalPrice: number
+}
+
+export type UserCartsInfoResponse = {
+  id: number
+  username: string
+  profileImageUrl: string
+  currentCarts: CartResponse[]
+}
+export type OrderResponse = {
+  id: number
+  userId: number
+  carts: CartResponse[]
+  status: string
+}
+
+export type ReservationDetailResponse = {
+  id: number
+  storeId: number
+  host: UserCartsInfoResponse
+  invitees: UserCartsInfoResponse[]
+  inviteCode: string
+  orders: OrderResponse[]
+}
+
 interface MyReservationProps {
   storeID: number
   menus: Menu[]
@@ -93,7 +123,7 @@ export default function MyReservation(props: MyReservationProps) {
   const { menus, storeID, isHost } = props
   const { toast } = useToast()
   const router = useRouter()
-  const [orderConfirm, setOrderConfirm] = useState(false);
+  const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const addCart = async (body: MenuQuantity) => {
     const session = await getSessionFromClient()
@@ -162,7 +192,7 @@ export default function MyReservation(props: MyReservationProps) {
     return
   }
 
-  const getOrders = async () => {
+  const getReservationDetail = async (): Promise<ReservationDetailResponse> => {
     const session = await getSessionFromClient()
     const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
       headers: {
@@ -174,12 +204,22 @@ export default function MyReservation(props: MyReservationProps) {
     const data = await response.json()
 
     if (!response.ok) throw new Error('Failed to fetch orders')
-    const orderIds = data.orders.map((order: { id: any }) => order.id); // 주문들의 ID 배열 생성
-    const allParticipants = [data.host.id, ...data.invitees.map((invitee: { id: any }) => invitee.id)];
-    const allMatched = allParticipants.every(participantId => orderIds.includes(participantId));
 
-    setOrderConfirm(allMatched);
-    return data
+    const orderedUserIds = data.orders.map(
+      (order: OrderResponse) => order.userId,
+    ) // 주문들의 ID 배열 생성
+
+    const allParticipantIds = [
+      data.host.id,
+      ...data.invitees.map((invitee: UserCartsInfoResponse) => invitee.id),
+    ]
+
+    const allMatched = allParticipantIds.every((participantId) =>
+      orderedUserIds.includes(participantId),
+    )
+
+    setOrderConfirm(allMatched)
+    return data as ReservationDetailResponse
   }
 
   const getMyCart = async () => {
@@ -199,12 +239,12 @@ export default function MyReservation(props: MyReservationProps) {
 
   // 0.5초 마다 팀원 전체의 order를 폴링
   const {
-    data: orders,
+    data: reservationDetail,
     isLoading,
     error,
-  } = useQuery<any>({
+  } = useQuery<ReservationDetailResponse>({
     queryKey: ['orders'],
-    queryFn: getOrders,
+    queryFn: getReservationDetail,
     refetchInterval: 500,
   })
 
@@ -218,10 +258,10 @@ export default function MyReservation(props: MyReservationProps) {
     window.location.href = '/reservation/payment'
   }
   const hostUser = {
-    username: orders?.host.username,
-    profileImageUrl: orders?.host.profileImageUrl,
-    id: orders?.host.id,
-    cartItems: orders?.host.currentCarts.map(
+    username: reservationDetail?.host.username,
+    profileImageUrl: reservationDetail?.host.profileImageUrl,
+    id: reservationDetail?.host.id,
+    cartItems: reservationDetail?.host.currentCarts.map(
       (cart: {
         menuName: any
         quantity: any
@@ -236,7 +276,7 @@ export default function MyReservation(props: MyReservationProps) {
     ),
   }
 
-  const inviteesUsers = orders?.invitees.map(
+  const inviteesUsers = reservationDetail?.invitees.map(
     (invitee: {
       username: any
       profileImageUrl: any
@@ -253,38 +293,40 @@ export default function MyReservation(props: MyReservationProps) {
         totalPrice: cart.totalPrice,
       })),
     }),
-    )
+  )
   const confimation = async () => {
     setLoading(true)
     const session = await getSessionFromClient()
-    const response = await fetch(`http://localhost:8000/v1/reservations/confirm`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+    const response = await fetch(
+      `http://localhost:8000/v1/reservations/confirm`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + session.formData['access_token'],
+        },
+        credentials: 'include',
       },
-      credentials: 'include',
-    })
+    )
 
     setTimeout(() => {
       toast({
         title: 'Confirmed',
         description: 'Enjoy!',
-        duration: 1000, 
-      });
+        duration: 1000,
+      })
 
       setTimeout(() => {
-        router.push('/');
-      }, 1500); 
+        router.push('/')
+      }, 1500)
 
-      setLoading(false); 
-    }, 1000);
+      setLoading(false)
+    }, 1000)
   }
   return (
     <div className="flex justify-between">
       <div className="w-full mr-4 ">
-
-      {loading && <Spinner />}
+        {loading && <Spinner />}
         <ScrollArea className="h-[50rem]">
           <Table>
             <TableHeader>
@@ -399,7 +441,11 @@ export default function MyReservation(props: MyReservationProps) {
             ))}
           </div>
           <div className="flex justify-end mt-4">
-            {isHost && orderConfirm && <Button className="w-full bg-violet-500" onClick={confimation}>Reservation confirmation</Button>}
+            {isHost && orderConfirm && (
+              <Button className="w-full bg-violet-500" onClick={confimation}>
+                Reservation confirmation
+              </Button>
+            )}
           </div>
         </div>
       </div>

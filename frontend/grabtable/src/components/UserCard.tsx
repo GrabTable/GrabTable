@@ -1,9 +1,12 @@
+import {
+  CartResponse,
+  ReservationDetailResponse,
+} from '@/app/reservation/MyReservation'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { Button } from './ui/button'
-import { FaPlus, FaMinus } from 'react-icons/fa6'
+import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 
 interface CartItem {
   menuName: string
@@ -13,10 +16,10 @@ interface CartItem {
 }
 
 interface User {
-  username: string
-  profileImageUrl: string
-  id: number
-  cartItems: CartItem[]
+  username: any
+  profileImageUrl: any
+  id: any
+  cartItems: any
 }
 
 interface UserCardProps {
@@ -54,13 +57,14 @@ type Orders = {
 export function UserCard({ user }: UserCardProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const [orderCompleted, setOrderCompleted] = useState(false)
+  const [paidOrderCarts, setPaidOrderCarts] = useState<CartResponse[]>([])
   const toggleCard = () => {
     setIsOpen(!isOpen)
   }
 
   const calculateTotalPrice = () => {
     return user.cartItems.reduce(
-      (total, item) => total + item.quantity * item.unitPrice,
+      (total: any, item: any) => total + item.quantity * item.unitPrice,
       0,
     )
   }
@@ -73,15 +77,23 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           Authorization: 'Bearer ' + session.formData['access_token'],
         },
         credentials: 'include',
-      });
-      const data = await response.json();
+      })
+      const data: ReservationDetailResponse = await response.json()
 
-      const isOrderCompleted = data.orders.some((order: Orders) => order.id === user.id);
-      setOrderCompleted(isOrderCompleted);
+      const isOrderCompleted = data.orders.some(
+        (order) => order.userId === user.id,
+      )
+
+      setOrderCompleted(isOrderCompleted)
+      if (isOrderCompleted) {
+        setPaidOrderCarts(
+          data.orders.find((order) => order.userId === user.id)!.carts,
+        )
+      }
     }
-    checkOrderStatus();
-  }, []);
-  
+    checkOrderStatus()
+  }, [])
+
   return (
     <div className="border p-4 mb-4 rounded shadow">
       <div
@@ -118,13 +130,43 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
       >
         <h4>Cart Items:</h4>
         <ul>
-          {user.cartItems.map((item, index) => (
-            <li
-              key={index}
-            >{`${item.menuName}: ${item.quantity} x ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
-          ))}
+          {!orderCompleted ? (
+            <>
+              {user.cartItems.map((item: any, index: any) => (
+                <>
+                  <li
+                    key={index}
+                  >{`${item.menuName}: ${item.quantity} x ₩${item.unitPrice} = ₩${item.quantity * item.unitPrice}`}</li>
+                </>
+              ))}
+              <p>
+                Total Price: ₩
+                {user.cartItems.reduce(
+                  (total: any, item: any) =>
+                    total + item.quantity * item.unitPrice,
+                  0,
+                )}
+              </p>
+            </>
+          ) : (
+            <>
+              {paidOrderCarts.map((item: CartResponse, index: number) => (
+                <>
+                  <li
+                    key={index}
+                  >{`${item.menuName}: ${item.quantity} x ₩${item.price} = ₩${item.price * item.quantity}`}</li>
+                </>
+              ))}
+              <p>
+                Total Price: ₩
+                {paidOrderCarts.reduce(
+                  (total: any, item: any) => total + item.totalPrice,
+                  0,
+                )}
+              </p>
+            </>
+          )}
         </ul>
-        <p>Total Price: ₩{calculateTotalPrice()}</p>
       </motion.div>
     </div>
   )

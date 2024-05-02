@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 export default function NoReservation() {
   const [inviteCode, setInviteCode] = useState('')
-
   const handleInviteCodeChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -27,10 +26,11 @@ export default function NoReservation() {
     )
   }
 
-  const handleJoinReservation = () => {
+  const handleJoinReservation = async () => {
     // TODO: Implement logic to join reservation using invite code
     console.log('Joining reservation with invite code:', inviteCode)
-    postJoinReservation(inviteCode)
+    await postJoinReservation(inviteCode)
+    window.location.reload()
   }
   return (
     <section

@@ -95,6 +95,9 @@ export default function MyReservation(props: MyReservationProps) {
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false);
   const [loading, setLoading] = useState(false)
+  const [isComplete, setComplete] = useState(false)
+  const [isHostComplete, setHostComplete] = useState(false)
+
   const addCart = async (body: MenuQuantity) => {
     const session = await getSessionFromClient()
     const { menuId, quantity, menuName } = body
@@ -177,7 +180,9 @@ export default function MyReservation(props: MyReservationProps) {
     const orderIds = data.orders.map((order: { id: any }) => order.id); // 주문들의 ID 배열 생성
     const allParticipants = [data.host.id, ...data.invitees.map((invitee: { id: any }) => invitee.id)];
     const allMatched = allParticipants.every(participantId => orderIds.includes(participantId));
-
+    if (orderIds.includes(data.host.id)) {
+      setHostComplete(true)
+    }
     setOrderConfirm(allMatched);
     return data
   }
@@ -205,13 +210,13 @@ export default function MyReservation(props: MyReservationProps) {
   } = useQuery<any>({
     queryKey: ['orders'],
     queryFn: getOrders,
-    refetchInterval: 500,
+    refetchInterval: 5000,
   })
 
   const { data: myCart } = useQuery<MyCart[]>({
     queryKey: ['myCarts'],
     queryFn: getMyCart,
-    refetchInterval: 500,
+    refetchInterval: 5000,
   })
 
   const handlePayment = () => {
@@ -279,6 +284,25 @@ export default function MyReservation(props: MyReservationProps) {
 
       setLoading(false); 
     }, 1000);
+  }
+
+  const getComplete = async (user: any) => {
+    const session = await getSessionFromClient()
+      const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + session.formData['access_token'],
+        },
+        credentials: 'include',
+      });
+      const data = await response.json();
+
+      const isOrderCompleted = data.orders.some((order: Orders) => order.id === user.id);
+      
+      if(isOrderCompleted) setComplete(true)
+      else setComplete(false)
+
+    return
   }
   return (
     <div className="flex justify-between">
@@ -391,12 +415,16 @@ export default function MyReservation(props: MyReservationProps) {
           <Separator className="mb-4 h-[2px]" />
           {/* <UserListView orders={orders} /> */}
           <div className="flex flex-col space-y-4">
-            {hostUser && inviteesUsers && (
-              <UserCard key={hostUser.username} user={hostUser} />
-            )}
-            {(inviteesUsers || []).map((invitee: any, index: any) => (
-              <UserCard key={invitee.username + index} user={invitee} />
-            ))}
+          {hostUser && (
+            <>
+              <UserCard key={hostUser.username} user={hostUser} isComplete={isHostComplete} />
+            </>
+          )}         
+            {(inviteesUsers || []).map((invitee: any, index: any) => {
+              getComplete(invitee); 
+              return <UserCard key={invitee.username + index} user={invitee} isComplete={isComplete} />;
+            })}
+
           </div>
           <div className="flex justify-end mt-4">
             {isHost && orderConfirm && <Button className="w-full bg-violet-500" onClick={confimation}>Reservation confirmation</Button>}

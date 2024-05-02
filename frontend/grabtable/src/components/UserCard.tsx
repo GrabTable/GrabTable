@@ -21,6 +21,7 @@ interface User {
 
 interface UserCardProps {
   user: User
+  isComplete: boolean
 }
 type Cart = {
   id: number
@@ -51,7 +52,7 @@ type Orders = {
     carts: CartItem[]
   }[]
 }
-export function UserCard({ user }: UserCardProps): JSX.Element {
+export function UserCard({ user, isComplete }: UserCardProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const [orderCompleted, setOrderCompleted] = useState(false)
   const toggleCard = () => {
@@ -94,7 +95,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
           <AvatarFallback>{user.username}</AvatarFallback>
         </Avatar>
         <h3>{user.username}</h3>
-        <p>{orderCompleted ? 'Order Completed' : 'Order Incompleted'}</p>
+        <p>{isComplete ? 'Order Completed' : 'Order Incompleted'}</p>
 
         <motion.button
           onClick={toggleCard}
@@ -118,13 +119,13 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
       >
         <h4>Cart Items:</h4>
         <ul>
-          {user.cartItems.map((item, index) => (
+          {user.cartItems && user.cartItems.map((item, index) => (
             <li
               key={index}
             >{`${item.menuName}: ${item.quantity} x ₩${item.unitPrice.toFixed(2)} = ₩${item.quantity * item.unitPrice}`}</li>
           ))}
         </ul>
-        <p>Total Price: ₩{calculateTotalPrice()}</p>
+        { user.cartItems && <p>Total Price: ₩{calculateTotalPrice()}</p>}
       </motion.div>
     </div>
   )

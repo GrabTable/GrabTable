@@ -47,28 +47,48 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
-task copyYml(type: Copy) {
+tasks.register('copyYml', Copy) {
     from "./config/yml/main"
     include "*.yml"
     into "./src/main/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
 }
 
-task copyTestYml(type: Copy) {
+tasks.register('copyTestYml', Copy) {
     from "./config/yml/test"
     include "*.yml"
     into "./src/test/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
 }
 
-task copySql(type: Copy) {
+tasks.register('copySql', Copy) {
     from "./config/sql/main"
     include "*.sql"
     into "./src/main/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
 }
 
-task copyTestSql(type: Copy) {
+tasks.register('copyTestSql', Copy) {
     from "./config/sql/test"
     include "*.sql"
     into "./src/test/resources/data"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
 }
 
 ext {
@@ -76,7 +96,6 @@ ext {
 }
 
 tasks.named('test') {
-    dependsOn(copyYml, copyTestYml, copySql, copyTestSql)
     useJUnitPlatform()
     outputs.dir snippetsDir
 }
@@ -92,7 +111,7 @@ asciidoctor.doFirst {
     delete file('src/main/resources/static/docs')
 }
 
-task copyDocument(type: Copy) {
+tasks.register('copyDocument', Copy) {
     dependsOn asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
@@ -111,4 +130,3 @@ allprojects {
 
 processResources.dependsOn(copyYml, copySql)
 processTestResources.dependsOn(copyTestYml, copyTestSql)
-

@@ -47,13 +47,37 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
+task copyYml(type: Copy) {
+    from "./config/yml/main"
+    include "*.yml"
+    into "./src/main/resources"
+}
+
+task copyTestYml(type: Copy) {
+    from "./config/yml/test"
+    include "*.yml"
+    into "./src/test/resources"
+}
+
+task copySql(type: Copy) {
+    from "./config/sql/main"
+    include "*.sql"
+    into "./src/main/resources"
+}
+
+task copyTestSql(type: Copy) {
+    from "./config/sql/test"
+    include "*.sql"
+    into "./src/test/resources/data"
+}
+
 ext {
     snippetsDir = file('build/generated-snippets')
 }
 
 tasks.named('test') {
+    dependsOn(copyYml, copyTestYml, copySql, copyTestSql)
     useJUnitPlatform()
-
     outputs.dir snippetsDir
 }
 
@@ -74,6 +98,7 @@ task copyDocument(type: Copy) {
     into file("src/main/resources/static/docs")
 }
 
+
 build {
     dependsOn copyDocument
 }
@@ -83,3 +108,7 @@ allprojects {
         maven { url 'https://jitpack.io' }
     }
 }
+
+processResources.dependsOn(copyYml, copySql)
+processTestResources.dependsOn(copyTestYml, copyTestSql)
+

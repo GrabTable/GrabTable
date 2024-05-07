@@ -30,9 +30,7 @@ const CategoryLink: React.FC<CategoryLinkProps> = ({ categoryName }) => {
         e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
         e.currentTarget.style.color = 'white'
       }}
-      onClick={() => {
-        console.log('hi')
-      }}
+      onClick={() => {}}
     >
       {categoryName}{' '}
       <BsArrowRight className="opacity-70 group-hover:translate-x-1 transition" />

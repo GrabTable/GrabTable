@@ -23,9 +23,14 @@ import {
 import { StarRating } from '@/components/StarRating'
 import { Input } from '@/components/ui/Input'
 import * as React from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { redirect, useParams, useRouter } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
 import { PiHandGrabbingDuotone } from 'react-icons/pi'
+import { getSession } from '@/lib/next-auth/session'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { Toaster } from '@/components/ui/toaster'
+import { useToast } from '@/components/ui/use-toast'
+import Spinner from '@/components/spinner'
 
 const restaurant_mock = {
   id: 1,
@@ -115,7 +120,8 @@ export default function Restaurant() {
   const [date, setDate] = React.useState<Date>()
   const router = useRouter()
   const store_id = useParams<{ id: string }>()['id']
-
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
   const [restaurant, setRestaurant] = useState<Restaurant>()
   const fetchStore = async () => {
     try {
@@ -154,145 +160,166 @@ export default function Restaurant() {
   }, [])
 
   const makeReservation = async () => {
-    const body = JSON.stringify({
-      storeId: store_id,
-    })
-    try {
-      const response = await fetch(`http://localhost:8000/v1/reservations`, {
-        method: 'POST',
-        body: body,
-        headers: {
-          Authorization: accessToken,
-        },
-      })
-      if (!response.ok) {
-        throw new Error('error')
+    setLoading(true)
+    const session = await getSessionFromClient()
+    setTimeout(async () => {
+      setLoading(false) // 스피너 종료
+
+      if (!session) {
+        // 스피너 종료 후 토스트 메시지 표시
+        toast({
+          title: 'Login first',
+          description: 'You need to log in to continue.',
+          duration: 1000, // 1초 동안 토스트 띄우기
+        })
+
+        // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
+        setTimeout(() => {
+          router.push('/mypage')
+        }, 1300)
+        return
       }
-      router.push('/reservation')
-    } catch (error) {
-      console.error('error', error)
-    }
+
+      try {
+        const response = await fetch(`http://localhost:8000/v1/reservations`, {
+          method: 'POST',
+          body: JSON.stringify({
+            storeId: store_id,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + session.formData['access_token'],
+          },
+          credentials: 'include',
+        })
+        if (response.ok) {
+          toast({
+            title: 'You have successfully grab!',
+            description: 'Invite your friends and order some food!',
+            duration: 1000, // 1초 동안 토스트 띄우기
+          })
+          setTimeout(() => {
+            router.push('/reservation')
+          }, 1300)
+          return
+        } else {
+          toast({
+            title: 'There is an ongoing reservation',
+            description: 'Please continue with your order!',
+            duration: 1000, // 1초 동안 토스트 띄우기
+          })
+
+          // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
+          setTimeout(() => {
+            router.push('/reservation')
+          }, 1300)
+        }
+      } catch (error) {
+        console.error('error occurred!', error)
+      }
+    }, 500)
   }
 
   if (!restaurant) {
     return <></>
   }
   return (
-    <motion.div
-      ref={ref}
-      style={{
-        scale: scaleProgess,
-        opacity: opacityProgess,
-      }}
-      className="group mb-3 sm:mb-8 last:mb-0 mx-4"
-    >
-      <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
-        <div className="pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 sm:max-w-[50%] flex flex-col h-full">
-          <Badge className="w-fit mb-2">{restaurant.category}</Badge>
-          <h3 className="text-2xl font-semibold">{restaurant.storeName}</h3>
-          <p>{restaurant.address}</p>
-          <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
-            {restaurant.description}
-          </p>
-          <p>{restaurant.phone}</p>
-        </div>
+    <>
+      {loading && <Spinner />}
+      <motion.div
+        ref={ref}
+        style={{
+          scale: scaleProgess,
+          opacity: opacityProgess,
+        }}
+        className="group mb-3 sm:mb-8 last:mb-0 mx-4"
+      >
+        <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
+          <div className="pt-4 pb-7 px-5 sm:pl-10 sm:pr-2 sm:pt-10 sm:max-w-[50%] flex flex-col h-full">
+            <Badge className="w-fit mb-2">{restaurant.category}</Badge>
+            <h3 className="text-2xl font-semibold">{restaurant.storeName}</h3>
+            <p>{restaurant.address}</p>
+            <p className="mt-2 leading-relaxed text-gray-700 dark:text-white/70">
+              {restaurant.description}
+            </p>
+            <p>{restaurant.phone}</p>
+          </div>
 
-        <Image
-          src={restaurant.storePictureUrl || '/restaurant.png'}
-          alt="No Restaurant Image"
-          width={500}
-          height={500}
-          quality={95}
-          className="absolute hidden sm:block top-6 -right-10 w-[20rem] rounded-t-lg shadow-2xl
+          <Image
+            src={restaurant.storePictureUrl || '/restaurant.png'}
+            alt="No Restaurant Image"
+            width={500}
+            height={500}
+            quality={95}
+            className="absolute hidden sm:block top-6 -right-10 w-[20rem] rounded-t-lg shadow-2xl
         transition 
         group-hover:scale-[1.04]
         group-hover:-translate-x-3
         group-hover:translate-y-3
         group-hover:-rotate-2"
-        />
-      </section>
+          />
+        </section>
 
-      <div className="flex justify-end">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="bg-violet-500 dark:text-white flex items-end rounded-full">
-              GRAB <PiHandGrabbingDuotone size={25} />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Grab Table</DialogTitle>
-              <DialogDescription>
-                How many people are in your party?
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex items-center justify-center space-x-2">
-              <Input
-                type="number"
-                min={0}
-                defaultValue={1}
-                className="w-[10rem]"
-              />
-            </div>
-            <DialogFooter>
-              <Button
-                className="bg-violet-400"
-                type="submit"
-                onClick={makeReservation}
-              >
-                Confirm
+        <div className="flex justify-end">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-violet-500 dark:text-white flex items-end rounded-full">
+                GRAB <PiHandGrabbingDuotone size={25} />
               </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Grab Table</DialogTitle>
+                <DialogDescription>
+                  How many people are in your party?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex items-center justify-center space-x-2">
+                <Input
+                  type="number"
+                  min={0}
+                  defaultValue={1}
+                  className="w-[10rem]"
+                />
+              </div>
+              <DialogFooter>
+                <Button
+                  className="bg-violet-400"
+                  type="submit"
+                  onClick={makeReservation}
+                >
+                  Confirm
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-      {/* <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={"outline"}
-          className={cn(
-            "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
-          )}
-        >
-          <FaHand className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          initialFocus
-        />
-      </PopoverContent>
-    </Popover> */}
-
-      <Table>
-        <TableBody>
-          {reviews.map((review: Review) => (
-            <TableRow key={review.id}>
-              {/* <TableCell className='w-[10rem]'>
+        <Table>
+          <TableBody>
+            {reviews.map((review: Review) => (
+              <TableRow key={review.id}>
+                {/* <TableCell className='w-[10rem]'>
                 <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
               </TableCell> */}
-              <TableCell className="flex items-start flex-col">
-                <div className="flex items-center mt-4">
-                  <div>{review.username || 'anonymous user'}</div>
-                  <div>
-                    <StarRating rating={review.rating} />
+                <TableCell className="flex items-start flex-col">
+                  <div className="flex items-center mt-4">
+                    <div>{review.username || 'anonymous user'}</div>
+                    <div>
+                      <StarRating rating={review.rating} />
+                    </div>
                   </div>
-                </div>
-                <p className="mt-2">{review.message}</p>
-                <p className="mt-4 text-xs">
-                  This review was written on {review.reviewPlatform}.
-                </p>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </motion.div>
+                  <p className="mt-2">{review.message}</p>
+                  <p className="mt-4 text-xs">
+                    This review was written on {review.reviewPlatform}.
+                  </p>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </motion.div>
+      <Toaster />
+    </>
   )
 }

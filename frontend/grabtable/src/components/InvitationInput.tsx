@@ -2,7 +2,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 
 interface InputWithButtonProps {
   inputValue: string
@@ -35,15 +34,10 @@ export function InvitationInput({
         />
 
         <Button
-          asChild
           className="group bg-violet-400 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack"
           onClick={onClick}
         >
-          <Link
-            href={`/reservations?inviteCode=${encodeURIComponent(inputValue)}`}
-          >
-            Join
-          </Link>
+          Join
         </Button>
       </motion.div>
     </div>

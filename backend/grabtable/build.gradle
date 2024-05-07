@@ -47,13 +47,56 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
+tasks.register('copyYml', Copy) {
+    from "./config/yml/main"
+    include "*.yml"
+    into "./src/main/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
+}
+
+tasks.register('copyTestYml', Copy) {
+    from "./config/yml/test"
+    include "*.yml"
+    into "./src/test/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
+}
+
+tasks.register('copySql', Copy) {
+    from "./config/sql/main"
+    include "*.sql"
+    into "./src/main/resources"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
+}
+
+tasks.register('copyTestSql', Copy) {
+    from "./config/sql/test"
+    include "*.sql"
+    into "./src/test/resources/data"
+    eachFile { FileCopyDetails fcp ->
+        if (new File(destinationDir, fcp.relativePath.getPathString()).exists()) {
+            fcp.exclude()
+        }
+    }
+}
+
 ext {
     snippetsDir = file('build/generated-snippets')
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-
     outputs.dir snippetsDir
 }
 
@@ -68,11 +111,12 @@ asciidoctor.doFirst {
     delete file('src/main/resources/static/docs')
 }
 
-task copyDocument(type: Copy) {
+tasks.register('copyDocument', Copy) {
     dependsOn asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
 }
+
 
 build {
     dependsOn copyDocument
@@ -83,3 +127,6 @@ allprojects {
         maven { url 'https://jitpack.io' }
     }
 }
+
+processResources.dependsOn(copyYml, copySql)
+processTestResources.dependsOn(copyTestYml, copyTestSql)

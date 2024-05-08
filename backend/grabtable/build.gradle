@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'org.asciidoctor.jvm.convert' version "3.3.2"
+    id 'jacoco'
 }
 
 group = 'edu.skku'
@@ -98,6 +99,8 @@ ext {
 tasks.named('test') {
     useJUnitPlatform()
     outputs.dir snippetsDir
+    jacoco {}
+    finalizedBy(tasks.jacocoTestReport)
 }
 
 asciidoctor {
@@ -117,6 +120,17 @@ tasks.register('copyDocument', Copy) {
     into file("src/main/resources/static/docs")
 }
 
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
 
 build {
     dependsOn copyDocument
@@ -130,3 +144,4 @@ allprojects {
 
 processResources.dependsOn(copyYml, copySql)
 processTestResources.dependsOn(copyTestYml, copyTestSql)
+

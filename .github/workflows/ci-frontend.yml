@@ -1,4 +1,4 @@
-name: CI
+name: Nextjs CI
 
 on:
   push:
@@ -23,3 +23,7 @@ jobs:
       - name: Check frontend code style
         working-directory: ./frontend/grabtable
         run: npm run check
+      
+      - name: Check frontend code build
+        working-directory: ./frontend/grabtable
+        run: npm run build

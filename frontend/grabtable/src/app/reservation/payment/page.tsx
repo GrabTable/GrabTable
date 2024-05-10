@@ -54,7 +54,6 @@ export default function Page() {
     }
 
     IMP.request_pay(data, callback)
-
   }
 
   async function callback(response: RequestPayResponse) {

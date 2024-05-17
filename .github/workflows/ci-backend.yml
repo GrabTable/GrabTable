@@ -70,6 +70,9 @@ jobs:
       with:
         java-version: '17'
         distribution: 'corretto'
-
+    - name: Init Gradle 
+      uses: gradle/gradle-build-action@v1
+      with:
+        gradle-version: 7.6.1
     - name: Generate and submit dependency graph
       uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0

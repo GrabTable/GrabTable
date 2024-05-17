@@ -46,6 +46,8 @@ dependencies {
     //spring rest docs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.register('copyYml', Copy) {

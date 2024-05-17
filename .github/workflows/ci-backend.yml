@@ -31,7 +31,15 @@ jobs:
       
     # - name: gradlew 권한 부여
     #   run: chmod +x gradlew
-      
+    
+    - name: DB config 
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3307
+        container port: 3306
+        mysql database: 'grabtable'
+        mysql root password: ${{ secrets.DB_SECRET }}
+        
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 

@@ -3,7 +3,7 @@ import { cookies } from 'next/headers'
 import { parseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { login } from '@/lib/next-auth/session'
 
-async function sendPostRequest(body_code: String | null) {
+async function sendPostRequest(body_code: string | null) {
   const url = 'http://localhost:8000/v1/auth/login/kakao' // 요청할 URL
   const data = {
     code: body_code, // 실제 코드 값으로 변경 필요

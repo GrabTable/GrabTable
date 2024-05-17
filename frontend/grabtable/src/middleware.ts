@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getSession } from './lib/next-auth/session'
 // import { updateSession } from './lib/next-auth/session'
 export const config = {

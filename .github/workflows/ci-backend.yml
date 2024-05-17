@@ -4,7 +4,10 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-
+  
+defaults:
+  run:
+    working-directory: backend/grabtable
 jobs:
   build:
 
@@ -28,7 +31,15 @@ jobs:
       
     # - name: gradlew 권한 부여
     #   run: chmod +x gradlew
-      
+    
+    - name: DB config 
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        host port: 3307
+        container port: 3306
+        mysql database: 'grabtable'
+        mysql root password: ${{ secrets.DB_SECRET }}
+        
     - name: Build with Gradle Wrapper
       run: ./gradlew build
 
@@ -42,20 +53,3 @@ jobs:
         min-coverage-overall: 50
         min-coverage-changed-files: 50
         update-comment: true
-        
-  dependency-submission:
-
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'corretto'
-
-    - name: Generate and submit dependency graph
-      uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0

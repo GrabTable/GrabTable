@@ -9,6 +9,7 @@ interface CartItem {
   totalPrice: number
 }
 interface User {
+  id: number
   username: string
   profileImageUrl: string
   orderCompleted: boolean
@@ -70,6 +71,7 @@ export function UserListView(orders: any): any {
       }),
     ),
     orderCompleted: false,
+    id: 1,
   }
 
   // Parsing the invitees data

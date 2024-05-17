@@ -54,11 +54,10 @@ export default function Page() {
     }
 
     IMP.request_pay(data, callback)
-
   }
 
   async function callback(response: RequestPayResponse) {
-    let request: any = {
+    const request: any = {
       impUid: response.imp_uid,
       amount: response.paid_amount,
     }

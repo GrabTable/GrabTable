@@ -26,4 +26,7 @@ jobs:
       
       - name: Check frontend code build
         working-directory: ./frontend/grabtable
-        run: npm run build
+        run: |
+          pwd
+          ls
+          npm run build

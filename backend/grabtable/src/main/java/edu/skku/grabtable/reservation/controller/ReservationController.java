@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/v1/reservations")
@@ -47,6 +48,11 @@ public class ReservationController {
     @GetMapping("/me")
     public ReservationDetailResponse findCurrentReservation(@AuthUser User user) {
         return reservationService.findReservationByUser(user);
+    }
+
+    @GetMapping("/me/subscribe")
+    public SseEmitter subscribe(@AuthUser User user) {
+        return reservationService.createEmitter(user.getId());
     }
 
     @PostMapping("/confirm")

@@ -14,11 +14,11 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -68,9 +68,12 @@ public class LoginController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/login/test")
-    public String test(@RequestParam String code) {
-        log.info("code={}", code);
-        return "ok";
+    @GetMapping("/login/test/{testUserId}")
+    public ResponseEntity<UserTokens> test(
+            @PathVariable String testUserId,
+            HttpServletResponse response
+    ) {
+        UserTokens userTokens = loginService.testLogin("TestUser#" + testUserId, "TestUser#" + testUserId);
+        return ResponseEntity.ok(userTokens);
     }
 }

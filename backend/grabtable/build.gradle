@@ -48,6 +48,8 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 
     implementation 'io.micrometer:micrometer-registry-prometheus'
+//    implementation 'org.flywaydb:flyway-mysql:10.8.1'
+
 }
 
 tasks.register('copyYml', Copy) {

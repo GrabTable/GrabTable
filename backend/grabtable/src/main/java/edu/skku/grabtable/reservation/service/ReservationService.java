@@ -186,11 +186,13 @@ public class ReservationService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
         ReservationDetailResponse reservation = findReservationByUser(user);
-        redisTemplate.convertAndSend(getChannelName(userId), reservation);
+        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservation);
     }
 
-    public SseEmitter createEmitter(Long userId) {
+    public SseEmitter createEmitter(User user) {
+        Long userId = user.getId();
         SseEmitter emitter = new SseEmitter(10L * 1000 * 60); //10분
+        ReservationDetailResponse reservation = findReservationByUser(user);
         userEmitters.put(userId, emitter);
 
         try {
@@ -207,15 +209,19 @@ public class ReservationService {
             sendToClient(emitter, userId, response);
         };
 
-        redisMessageListenerContainer.addMessageListener(messageListener, ChannelTopic.of(getChannelName(userId)));
+        redisMessageListenerContainer
+                .addMessageListener(
+                        messageListener,
+                        ChannelTopic.of(getChannelName(reservation.getId()))
+                );
 
         setEmitterCallbacks(userId, emitter, messageListener);
 
         return emitter;
     }
 
-    private String getChannelName(Long userId) {
-        return "Reservation-user" + userId;
+    private String getChannelName(Long reservationId) {
+        return "Reservation-" + reservationId;
     }
 
     private void setEmitterCallbacks(Long userId, SseEmitter emitter, MessageListener messageListener) {

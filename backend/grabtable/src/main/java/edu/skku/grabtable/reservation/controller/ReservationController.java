@@ -52,7 +52,7 @@ public class ReservationController {
 
     @GetMapping("/me/subscribe")
     public SseEmitter subscribe(@AuthUser User user) {
-        return reservationService.createEmitter(user.getId());
+        return reservationService.createEmitter(user);
     }
 
     @PostMapping("/confirm")

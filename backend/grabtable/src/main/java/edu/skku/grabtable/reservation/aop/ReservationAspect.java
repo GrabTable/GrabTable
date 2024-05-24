@@ -31,7 +31,7 @@ public class ReservationAspect {
     }
 
     @AfterReturning("cartControllerUpdateMethods() || reservationControllerUpdateMethods()")
-    public void sendReservationEvent(JoinPoint joinPoint) throws Throwable {
+    public void sendReservationEvent(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
             if (arg instanceof User user) {

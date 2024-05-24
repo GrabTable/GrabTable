@@ -5,8 +5,10 @@ import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class ReservationDetailResponse {
 

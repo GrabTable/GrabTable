@@ -198,7 +198,8 @@ public class ReservationService {
         try {
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
-                    .name("reservation-init"));
+                    .name("reservation")
+                    .data(reservation));
         } catch (IOException e) {
             log.error("SSE 연결 초기화 오류 발생, userId={}", userId);
             throw new RuntimeException(e);
@@ -258,6 +259,7 @@ public class ReservationService {
         } catch (IOException e) {
             userEmitters.remove(userId);
             log.error("SSE 연결 오류 발생, userId={}", userId);
+            throw new RuntimeException(e);
         }
     }
 

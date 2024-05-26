@@ -32,6 +32,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @WebMvcTest(ReservationController.class)
 @AutoConfigureRestDocs
@@ -147,6 +148,49 @@ class ReservationControllerTest extends ControllerTest {
         );
 
         assertThat(response).usingRecursiveComparison().isEqualTo(actual);
+    }
+
+    @Test
+    @DisplayName("유저의 현재 예약 정보를 SSE로 받아올 수 있다.")
+    void subscribe() throws Exception {
+        //given
+        ReservationDetailResponse data = new ReservationDetailResponse(1L, 1L, null, null,
+                "invite-code", null, null);
+        SseEmitter expected = new SseEmitter(10L * 1000 * 60);
+
+        when(reservationService.createEmitter(any()))
+                .thenReturn(expected);
+
+        new Thread(() -> {
+            try {
+                expected.send(SseEmitter.event()
+                        .id("1L")
+                        .name("reservation")
+                        .data(data)
+                );
+                expected.complete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/v1/reservations/me/subscribe")
+                        .header(HttpHeaders.AUTHORIZATION, USER_TOKENS.getAccessToken())
+                        .cookie(COOKIE)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        //then
+        String contentType = mvcResult.getResponse().getContentType();
+        assertThat(contentType).contains(MediaType.TEXT_EVENT_STREAM_VALUE);
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).contains("id:1L");
+        assertThat(contentAsString).contains("event:reservation");
+        assertThat(contentAsString).contains("data:");
     }
 
     @Test

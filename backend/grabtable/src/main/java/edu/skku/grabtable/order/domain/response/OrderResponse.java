@@ -5,9 +5,11 @@ import edu.skku.grabtable.order.domain.Order;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Getter
 public class OrderResponse {

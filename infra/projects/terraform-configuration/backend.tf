@@ -11,7 +11,7 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
 
 resource "aws_dynamodb_table" "terraform_state_lock" {
   name         = "terraform-state-lock"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = "PROVISIONED"
   hash_key     = "LockID"
 
   attribute {

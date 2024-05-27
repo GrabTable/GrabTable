@@ -5,6 +5,14 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  backend "s3" {
+    bucket         = "grabtable-terraform-state"
+    key            = "grabtable/terraform.tfstate"
+    region         = "ap-northeast-2"
+    encrypt        = true
+    dynamodb_table = "terraform-state-lock"
+  }
 }
 
 # Configure the AWS Provider

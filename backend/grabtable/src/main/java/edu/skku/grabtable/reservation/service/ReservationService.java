@@ -6,7 +6,9 @@ import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.order.domain.Order;
+import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
+import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
@@ -93,6 +95,7 @@ public class ReservationService {
                         order.getId(),
                         order.getUser().getId(),
                         order.getCarts().stream().map(CartResponse::of).toList(),
+                        order.getTotalPrice(),
                         order.getStatus().toString()))
                 .toList();
 
@@ -102,6 +105,14 @@ public class ReservationService {
                 reservation.getHost().getProfileImageUrl(),
                 cartRepository.findHostCurrentCartsByReservationId(reservation.getId())
                         .stream().map(CartResponse::of).toList()
+        );
+
+        SharedOrderResponse sharedOrderResponse = SharedOrderResponse.of(
+                reservation.getSharedOrder().getId(),
+                reservation.getSharedOrder().getCarts()
+                        .stream().map(CartResponse::of).toList(),
+                reservation.getSharedOrder().getOrders()
+                        .stream().map(OrderResponse::of).toList()
         );
 
         List<UserCartsInfoResponse> inviteesInfo = userRepository.findAllByInvitedReservation(reservation)
@@ -118,6 +129,7 @@ public class ReservationService {
                 hostInfo,
                 inviteesInfo,
                 reservation.getInviteCode(),
+                sharedOrderResponse,
                 orders);
     }
 
@@ -148,12 +160,22 @@ public class ReservationService {
         List<Order> orders = orderRepository.findByReservation(reservation);
         validateLengthOfInviteesAndOrders(invitees, orders);
 
+        //공유 주문 완료되었는지 검사
+        validateSharedOrder(reservation);
+
         //예약을 확정 처리
         reservation.confirm();
 
         //invitee들의 예약 연관관계 해제
         for (User invitee : invitees) {
             invitee.clearReservation();
+        }
+    }
+
+    private void validateSharedOrder(Reservation reservation) {
+        SharedOrder sharedOrder = reservation.getSharedOrder();
+        if (sharedOrder.calculateLeftAmount() > 0) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
     }
 
@@ -172,6 +194,7 @@ public class ReservationService {
                         order.getId(),
                         order.getUser().getId(),
                         order.getCarts().stream().map(CartResponse::of).toList(),
+                        order.getTotalPrice(),
                         order.getStatus().toString()))
                 .toList();
     }

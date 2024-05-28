@@ -13,9 +13,8 @@ public class SharedOrderResponse {
     private Long id;
     private List<CartResponse> carts;
     private List<OrderResponse> orders;
-    private String status;
 
-    public static SharedOrderResponse of(Long id, List<CartResponse> carts, List<OrderResponse> orders, String status) {
-        return new SharedOrderResponse(id, carts, orders, status);
+    public static SharedOrderResponse of(Long id, List<CartResponse> carts, List<OrderResponse> orders) {
+        return new SharedOrderResponse(id, carts, orders);
     }
 }

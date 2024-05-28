@@ -4,6 +4,8 @@ import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -44,5 +46,22 @@ public class SharedOrder extends BaseTimeEntity {
         sharedOrder.orderStatus = OrderStatus.PENDING;
         return sharedOrder;
     }
+
+    public int calculateTotalAmount() {
+        return this.carts.stream()
+                .mapToInt(Cart::calculateTotalPrice)
+                .sum();
+    }
+
+    public int calculateLeftAmount() {
+        return calculateTotalAmount() - getTotalPaidAmount();
+    }
+
+    private int getTotalPaidAmount() {
+        return this.orders.stream().mapToInt(Order::getTotalPrice).sum();
+    }
+
+    public void complete() {
+        this.orderStatus = OrderStatus.PAID;
     }
 }

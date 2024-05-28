@@ -27,15 +27,8 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final PaymentValidator validator;
 
-    public OrderResponse create(User user, PaymentRequest paymentRequest) {
-        Reservation invitedReservation = user.getInvitedReservation();
-        if (invitedReservation != null) {
-            validateUserCarts(user);
-            validator.verify(paymentRequest);
-            return buildOrderResponse(user, invitedReservation);
-        }
-
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+    public OrderResponse processPayment(User user, PaymentRequest paymentRequest) {
+        Reservation reservation = reservationRepository.findByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         validateUserCarts(user);

@@ -20,11 +20,11 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderResponse create(
+    public OrderResponse processPayment(
             @AuthUser User user,
             @Valid @RequestBody PaymentRequest paymentRequest
     ) {
-        return orderService.create(user, paymentRequest);
+        return orderService.processPayment(user, paymentRequest);
     }
 
 }

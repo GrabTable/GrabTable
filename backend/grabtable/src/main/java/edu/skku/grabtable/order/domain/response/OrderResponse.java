@@ -16,6 +16,7 @@ public class OrderResponse {
     private Long id;
     private Long userId;
     private List<CartResponse> carts;
+    private Integer paidAmount;
     private String status;
 
     public static OrderResponse of(Order order) {
@@ -23,11 +24,13 @@ public class OrderResponse {
                 order.getId(),
                 order.getUser().getId(),
                 order.getCarts().stream().map(CartResponse::of).toList(),
+                order.getTotalPrice(),
                 order.getStatus().toString()
         );
     }
 
-    public static OrderResponse of(Long orderId, Long userId, List<CartResponse> carts, String status) {
-        return new OrderResponse(orderId, userId, carts, status);
+    public static OrderResponse of(Long orderId, Long userId, List<CartResponse> carts, Integer paidAmount,
+                                   String status) {
+        return new OrderResponse(orderId, userId, carts, paidAmount, status);
     }
 }

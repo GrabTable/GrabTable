@@ -5,7 +5,7 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.Payment;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Bill;
+import edu.skku.grabtable.order.domain.PayOneBill;
 import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.repository.BillRepository;
 import java.io.IOException;
@@ -35,8 +35,8 @@ public class PaymentValidator {
         }
         //TODO: 서버-사이드 이벤트
         //주문결제 정보 DB에 저장
-        Bill bill = new Bill(receivedcPayment.getImpUid(), receivedcPayment.getMerchantUid(),
+        PayOneBill payOneBill = new PayOneBill(receivedcPayment.getImpUid(), receivedcPayment.getMerchantUid(),
                 receivedcPayment.getReceiptUrl(), receivedcPayment.getAmount());
-        billRepository.save(bill);
+        billRepository.save(payOneBill);
     }
 }

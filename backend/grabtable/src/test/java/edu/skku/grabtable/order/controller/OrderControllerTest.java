@@ -40,9 +40,9 @@ class OrderControllerTest extends ControllerTest {
     @DisplayName("유저의 현재 카트를 기반으로 주문을 생성할 수 있다.")
     void create() throws Exception {
         //given
-        OrderResponse orderResponse = new OrderResponse(1L, 1L, null, "PENDING");
+        OrderResponse orderResponse = new OrderResponse(1L, 1L, null, 10000, "PAID");
         PaymentRequest paymentRequest = new PaymentRequest("1", 10000);
-        Mockito.when(orderService.create(any(), any()))
+        Mockito.when(orderService.processPayment(any(), any()))
                 .thenReturn(orderResponse);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/v1/orders")

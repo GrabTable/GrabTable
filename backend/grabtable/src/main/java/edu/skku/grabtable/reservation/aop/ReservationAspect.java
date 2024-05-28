@@ -22,8 +22,7 @@ public class ReservationAspect {
     public void cartControllerUpdateMethods() {
     }
 
-    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.create(..)) || " +
-            "execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..)) || " +
+    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..)) || " +
             "execution(* edu.skku.grabtable.reservation.controller.ReservationController.confirm(..)) || " +
             "execution(* edu.skku.grabtable.reservation.controller.ReservationController.cancelReservation(..))")
     public void reservationControllerUpdateMethods() {

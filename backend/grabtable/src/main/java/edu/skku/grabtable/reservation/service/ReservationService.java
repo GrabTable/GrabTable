@@ -84,12 +84,8 @@ public class ReservationService {
     }
 
     public ReservationDetailResponse findReservationByUser(User user) {
-        Reservation reservation = user.getInvitedReservation();
-
-        if (reservation == null) {
-            reservation = reservationRepository.findByHostId(user.getId())
-                    .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
-        }
+        Reservation reservation = reservationRepository.findByUser(user)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         List<OrderResponse> orders = orderRepository.findByReservation(reservation)
                 .stream()

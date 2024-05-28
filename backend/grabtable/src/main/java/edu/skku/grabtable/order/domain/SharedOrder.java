@@ -39,6 +39,10 @@ public class SharedOrder extends BaseTimeEntity {
     private OrderStatus orderStatus;
 
     public static SharedOrder of(Reservation reservation) {
-        return new SharedOrder(null, reservation, new ArrayList<>());
+        SharedOrder sharedOrder = new SharedOrder();
+        sharedOrder.reservation = reservation;
+        sharedOrder.orderStatus = OrderStatus.PENDING;
+        return sharedOrder;
+    }
     }
 }

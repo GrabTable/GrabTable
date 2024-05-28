@@ -40,6 +40,10 @@ public class Order extends BaseTimeEntity {
     private Reservation reservation;
 
     @ManyToOne
+    @JoinColumn(name = "shared_order_id")
+    private SharedOrder sharedOrder;
+
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -61,6 +65,14 @@ public class Order extends BaseTimeEntity {
         this.carts = carts;
         changeCartsMapping(carts);
         this.totalPrice = calculateTotalPrice(carts);
+        this.status = OrderStatus.PAID;
+    }
+
+    public Order(User user, SharedOrder sharedOrder, int amount) {
+        this.sharedOrder = sharedOrder;
+        this.user = user;
+        changeCartsMapping(carts);
+        this.totalPrice = amount;
         this.status = OrderStatus.PAID;
     }
 

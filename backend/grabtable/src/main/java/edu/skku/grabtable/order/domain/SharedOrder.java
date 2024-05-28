@@ -32,6 +32,12 @@ public class SharedOrder extends BaseTimeEntity {
     @OneToMany(mappedBy = "sharedOrder")
     List<Cart> carts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "sharedOrder")
+    List<Order> orders = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
     public static SharedOrder of(Reservation reservation) {
         return new SharedOrder(null, reservation, new ArrayList<>());
     }

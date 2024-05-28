@@ -15,10 +15,10 @@ resource "aws_lb_listener" "terraform_lb_listener" {
   port              = "80"
   protocol          = "TCP"
   default_action {
-    type             = "forward"
+    type = "forward"
     forward {
       target_group {
-        arn = aws_lb_target_group.terraform_target_group.arn
+        arn    = aws_lb_target_group.terraform_target_group.arn
         weight = 0
       }
     }

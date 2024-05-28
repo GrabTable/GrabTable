@@ -1,6 +1,5 @@
 package edu.skku.grabtable.cart.domain;
 
-import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
@@ -42,6 +41,13 @@ public class Cart extends BaseTimeEntity {
 
     public Cart(User user, Menu menu, Integer quantity) {
         this.user = user;
+        this.menuName = menu.getMenuName();
+        this.price = menu.getPrice();
+        this.quantity = quantity;
+    }
+
+    public Cart(SharedOrder sharedOrder, Menu menu, Integer quantity) {
+        this.sharedOrder = sharedOrder;
         this.menuName = menu.getMenuName();
         this.price = menu.getPrice();
         this.quantity = quantity;

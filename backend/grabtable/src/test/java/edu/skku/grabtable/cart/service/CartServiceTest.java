@@ -52,7 +52,7 @@ public class CartServiceTest {
                 .thenReturn(List.of(cart, cart2));
 
         //when
-        List<CartResponse> result = cartService.findCurrentCarts(user.getId());
+        List<CartResponse> result = cartService.findMyCarts(user.getId());
 
         //then
         assertThat(result.size()).isEqualTo(2);

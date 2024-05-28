@@ -53,7 +53,7 @@ public class CartControllerTest extends ControllerTest {
                 .map(CartResponse::of)
                 .toList();
 
-        when(cartService.findCurrentCarts(any()))
+        when(cartService.findMyCarts(any()))
                 .thenReturn(expected);
         //when
         MvcResult mvcResult = mockMvc.perform(get("/v1/carts/me")

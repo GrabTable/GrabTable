@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("v1/carts")
+
+@RequestMapping("/v1/carts")
 @RestController
 @RequiredArgsConstructor
 public class CartController {
@@ -27,8 +28,8 @@ public class CartController {
     private final CartService cartService;
 
     @GetMapping("/me")
-    public List<CartResponse> getCurrentCarts(@AuthUser User user) {
-        return cartService.findCurrentCarts(user.getId());
+    public List<CartResponse> getMyCarts(@AuthUser User user) {
+        return cartService.findMyCarts(user.getId());
     }
 
     @PostMapping
@@ -53,6 +54,37 @@ public class CartController {
     @DeleteMapping("/{cartId}")
     public ResponseEntity<Void> deleteCart(@AuthUser User user, @PathVariable Long cartId) {
         cartService.deleteCart(user.getId(), cartId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /* === 공유 주문 기능 === */
+    @GetMapping("/shared")
+    public List<CartResponse> getSharedCarts(@AuthUser User user) {
+        return cartService.findSharedCarts(user);
+    }
+
+    @PostMapping("/shared")
+    public ResponseEntity<Void> addSharedCart(
+            @AuthUser User user,
+            @RequestBody CartCreateRequest cartRequest
+    ) {
+        cartService.createSharedCart(user, cartRequest.getMenuId(), cartRequest.getQuantity());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/shared/{cartId}")
+    public ResponseEntity<Void> updateSharedCart(
+            @AuthUser User user,
+            @PathVariable Long cartId,
+            @RequestBody CartUpdateRequest cartRequest
+    ) {
+        cartService.updateSharedCart(user, cartId, cartRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/shared/{cartId}")
+    public ResponseEntity<Void> deleteSharedCart(@AuthUser User user, @PathVariable Long cartId) {
+        cartService.deleteSharedCart(user, cartId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -53,38 +53,33 @@ public class CartController {
 
     @DeleteMapping("/{cartId}")
     public ResponseEntity<Void> deleteCart(@AuthUser User user, @PathVariable Long cartId) {
-        cartService.deleteCart(user.getId(), cartId);
+        cartService.deleteCart(user, cartId);
         return ResponseEntity.noContent().build();
     }
 
     /* === 공유 주문 기능 === */
-    @GetMapping("/shared")
-    public List<CartResponse> getSharedCarts(@AuthUser User user) {
-        return cartService.findSharedCarts(user);
-    }
-
     @PostMapping("/shared")
-    public ResponseEntity<Void> addSharedCart(
+    public ResponseEntity<Void> addCartInSharedOrder(
             @AuthUser User user,
             @RequestBody CartCreateRequest cartRequest
     ) {
-        cartService.createSharedCart(user, cartRequest.getMenuId(), cartRequest.getQuantity());
+        cartService.createCartInSharedOrder(user, cartRequest.getMenuId(), cartRequest.getQuantity());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/shared/{cartId}")
-    public ResponseEntity<Void> updateSharedCart(
+    public ResponseEntity<Void> updateCartInSharedOrder(
             @AuthUser User user,
             @PathVariable Long cartId,
             @RequestBody CartUpdateRequest cartRequest
     ) {
-        cartService.updateSharedCart(user, cartId, cartRequest);
+        cartService.updateCartInSharedOrder(user, cartId, cartRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/shared/{cartId}")
-    public ResponseEntity<Void> deleteSharedCart(@AuthUser User user, @PathVariable Long cartId) {
-        cartService.deleteSharedCart(user, cartId);
+    public ResponseEntity<Void> deleteCartInSharedOrder(@AuthUser User user, @PathVariable Long cartId) {
+        cartService.deleteCartInSharedOrder(user, cartId);
         return ResponseEntity.noContent().build();
     }
 }

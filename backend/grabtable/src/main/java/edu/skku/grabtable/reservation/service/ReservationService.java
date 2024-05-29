@@ -112,7 +112,9 @@ public class ReservationService {
                 reservation.getSharedOrder().getCarts()
                         .stream().map(CartResponse::of).toList(),
                 reservation.getSharedOrder().getOrders()
-                        .stream().map(OrderResponse::of).toList()
+                        .stream().map(OrderResponse::of).toList(),
+                reservation.getSharedOrder().calculateTotalAmount(),
+                reservation.getSharedOrder().calculateLeftAmount()
         );
 
         List<UserCartsInfoResponse> inviteesInfo = userRepository.findAllByInvitedReservation(reservation)

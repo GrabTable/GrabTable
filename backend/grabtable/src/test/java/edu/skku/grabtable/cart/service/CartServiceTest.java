@@ -88,7 +88,7 @@ public class CartServiceTest {
         when(cartRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(cart));
         //when
-        cartService.deleteCart(user.getId(), deleteCartId);
+        cartService.deleteCart(user, deleteCartId);
         //then
         verify(cartRepository).deleteById(deleteCartId);
     }

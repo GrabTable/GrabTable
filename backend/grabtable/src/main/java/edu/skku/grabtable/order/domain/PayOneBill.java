@@ -1,11 +1,11 @@
 package edu.skku.grabtable.order.domain;
 
+import com.siot.IamportRestClient.response.Payment;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -14,7 +14,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @ToString
-public class Bill {
+public class PayOneBill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +28,11 @@ public class Bill {
 
     private BigDecimal amount;
 
-    @Builder
-    public Bill(String impUid, String merchantUid, String receiptUrl, BigDecimal amount) {
-        this.impUid = impUid;
-        this.merchantUid = merchantUid;
-        this.receiptUrl = receiptUrl;
-        this.amount = amount;
+
+    public PayOneBill(Payment payment) {
+        this.impUid = payment.getImpUid();
+        this.merchantUid = payment.getMerchantUid();
+        this.receiptUrl = payment.getReceiptUrl();
+        this.amount = payment.getAmount();
     }
 }

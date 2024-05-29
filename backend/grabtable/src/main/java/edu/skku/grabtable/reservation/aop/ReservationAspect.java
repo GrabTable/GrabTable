@@ -22,15 +22,23 @@ public class ReservationAspect {
     public void cartControllerUpdateMethods() {
     }
 
-    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.create(..)) || " +
-            "execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..)) || " +
+    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..)) || " +
             "execution(* edu.skku.grabtable.reservation.controller.ReservationController.confirm(..)) || " +
             "execution(* edu.skku.grabtable.reservation.controller.ReservationController.cancelReservation(..))")
     public void reservationControllerUpdateMethods() {
+    }
+
+    @Pointcut("execution(* edu.skku.grabtable.order.controller.OrderController.processPayment(..))")
+    public void orderControllerUpdateMethods() {
+    }
+
+    @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.processPayment(..))")
+    public void sharedOrderControllerUpdateMethods() {
 
     }
 
-    @AfterReturning("cartControllerUpdateMethods() || reservationControllerUpdateMethods()")
+    @AfterReturning("cartControllerUpdateMethods() || reservationControllerUpdateMethods() || "
+            + "orderControllerUpdateMethods() || sharedOrderControllerUpdateMethods()")
     public void sendReservationEvent(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {

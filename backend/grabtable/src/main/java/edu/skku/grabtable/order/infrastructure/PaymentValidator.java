@@ -5,15 +5,15 @@ import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.Payment;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Bill;
+import edu.skku.grabtable.order.domain.PayOneBill;
 import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.repository.BillRepository;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Component
 @Transactional
 @RequiredArgsConstructor
 public class PaymentValidator {
@@ -22,8 +22,7 @@ public class PaymentValidator {
     private final BillRepository billRepository;
 
     public void verify(PaymentRequest paymentRequest) {
-
-        Payment receivedcPayment = null;
+        Payment receivedcPayment;
         try {
             receivedcPayment = iamportClient.paymentByImpUid(paymentRequest.getImpUid()).getResponse();
         } catch (IamportResponseException | IOException e) {
@@ -33,10 +32,8 @@ public class PaymentValidator {
         if (!receivedcPayment.getImpUid().equals(paymentRequest.getImpUid())) {
             throw new BadRequestException(ExceptionCode.FAILED_TO_VALIDATE_PAYMENT);
         }
-        //TODO: 서버-사이드 이벤트
-        //주문결제 정보 DB에 저장
-        Bill bill = new Bill(receivedcPayment.getImpUid(), receivedcPayment.getMerchantUid(),
-                receivedcPayment.getReceiptUrl(), receivedcPayment.getAmount());
-        billRepository.save(bill);
+
+        PayOneBill payOneBill = new PayOneBill(receivedcPayment);
+        billRepository.save(payOneBill);
     }
 }

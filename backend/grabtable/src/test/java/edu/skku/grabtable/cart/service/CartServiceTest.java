@@ -52,7 +52,7 @@ public class CartServiceTest {
                 .thenReturn(List.of(cart, cart2));
 
         //when
-        List<CartResponse> result = cartService.findCurrentCarts(user.getId());
+        List<CartResponse> result = cartService.findMyCarts(user.getId());
 
         //then
         assertThat(result.size()).isEqualTo(2);
@@ -88,7 +88,7 @@ public class CartServiceTest {
         when(cartRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(cart));
         //when
-        cartService.deleteCart(user.getId(), deleteCartId);
+        cartService.deleteCart(user, deleteCartId);
         //then
         verify(cartRepository).deleteById(deleteCartId);
     }

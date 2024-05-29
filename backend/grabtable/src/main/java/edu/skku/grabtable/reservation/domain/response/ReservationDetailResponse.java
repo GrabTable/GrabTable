@@ -26,6 +26,7 @@ public class ReservationDetailResponse {
             UserCartsInfoResponse hostInfo,
             List<UserCartsInfoResponse> inviteesInfo,
             String inviteCode,
+            SharedOrderResponse sharedOrder,
             List<OrderResponse> orders
     ) {
         return new ReservationDetailResponse(
@@ -35,7 +36,7 @@ public class ReservationDetailResponse {
                 hostInfo,
                 inviteesInfo,
                 inviteCode,
-                null,
+                sharedOrder,
                 orders
         );
     }

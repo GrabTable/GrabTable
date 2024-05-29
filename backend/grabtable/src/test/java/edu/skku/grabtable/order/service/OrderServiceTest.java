@@ -43,6 +43,7 @@ class OrderServiceTest {
 
     @Mock
     PaymentValidator paymentValidator;
+
     @InjectMocks
     OrderService orderService;
 
@@ -56,13 +57,13 @@ class OrderServiceTest {
         Reservation reservation = new Reservation(1L, user, null, null, null, "code", ReservationStatus.ONGOING);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
         //given
-        given(reservationRepository.findByHostId(any()))
+        given(reservationRepository.findByUser(any()))
                 .willReturn(Optional.of(reservation));
         given(cartRepository.findByUserId(any()))
                 .willReturn(List.of(cart));
 
         //when
-        OrderResponse orderResponse = orderService.create(user, paymentRequest);
+        OrderResponse orderResponse = orderService.processPayment(user, paymentRequest);
 
         //then
         assertThat(orderResponse.getStatus()).isEqualTo("PAID");
@@ -77,12 +78,12 @@ class OrderServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
 
         //given
-        given(reservationRepository.findByHostId(any()))
+        given(reservationRepository.findByUser(any()))
                 .willReturn(Optional.of(reservation));
         given(cartRepository.findByUserId(any()))
                 .willReturn(List.of());
         //when,
-        assertThatThrownBy(() -> orderService.create(user, paymentRequest))
+        assertThatThrownBy(() -> orderService.processPayment(user, paymentRequest))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("사용자의 장바구니가 비어 있습니다.");
     }

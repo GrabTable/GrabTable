@@ -66,5 +66,38 @@ public class LoginIntegrationTest {
         assertThat(present).isTrue();
     }
 
+    @Test
+    @DisplayName("AccessToken이 유효한 사용자가 토큰 재발급 시 해당 토큰을 그대로 반환한다.")
+    void reissue() throws Exception {
+        //given
+        given(kakaoOAuthProvider.getUserInfo(any()))
+                .willReturn(buildUserInfo());
+
+        UserTokens tokens = loginService.login(new LoginRequest("code"));
+
+        //when
+        String reissued = loginService.reissueAccessToken(tokens.getRefreshToken(),
+                "Bearer " + tokens.getAccessToken());
+
+        //then
+        assertThat(reissued).isEqualTo(tokens.getAccessToken());
+    }
+
+    @Test
+    @DisplayName("로그아웃 시 RefreshToken이 삭제된다.")
+    void logout() throws Exception {
+        //given
+        given(kakaoOAuthProvider.getUserInfo(any()))
+                .willReturn(buildUserInfo());
+        UserTokens tokens = loginService.login(new LoginRequest("code"));
+
+        //when
+        loginService.logout(tokens.getRefreshToken());
+
+        //then
+        boolean present = refreshTokenRepository.findById(tokens.getRefreshToken()).isPresent();
+        assertThat(present).isFalse();
+    }
+
 
 }

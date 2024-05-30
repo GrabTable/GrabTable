@@ -56,10 +56,8 @@ public class LoginService {
         return nickname + "#" + socialLoginId;
     }
 
-
-    // Refresh Token을 DB에서 제거
-    public void logout(User user) {
-        refreshTokenRepository.deleteById(user.getId());
+    public void logout(String refreshToken) {
+        refreshTokenRepository.deleteById(refreshToken);
     }
 
     //TODO
@@ -77,7 +75,7 @@ public class LoginService {
 
         //Access Token이 만료된 경우 -> Refresh Token DB 검증 후 재발급
         if (jwtUtil.isAccessTokenExpired(accessToken)) {
-            RefreshToken foundRefreshToken = refreshTokenRepository.findByValue(refreshToken)
+            RefreshToken foundRefreshToken = refreshTokenRepository.findById(refreshToken)
                     .orElseThrow(() -> new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN));
             return jwtUtil.reissueAccessToken(foundRefreshToken.getUserId().toString());
         }

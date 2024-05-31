@@ -48,9 +48,7 @@ export default function Home() {
 
   const fetchStores = async () => {
     try {
-      const response = await fetch(
-        `${baseUrl}/v1/stores`,
-      )
+      const response = await fetch(`${baseUrl}/v1/stores`)
       if (!response.ok) {
         throw new Error('Something went wrong')
       }

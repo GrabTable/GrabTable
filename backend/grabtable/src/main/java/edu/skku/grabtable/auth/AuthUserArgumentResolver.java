@@ -29,7 +29,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(AuthUser.class) != null;
+        return parameter.hasParameterAnnotation(AuthUser.class);
     }
 
     @Override
@@ -39,7 +39,11 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+
+        if (request == null) {
+            throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
+        }
 
         String refreshToken = extractRefreshToken(request);
         String accessToken = extractAccessToken(request);
@@ -54,6 +58,9 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     private String extractAccessToken(HttpServletRequest request) {
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null) {
+            throw new InvalidJwtException(ExceptionCode.INVALID_ACCESS_TOKEN);
+        }
         return authHeader.split(" ")[1];
     }
 

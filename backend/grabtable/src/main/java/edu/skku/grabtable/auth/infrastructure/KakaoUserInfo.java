@@ -2,9 +2,7 @@ package edu.skku.grabtable.auth.infrastructure;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.ToString;
 
-@ToString
 public class KakaoUserInfo {
 
     @Getter

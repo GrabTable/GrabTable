@@ -29,7 +29,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(AuthUser.class) != null;
+        return parameter.hasParameterAnnotation(AuthUser.class);
     }
 
     @Override
@@ -39,33 +39,48 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
             NativeWebRequest webRequest,
             WebDataBinderFactory binderFactory
     ) {
-        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 
-        //refresh-token 추출
+        if (request == null) {
+            throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
+        }
+
+        String refreshToken = extractRefreshToken(request);
+        String accessToken = extractAccessToken(request);
+
+        //검증
+        if (jwtUtil.isAccessTokenValid(accessToken)) {
+            return extractUser(accessToken);
+        }
+
+        throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
+    }
+
+    private String extractAccessToken(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null) {
+            throw new InvalidJwtException(ExceptionCode.INVALID_ACCESS_TOKEN);
+        }
+        return authHeader.split(" ")[1];
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
+
         if (cookies == null) {
             throw new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN);
         }
 
-        String refreshToken = Arrays.stream(cookies)
+        return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals("refresh-token"))
                 .findFirst()
                 .orElseThrow(() -> new InvalidJwtException(ExceptionCode.INVALID_REFRESH_TOKEN))
                 .getValue();
+    }
 
-        //access token 추출
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String accessToken = authHeader.split(" ")[1];
-        log.info("AuthUserArgumentResolver access token={}", accessToken);
-
-        //검증
-        jwtUtil.validateRefreshToken(refreshToken);
-        if (!jwtUtil.isAccessTokenValid(accessToken)) {
-            throw new InvalidJwtException(ExceptionCode.FAILED_TO_VALIDATE_TOKEN);
-        }
-
-        //Access Token으로 정보 추출
+    private User extractUser(String accessToken) {
         Long userId = Long.valueOf(jwtUtil.getSubject(accessToken));
+
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
     }

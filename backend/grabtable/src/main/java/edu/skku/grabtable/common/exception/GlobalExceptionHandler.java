@@ -46,7 +46,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InvalidJwtException.class)
     public ResponseEntity<ExceptionResponse> handleInvalidJwtException(InvalidJwtException e) {
         log.warn(e.getMessage(), e);
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ExceptionResponse(e.getCode(), e.getMessage()));
     }
+
 }

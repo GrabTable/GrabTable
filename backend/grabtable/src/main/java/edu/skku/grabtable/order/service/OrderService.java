@@ -46,7 +46,7 @@ public class OrderService {
     private void validateUserCarts(User user) {
         List<Cart> carts = cartRepository.findByUserId(user.getId());
         if (carts.isEmpty()) {
-            throw new BadRequestException(ExceptionCode.CUREENT_CARTS_EMPTY);
+            throw new BadRequestException(ExceptionCode.CURRENT_CARTS_EMPTY);
         }
     }
 }

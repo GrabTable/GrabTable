@@ -44,7 +44,7 @@ public class SharedOrderService {
     private void validateSharedCarts(SharedOrder sharedOrder) {
         List<Cart> carts = cartRepository.findBySharedOrderId(sharedOrder.getId());
         if (carts.isEmpty()) {
-            throw new BadRequestException(ExceptionCode.CUREENT_CARTS_EMPTY);
+            throw new BadRequestException(ExceptionCode.CURRENT_CARTS_EMPTY);
         }
     }
 

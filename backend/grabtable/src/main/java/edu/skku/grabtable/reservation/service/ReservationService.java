@@ -1,6 +1,7 @@
 package edu.skku.grabtable.reservation.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
@@ -148,7 +149,8 @@ public class ReservationService {
 
         List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
-            invitee.clearCarts();
+            cartRepository.findByUserId(invitee.getId())
+                    .forEach(Cart::disconnectUser);
             invitee.clearReservation();
         }
     }

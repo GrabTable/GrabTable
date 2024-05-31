@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
 import InviteCode from './InvitateCode'
+import { baseUrl } from '@/lib/constants'
 
 export default function Page() {
   const router = useRouter()
@@ -35,16 +36,13 @@ export default function Page() {
       }
 
       try {
-        const response = await fetch(
-          `http://localhost:8000/v1/reservations/me`,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + session.formData['access_token'],
-            },
-            credentials: 'include',
+        const response = await fetch(`${baseUrl}/v1/reservations/me`, {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + session.formData['access_token'],
           },
-        )
+          credentials: 'include',
+        })
         const data = await response.json()
         if (response.ok) {
           setInviteCode(data.inviteCode)
@@ -53,7 +51,7 @@ export default function Page() {
             setisHost(true)
           }
           const response2 = await fetch(
-            `http://localhost:8000/v1/stores/${data.storeId}/menus`,
+            `${baseUrl}/v1/stores/${data.storeId}/menus`,
             {
               headers: {
                 'Content-Type': 'application/json',

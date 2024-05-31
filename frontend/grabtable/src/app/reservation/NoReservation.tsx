@@ -1,4 +1,5 @@
 import { InvitationInput } from '@/components/InvitationInput'
+import { baseUrl } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useState } from 'react'
 
@@ -13,17 +14,14 @@ export default function NoReservation() {
   async function postJoinReservation(inviteCode: string) {
     const session = await getSessionFromClient()
 
-    const response = await fetch(
-      `http://localhost:8000/v1/reservations/${inviteCode}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['access_token'],
-        },
-        credentials: 'include',
+    const response = await fetch(`${baseUrl}/v1/reservations/${inviteCode}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
       },
-    )
+      credentials: 'include',
+    })
   }
 
   const handleJoinReservation = async () => {

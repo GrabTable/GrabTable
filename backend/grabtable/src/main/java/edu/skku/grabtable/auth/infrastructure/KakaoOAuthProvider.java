@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.Getter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -33,24 +32,23 @@ public class KakaoOAuthProvider {
 
 
     public KakaoOAuthProvider(
+            RestTemplate restTemplate,
             @Value("${spring.security.oauth2.client.registration.kakao.client-id}") String clientId,
             @Value("${spring.security.oauth2.client.registration.kakao.client-secret}") String clientSecret,
             @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") String redirectUri,
             @Value("${spring.security.oauth2.client.provider.kakao.token-uri}") String tokenUri,
             @Value("${spring.security.oauth2.client.provider.kakao.user-info-uri}") String userInfoUri) {
+        this.restTemplate = restTemplate;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.redirectUri = redirectUri;
         this.tokenUri = tokenUri;
         this.userInfoUri = userInfoUri;
-        this.restTemplate = new RestTemplate();
     }
 
-    public KakaoUserInfo getUserInfo(String code) {
-        String accessToken = fetchAccessToken(code);
-
+    public KakaoUserInfo getUserInfo(String kakaoAccessToken) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
+        headers.setBearerAuth(kakaoAccessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         Map<String, Boolean> params = new HashMap<>();
@@ -73,7 +71,7 @@ public class KakaoOAuthProvider {
         throw new SocialLoginException(ExceptionCode.UNABLE_TO_GET_USER_INFO);
     }
 
-    private String fetchAccessToken(String code) {
+    public String fetchKakaoAccessToken(String code) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -85,11 +83,11 @@ public class KakaoOAuthProvider {
         params.add("grant_type", "authorization_code");
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, headers);
 
-        ResponseEntity<KakaoAccessTokenResponse> response = restTemplate.exchange(
+        ResponseEntity<KakaoTokenResponse> response = restTemplate.exchange(
                 tokenUri,
                 HttpMethod.POST,
                 requestEntity,
-                KakaoAccessTokenResponse.class
+                KakaoTokenResponse.class
         );
 
         return Optional.ofNullable(response.getBody())
@@ -98,8 +96,7 @@ public class KakaoOAuthProvider {
     }
 
     @Getter
-    @ToString
-    public static class KakaoAccessTokenResponse {
+    public static class KakaoTokenResponse {
         @JsonProperty("access_token")
         private String accessToken;
 

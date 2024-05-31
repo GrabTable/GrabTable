@@ -27,7 +27,8 @@ public class LoginService {
     private final KakaoOAuthProvider kakaoOAuthProvider;
 
     public UserTokens login(LoginRequest loginRequest) {
-        KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(loginRequest.getCode());
+        String kakaoAccessToken = kakaoOAuthProvider.fetchKakaoAccessToken(loginRequest.getCode());
+        KakaoUserInfo userInfo = kakaoOAuthProvider.getUserInfo(kakaoAccessToken);
 
         User user = findOrCreateUser(
                 userInfo.getSocialLoginId(),

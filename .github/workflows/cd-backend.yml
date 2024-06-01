@@ -21,7 +21,7 @@ env:
 
 jobs:
   build-and-deploy:
-    name: gradle build
+    name: build and ecs deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -65,6 +65,9 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        
+    - name: List files
+      run: ls -R
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def

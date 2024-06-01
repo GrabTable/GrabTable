@@ -1,11 +1,9 @@
 package edu.skku.grabtable.auth.controller;
 
-import edu.skku.grabtable.auth.annotation.AuthUser;
 import edu.skku.grabtable.auth.domain.UserTokens;
 import edu.skku.grabtable.auth.domain.request.LoginRequest;
 import edu.skku.grabtable.auth.domain.response.AccessTokenResponse;
 import edu.skku.grabtable.auth.service.LoginService;
-import edu.skku.grabtable.user.domain.User;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,10 +59,10 @@ public class LoginController {
 
     @PostMapping(value = "/logout")
     public ResponseEntity<Void> logout(
-            @AuthUser User user
+            @CookieValue("refresh-token") String refreshToken
     ) {
 
-        loginService.logout(user);
+        loginService.logout(refreshToken);
         return ResponseEntity.noContent().build();
     }
 

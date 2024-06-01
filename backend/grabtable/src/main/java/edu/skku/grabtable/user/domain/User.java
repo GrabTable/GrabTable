@@ -78,11 +78,7 @@ public class User extends BaseTimeEntity {
     public void joinReservation(Reservation reservation) {
         this.invitedReservation = reservation;
     }
-
-    public void clearCarts() {
-        //TODO
-    }
-
+    
     public void update(String username, String email, String phone, String profileImageUrl) {
         this.email = email;
         this.profileImageUrl = profileImageUrl;

@@ -14,7 +14,7 @@ env:
   ECS_SERVICE: terraform-ecs-service                 # set this to your Amazon ECS service name
   ECS_CLUSTER: terraform-ecs-cluster                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: backend/grabtable/task-definition.json # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME: grabtable-be           # set this to the name of the container in the
+  CONTAINER_NAME: terraform-container-definition           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
   contents: read

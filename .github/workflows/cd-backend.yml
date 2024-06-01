@@ -43,7 +43,7 @@ jobs:
       uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
 
     - name: gradle build
-      run: ./gradlew build --exclude-task test
+      run: ./gradlew build --exclude-task test --exclude-task asciidoctor
 
   deploy:
     name: Deploy
@@ -52,7 +52,7 @@ jobs:
       contents: read
     environment: production
     needs: [build]
-    
+
     steps:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1

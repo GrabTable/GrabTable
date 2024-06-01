@@ -20,7 +20,7 @@ env:
   contents: read
 
 jobs:
-  build:
+  build-and-deploy:
     name: gradle build
     runs-on: ubuntu-latest
     permissions:
@@ -45,18 +45,6 @@ jobs:
     - name: gradle build
       run: ./gradlew build --exclude-task test --exclude-task asciidoctor
 
-  deploy:
-    name: Deploy
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    environment: production
-    needs: [build]
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:

@@ -1,0 +1,56 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:767398069571:task-definition/terraform-ecs-task-definition:4",
+    "containerDefinitions": [
+        {
+            "name": "terraform-container-definition",
+            "image": "767398069571.dkr.ecr.ap-northeast-2.amazonaws.com/grabtable:latest",
+            "cpu": 256,
+            "memory": 256,
+            "memoryReservation": 36,
+            "portMappings": [
+                {
+                    "containerPort": 8000,
+                    "hostPort": 8000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "systemControls": []
+        }
+    ],
+    "family": "terraform-ecs-task-definition",
+    "taskRoleArn": "arn:aws:iam::767398069571:role/ecsTaskRole",
+    "executionRoleArn": "arn:aws:iam::767398069571:role/ecsTaskExecutionRole",
+    "networkMode": "bridge",
+    "revision": 4,
+    "volumes": [],
+    "status": "ACTIVE",
+    "requiresAttributes": [
+        {
+            "name": "com.amazonaws.ecs.capability.ecr-auth"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.21"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.task-iam-role"
+        },
+        {
+            "name": "ecs.capability.execution-role-ecr-pull"
+        }
+    ],
+    "placementConstraints": [],
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "registeredAt": "2024-05-26T11:15:17.516Z",
+    "registeredBy": "arn:aws:iam::767398069571:user/grabtable-iam",
+    "tags": []
+}

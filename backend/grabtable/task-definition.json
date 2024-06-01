@@ -5,8 +5,8 @@
             "name": "terraform-container-definition",
             "image": "767398069571.dkr.ecr.ap-northeast-2.amazonaws.com/grabtable:latest",
             "cpu": 1024,
-            "memory": "1GB",
-            "memoryReservation": "1G",
+            "memory": 1024,
+            "memoryReservation": 1024,
             "portMappings": [
                 {
                     "containerPort": 8000,

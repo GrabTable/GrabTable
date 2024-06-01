@@ -5,23 +5,22 @@ on:
   push:
     branches:
       - "65-feature-be-cd"
+
 defaults:
   run:
     working-directory: backend/grabtable
-env:
-  AWS_REGION: ap-northeast-2                # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: grabtable           # set this to your Amazon ECR repository name
-  ECS_SERVICE: terraform-ecs-service                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: terraform-ecs-cluster                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: backend/grabtable/task-definition.json # set this to the path to your Amazon ECS task definition
-  CONTAINER_NAME: terraform-container-definition           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
 
-  contents: read
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: grabtable
+  ECS_SERVICE: terraform-ecs-service
+  ECS_CLUSTER: terraform-ecs-cluster
+  ECS_TASK_DEFINITION: backend/grabtable/task-definition.json
+  CONTAINER_NAME: terraform-container-definition
 
 jobs:
   build-and-deploy:
-    name: build and ecs deploy
+    name: Build and ECS Deploy
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,7 +29,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
       with:
-        token: ${{secrets.ACTION_TOKEN}}
+        token: ${{ secrets.ACTION_TOKEN }}
         submodules: true
 
     - name: Set up JDK 17
@@ -39,10 +38,10 @@ jobs:
         java-version: '17'
         distribution: 'corretto'
 
-    - name: setup Gradle
-      uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
+    - name: Set up Gradle
+      uses: gradle/gradle-build-action@v2
 
-    - name: gradle build
+    - name: Gradle build
       run: ./gradlew build --exclude-task test --exclude-task asciidoctor
 
     - name: Configure AWS credentials
@@ -65,6 +64,15 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Stop existing ECS tasks
+      run: |
+        ecs_tasks=$(aws ecs list-tasks --cluster ${{ env.ECS_CLUSTER }} --service-name ${{ env.ECS_SERVICE }} --query taskArns --output text)
+        if [ -n "$ecs_tasks" ]; then
+          for task in $ecs_tasks; do
+            aws ecs stop-task --cluster ${{ env.ECS_CLUSTER }} --task $task
+          done
+        fi
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def

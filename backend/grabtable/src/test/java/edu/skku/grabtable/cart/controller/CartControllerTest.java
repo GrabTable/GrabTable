@@ -44,7 +44,7 @@ public class CartControllerTest extends ControllerTest {
 
 
     @Test
-    @DisplayName("내 장바구니 목록을 조회할 수 있다")
+    @DisplayName("내 장바구니를 조회할 수 있다")
     void getCarts() throws Exception {
         //given
         Cart cart = new Cart(1L, null, "menu1", 10000, null, null, 1);
@@ -53,7 +53,7 @@ public class CartControllerTest extends ControllerTest {
                 .map(CartResponse::of)
                 .toList();
 
-        when(cartService.findCurrentCarts(any()))
+        when(cartService.findMyCarts(any()))
                 .thenReturn(expected);
         //when
         MvcResult mvcResult = mockMvc.perform(get("/v1/carts/me")
@@ -63,7 +63,7 @@ public class CartControllerTest extends ControllerTest {
         //then
         List<CartResponse> response = objectMapper.readValue(
                 mvcResult.getResponse().getContentAsString(),
-                new TypeReference<List<CartResponse>>() {
+                new TypeReference<>() {
                 }
         );
 
@@ -71,23 +71,25 @@ public class CartControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("장바구니에 주문 목록을 추가할 수 있다")
-    void createCart() throws Exception {
+    @DisplayName("장바구니에 상품을 추가할 수 있다")
+    void addCart() throws Exception {
         //given
-        final Cart cart = new Cart(1L, null, "menuName", 10000, null, null, 1);
+        doNothing().when(cartService).createCart(any(), any(), any());
         CartCreateRequest cartCreateRequest = new CartCreateRequest(1L, 1);
 
-        //when & then
-        doNothing().when(cartService).createCart(any(), any(), any());
+        //when
         mockMvc.perform(post("/v1/carts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cartCreateRequest)))
                 .andExpect(status().isCreated())
                 .andReturn();
+
+        //then
+        verify(cartService).createCart(any(), any(), any());
     }
 
     @Test
-    @DisplayName("장바구니 주문 목록을 수정할 수 있다")
+    @DisplayName("장바구니에 존재하는 상품을 수정할 수 있다")
     void modifyCart() throws Exception {
         //given
         CartUpdateRequest updateRequest = new CartUpdateRequest(10);
@@ -95,7 +97,7 @@ public class CartControllerTest extends ControllerTest {
         doNothing().when(cartService).updateCart(any(), any(), any());
 
         //when
-        mockMvc.perform(patch("/v1/carts/1")
+        mockMvc.perform(patch("/v1/carts/{cartId}", updateCartId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andDo(print())
@@ -106,7 +108,7 @@ public class CartControllerTest extends ControllerTest {
     }
 
     @Test
-    @DisplayName("장바구니 주문 목록을 삭제할 수 있다")
+    @DisplayName("장바구니에 존재하는 상품을 삭제할 수 있다")
     void deleteCart() throws Exception {
         //given
         doNothing().when(cartService).deleteCart(any(), anyLong());
@@ -121,5 +123,53 @@ public class CartControllerTest extends ControllerTest {
                 any(),
                 anyLong()
         );
+    }
+
+    @Test
+    @DisplayName("공유 주문 장바구니에 상품을 추가할 수 있다")
+    void addCartInSharedOrder() throws Exception {
+        //given
+        doNothing().when(cartService).createCartInSharedOrder(any(), any(), any());
+        CartCreateRequest cartCreateRequest = new CartCreateRequest(1L, 1);
+
+        //when & then
+        mockMvc.perform(post("/v1/carts/shared")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(cartCreateRequest)))
+                .andExpect(status().isCreated())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("공유 주문 장바구니에 존재하는 상품을 수정할 수 있다")
+    void modifyCartInSharedOrder() throws Exception {
+        //given
+        CartUpdateRequest updateRequest = new CartUpdateRequest(10);
+        doNothing().when(cartService).updateCartInSharedOrder(any(), any(), any());
+
+        //when
+        mockMvc.perform(patch("/v1/carts/shared/{cartId}", "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        //then
+        verify(cartService).updateCartInSharedOrder(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("공유 주문 장바구니에 존재하는 상품을 삭제할 수 있다")
+    void deleteCartInSharedOrder() throws Exception {
+        //given
+        doNothing().when(cartService).deleteCartInSharedOrder(any(), anyLong());
+
+        //when
+        mockMvc.perform(delete("/v1/carts/shared/{cartId}", "1"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        //then
+        verify(cartService).deleteCartInSharedOrder(any(), anyLong());
     }
 }

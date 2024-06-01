@@ -2,13 +2,14 @@ package edu.skku.grabtable.order.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.common.ControllerTest;
 import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
-import edu.skku.grabtable.order.service.OrderService;
+import edu.skku.grabtable.order.service.SharedOrderService;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,12 +21,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-@WebMvcTest(OrderController.class)
+@WebMvcTest(SharedOrderController.class)
 @AutoConfigureRestDocs
-class OrderControllerTest extends ControllerTest {
+class SharedOrderControllerTest extends ControllerTest {
 
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
@@ -34,18 +34,19 @@ class OrderControllerTest extends ControllerTest {
     ObjectMapper objectMapper;
 
     @MockBean
-    OrderService orderService;
+    SharedOrderService sharedOrderService;
 
     @Test
-    @DisplayName("유저의 현재 카트를 기반으로 주문을 생성할 수 있다.")
-    void create() throws Exception {
+    @DisplayName("사용자가 공유 주문에 대해 결제할 수 있다.")
+    void processPayment() throws Exception {
         //given
-        OrderResponse orderResponse = new OrderResponse(1L, 1L, null, 10000, "PAID");
+        OrderResponse expected = new OrderResponse(1L, 1L, null, 10000, "PAID");
         PaymentRequest paymentRequest = new PaymentRequest("1", 10000);
-        Mockito.when(orderService.processPayment(any(), any()))
-                .thenReturn(orderResponse);
+        Mockito.when(sharedOrderService.processPayment(any(), any()))
+                .thenReturn(expected);
 
-        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/v1/orders")
+        //when
+        MvcResult mvcResult = mockMvc.perform(post("/v1/shared-orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .cookie(new Cookie("refresh-token", REFRESH_TOKEN))
@@ -59,6 +60,7 @@ class OrderControllerTest extends ControllerTest {
                 OrderResponse.class
         );
 
-        assertThat(actual).usingRecursiveComparison().isEqualTo(orderResponse);
+        //then
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
     }
 }

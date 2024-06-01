@@ -5,8 +5,10 @@ import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 public class ReservationDetailResponse {
 
@@ -24,6 +26,7 @@ public class ReservationDetailResponse {
             UserCartsInfoResponse hostInfo,
             List<UserCartsInfoResponse> inviteesInfo,
             String inviteCode,
+            SharedOrderResponse sharedOrder,
             List<OrderResponse> orders
     ) {
         return new ReservationDetailResponse(
@@ -33,7 +36,7 @@ public class ReservationDetailResponse {
                 hostInfo,
                 inviteesInfo,
                 inviteCode,
-                null,
+                sharedOrder,
                 orders
         );
     }

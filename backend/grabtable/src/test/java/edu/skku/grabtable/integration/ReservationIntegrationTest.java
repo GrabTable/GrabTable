@@ -29,4 +29,9 @@ public class ReservationIntegrationTest {
     void findReservationDetailInfo() {
     }
 
+    @Test
+    @DisplayName("공유 주문 잔여 금액이 0원이 아니라면 예약 확정에 실패한다.")
+    void confirm_reservation_fail() {
+    }
+
 }

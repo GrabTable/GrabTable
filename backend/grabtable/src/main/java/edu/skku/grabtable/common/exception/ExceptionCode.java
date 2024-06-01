@@ -25,10 +25,13 @@ public enum ExceptionCode {
     ALREADY_INVITED_USER(4002, "이미 예약에 초대된 유저입니다."),
     NO_RESERVATION_USER(4003, "현재 진행 중인 예약이 존재하지 않는 유저입니다."),
     ALREADY_EXISTING_CART(4004, "사용자의 장바구니에 이미 존재하는 메뉴입니다."),
+    NOT_CONTAIN_MENU(4005, "현재 예약 중인 가게에 존재하지 않는 메뉴입니다."),
+
 
     CUREENT_CARTS_EMPTY(5001, "사용자의 장바구니가 비어 있습니다."),
     FAILED_TO_VALIDATE_PAYMENT(5002, "결제 검증에 실패했습니다."),
-    NOT_ENOUGH_ORDER(5003, "미결제 인원이 존재하여 예약을 확정할 수 없습니다.");
+    NOT_ENOUGH_ORDER(5003, "미결제 인원이 존재하여 예약을 확정할 수 없습니다."),
+    TOO_MUCH_PAYING_AMOUNT(5004, "지불 요청 금액이 잔여 금액보다 많습니다.");
 
     private final int code;
     private final String message;

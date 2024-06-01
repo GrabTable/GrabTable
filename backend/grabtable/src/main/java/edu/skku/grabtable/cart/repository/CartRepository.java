@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.Query;
 public interface CartRepository extends JpaRepository<Cart, Long> {
     List<Cart> findByUserId(Long userId);
 
+    List<Cart> findBySharedOrderId(Long sharedOrderId);
+
     boolean existsByUserIdAndMenuName(Long userId, String menuName);
+
+    boolean existsBySharedOrderIdAndMenuName(Long sharedOrderId, String menuName);
 
     @Query("""
             SELECT c

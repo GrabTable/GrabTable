@@ -16,7 +16,7 @@ import {
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
-import { useQuery } from '@tanstack/react-query'
+import { EventSourcePolyfill } from 'event-source-polyfill'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -125,6 +125,53 @@ export default function MyReservation(props: MyReservationProps) {
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [myCarts, setMyCarts] = useState<MyCart[]>([])
+  const [reservationInfo, setReservationInfo] =
+    useState<ReservationDetailResponse>()
+
+  useEffect(() => {
+    const getReservationDetailWithSse = async () => {
+      const session = await getSessionFromClient()
+      const EventSource = EventSourcePolyfill || window.EventSource
+
+      const eventSource = new EventSource(
+        `http://localhost:8000/v1/reservations/me/subscribe`,
+        {
+          headers: {
+            Authorization: 'Bearer ' + session.formData['access_token'],
+          },
+          withCredentials: true,
+        },
+      )
+
+      eventSource.addEventListener('reservation', (event: any) => {
+        const data = JSON.parse(event.data) // 이벤트 데이터 파싱
+        console.log(data)
+        setReservationInfo(data)
+      })
+
+      eventSource.onerror = (error) => {
+        console.error('EventSource failed:', error)
+        if (eventSource.readyState === EventSource.CLOSED) {
+          console.log('Reconnecting SSE...')
+          setTimeout(() => {
+            getReservationDetailWithSse()
+          }, 3000) // 3초 후에 재연결 시도
+        }
+      }
+
+      return () => {
+        eventSource.close() // 컴포넌트 언마운트 시 EventSource 닫기
+      }
+    }
+
+    getReservationDetailWithSse()
+  }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
+
+  // useEffect(() => {
+  //   getMyCart().then((data) => setMyCarts(data))
+  // })
+
   const addCart = async (body: MenuQuantity) => {
     const session = await getSessionFromClient()
     const { menuId, quantity, menuName } = body
@@ -169,6 +216,7 @@ export default function MyReservation(props: MyReservationProps) {
         description: 'Successfully deleted!',
         duration: 1000,
       })
+      getMyCart().then((data) => setMyCarts(data))
       return
     }
 
@@ -189,6 +237,7 @@ export default function MyReservation(props: MyReservationProps) {
       description: 'grab more!',
       duration: 1000,
     })
+    getMyCart().then((data) => setMyCarts(data))
     return
   }
 
@@ -237,31 +286,14 @@ export default function MyReservation(props: MyReservationProps) {
     return await response.json()
   }
 
-  // 0.5초 마다 팀원 전체의 order를 폴링
-  const {
-    data: reservationDetail,
-    isLoading,
-    error,
-  } = useQuery<ReservationDetailResponse>({
-    queryKey: ['orders'],
-    queryFn: getReservationDetail,
-    refetchInterval: 500,
-  })
-
-  const { data: myCart } = useQuery<MyCart[]>({
-    queryKey: ['myCarts'],
-    queryFn: getMyCart,
-    refetchInterval: 500,
-  })
-
   const handlePayment = () => {
     window.location.href = '/reservation/payment'
   }
   const hostUser = {
-    username: reservationDetail?.host.username,
-    profileImageUrl: reservationDetail?.host.profileImageUrl,
-    id: reservationDetail?.host.id,
-    cartItems: reservationDetail?.host.currentCarts.map(
+    username: reservationInfo?.host.username,
+    profileImageUrl: reservationInfo?.host.profileImageUrl,
+    id: reservationInfo?.host.id,
+    cartItems: reservationInfo?.host.currentCarts.map(
       (cart: {
         menuName: any
         quantity: any
@@ -276,7 +308,7 @@ export default function MyReservation(props: MyReservationProps) {
     ),
   }
 
-  const inviteesUsers = reservationDetail?.invitees.map(
+  const inviteesUsers = reservationInfo?.invitees.map(
     (invitee: {
       username: any
       profileImageUrl: any
@@ -323,6 +355,7 @@ export default function MyReservation(props: MyReservationProps) {
       setLoading(false)
     }, 1000)
   }
+
   return (
     <div className="flex justify-between">
       <div className="w-full mr-4 ">
@@ -338,7 +371,7 @@ export default function MyReservation(props: MyReservationProps) {
             </TableHeader>
             <TableBody>
               {menus.map((menu) => {
-                const cartItem: MyCart | undefined = myCart?.find(
+                const cartItem: MyCart | undefined = myCarts?.find(
                   (cart: MyCart) => cart.menuName === menu.menuName,
                 )
                 const getInitialQuantity = () => {
@@ -433,7 +466,7 @@ export default function MyReservation(props: MyReservationProps) {
           <Separator className="mb-4 h-[2px]" />
           {/* <UserListView orders={orders} /> */}
           <div className="flex flex-col space-y-4">
-            {hostUser && inviteesUsers && (
+            {reservationInfo && hostUser && inviteesUsers && (
               <UserCard key={hostUser.username} user={hostUser} />
             )}
             {(inviteesUsers || []).map((invitee: any, index: any) => (

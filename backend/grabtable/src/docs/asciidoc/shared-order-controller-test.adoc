@@ -1,0 +1,11 @@
+== SharedOrderController
+
+=== 공유 주문에 대한 결제 요청 (POST /v1/shared-orders)
+
+==== 요청
+
+include::{snippets}/shared-order-controller-test/process-payment/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/shared-order-controller-test/process-payment/http-response.adoc[]

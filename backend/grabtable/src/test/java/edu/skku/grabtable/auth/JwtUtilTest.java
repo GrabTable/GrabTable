@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Test;
 class JwtUtilTest {
 
     private final String secretKey = "secretsecretsecretsecretsecretsecretsecretsecret";
-    private final Long accessTokenExpiry = 1000L;
-    private final Long refreshTokenExpiry = 1000L;
+    private final Long accessTokenExpiry = 100000L;
+    private final Long refreshTokenExpiry = 1000000L;
 
     @Test
     @DisplayName("토큰을 파싱해 subject를 읽을 수 있다.")

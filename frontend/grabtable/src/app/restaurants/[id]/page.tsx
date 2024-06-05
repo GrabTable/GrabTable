@@ -31,6 +31,7 @@ import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import Spinner from '@/components/spinner'
+import { baseUrl } from '@/lib/constants'
 
 const restaurant_mock = {
   id: 1,
@@ -125,9 +126,7 @@ export default function Restaurant() {
   const [restaurant, setRestaurant] = useState<Restaurant>()
   const fetchStore = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/v1/stores/${store_id}`,
-      )
+      const response = await fetch(`${baseUrl}/v1/stores/${store_id}`)
       if (!response.ok) {
         throw new Error('error')
       }
@@ -141,9 +140,7 @@ export default function Restaurant() {
   const [reviews, setReviews] = useState<Reviews>([])
   const fetchReview = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/v1/reviews/stores/${store_id}`,
-      )
+      const response = await fetch(`${baseUrl}/v1/reviews/stores/${store_id}`)
       if (!response.ok) {
         throw new Error('error')
       }
@@ -181,7 +178,7 @@ export default function Restaurant() {
       }
 
       try {
-        const response = await fetch(`http://localhost:8000/v1/reservations`, {
+        const response = await fetch(`${baseUrl}/v1/reservations`, {
           method: 'POST',
           body: JSON.stringify({
             storeId: store_id,

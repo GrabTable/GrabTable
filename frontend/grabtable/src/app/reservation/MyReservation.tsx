@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
+import { baseUrl } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import Image from 'next/image'
@@ -135,7 +136,7 @@ export default function MyReservation(props: MyReservationProps) {
       const EventSource = EventSourcePolyfill || window.EventSource
 
       const eventSource = new EventSource(
-        `http://localhost:8000/v1/reservations/me/subscribe`,
+        `${baseUrl}/v1/reservations/me/subscribe`,
         {
           headers: {
             Authorization: 'Bearer ' + session.formData['access_token'],
@@ -180,7 +181,7 @@ export default function MyReservation(props: MyReservationProps) {
       // 0개를 추가하면 그냥 무시
       return
     }
-    const response = await fetch(`http://localhost:8000/v1/carts`, {
+    const response = await fetch(`${baseUrl}/v1/carts`, {
       method: 'POST',
       body: JSON.stringify({
         menuId: menuId,
@@ -203,7 +204,7 @@ export default function MyReservation(props: MyReservationProps) {
     const session = await getSessionFromClient()
     if (quantity === 0) {
       // 삭제하기
-      const response = await fetch(`http://localhost:8000/v1/carts/${cartId}`, {
+      const response = await fetch(`${baseUrl}/v1/carts/${cartId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -221,7 +222,7 @@ export default function MyReservation(props: MyReservationProps) {
     }
 
     // 0개가 아니라면, 수정
-    const response = await fetch(`http://localhost:8000/v1/carts/${cartId}`, {
+    const response = await fetch(`${baseUrl}/v1/carts/${cartId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         quantity: quantity,
@@ -243,7 +244,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   const getReservationDetail = async (): Promise<ReservationDetailResponse> => {
     const session = await getSessionFromClient()
-    const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
+    const response = await fetch(`${baseUrl}/v1/reservations/me`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + session.formData['access_token'],
@@ -273,7 +274,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   const getMyCart = async () => {
     const session = await getSessionFromClient()
-    const response = await fetch(`http://localhost:8000/v1/carts/me`, {
+    const response = await fetch(`${baseUrl}/v1/carts/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -329,17 +330,14 @@ export default function MyReservation(props: MyReservationProps) {
   const confimation = async () => {
     setLoading(true)
     const session = await getSessionFromClient()
-    const response = await fetch(
-      `http://localhost:8000/v1/reservations/confirm`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['access_token'],
-        },
-        credentials: 'include',
+    const response = await fetch(`${baseUrl}/v1/reservations/confirm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
       },
-    )
+      credentials: 'include',
+    })
 
     setTimeout(() => {
       toast({

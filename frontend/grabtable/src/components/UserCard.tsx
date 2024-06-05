@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { FaMinus, FaPlus } from 'react-icons/fa6'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
+import { baseUrl } from '@/lib/constants'
 
 interface CartItem {
   menuName: string
@@ -71,7 +72,7 @@ export function UserCard({ user }: UserCardProps): JSX.Element {
   useEffect(() => {
     async function checkOrderStatus() {
       const session = await getSessionFromClient()
-      const response = await fetch(`http://localhost:8000/v1/reservations/me`, {
+      const response = await fetch(`${baseUrl}/v1/reservations/me`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: 'Bearer ' + session.formData['access_token'],

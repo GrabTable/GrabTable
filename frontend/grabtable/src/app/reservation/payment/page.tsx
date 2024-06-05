@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import { RequestPayParams, RequestPayResponse } from '../portone'
 import { useRouter } from 'next/navigation'
+import { baseUrl } from '@/lib/constants'
 
 export default function Page() {
   const router = useRouter()
@@ -62,7 +63,7 @@ export default function Page() {
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch('http://localhost:8000/v1/orders', {
+    const res = await fetch(`${baseUrl}/v1/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export default function Page() {
   const getMyCart = async () => {
     try {
       const session = await getSessionFromClient()
-      const response = await fetch(`http://localhost:8000/v1/carts/me`, {
+      const response = await fetch(`${baseUrl}/v1/carts/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

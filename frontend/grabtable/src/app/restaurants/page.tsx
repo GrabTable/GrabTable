@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import RestaurantCard from '@/components/RestaurantCard'
+import { baseUrl } from '@/lib/constants'
 
 type Restaurant = {
   address: string
@@ -47,7 +48,7 @@ export default function Home() {
 
   const fetchStores = async () => {
     try {
-      const response = await fetch('http://localhost:8000/v1/stores')
+      const response = await fetch(`${baseUrl}/v1/stores`)
       if (!response.ok) {
         throw new Error('Something went wrong')
       }

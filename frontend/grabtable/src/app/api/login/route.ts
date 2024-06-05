@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { parseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { login } from '@/lib/next-auth/session'
+import { baseUrl } from '@/lib/constants'
 
 async function sendPostRequest(body_code: string | null) {
-  const url = 'http://localhost:8000/v1/auth/login/kakao' // 요청할 URL
+  const url = `${baseUrl}/v1/auth/login/kakao` // 요청할 URL
   const data = {
     code: body_code, // 실제 코드 값으로 변경 필요
   }
@@ -29,7 +30,7 @@ async function sendPostRequest(body_code: string | null) {
     cookies().set('refresh-token', refresh_token)
 
     const access_token = (await response.json())?.accessToken
-    const res = await fetch('http://localhost:8000/v1/user/me', {
+    const res = await fetch(`${baseUrl}/v1/user/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -16,9 +16,21 @@ class Crawler:
         self.naver_reviews = []
         self.kakao_reviews = []
         self.menus = []
+        self.latitude = 0.0
+        self.longitude = 0.0
         self.naver_avg_rating = 0
         self.kakao_avg_rating = 0
     
+    def fetch_store_info_with_naver_code(self, place_code: str):
+        url = f'https://map.naver.com/p/api/place/summary/{place_code}'
+        headers = {
+            'Accept': 'application/json, text/plain, */*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        }
+        response = requests.get(url, headers=headers).json()
+        self.place_name = response['name']
+        self.latitude = response['y']
+        self.longitude = response['x']
 
     def fetch_naver_reviews(self, place_code: str):
         url = f'https://m.place.naver.com/restaurant/{place_code}/review/visitor?entry=ple&reviewSort=recent'
@@ -67,7 +79,6 @@ class Crawler:
         }
 
         response = requests.get(url, headers=headers).json()
-        self.place_name = response['basicInfo']['placenamefull']
         self.kakao_avg_rating = round(response['comment']['scoresum'] / response['comment']['scorecnt'], 2)
 
         comments = response['comment']['list']
@@ -106,7 +117,7 @@ class Crawler:
         self.menus = menus
         
     def send_data(self, generator, category):
-        generator.add_store_query(self.place_name, category)
+        generator.add_store_query(self.place_name, category, self.latitude, self.longitude)
         for review in self.naver_reviews:
             generator.add_review_query(review['content'], None, 'NAVER')
         for review in self.kakao_reviews:
@@ -123,6 +134,7 @@ class Crawler:
         self.kakao_avg_rating = 0
 
     def execute(self, generator, category, naver_place_code, kakao_place_code):
+        self.fetch_store_info_with_naver_code(naver_place_code)
         self.fetch_naver_reviews(naver_place_code)
         self.fetch_kakao_reviews(kakao_place_code)
         self.fetch_menus(kakao_place_code)
@@ -138,11 +150,11 @@ class SeedGenerator:
         self.review_start_id = 0
         self.menu_id = 0
 
-    def add_store_query(self, place_name, category):
+    def add_store_query(self, place_name, category, latitude, longitude):
         self.store_id += 1
         store_query = f"""
-        INSERT INTO store (id, created_at, last_modified_at, address, description, phone, store_name, store_picture_url, category, status)
-        VALUES ({self.store_id}, NULL, NULL, NULL, NULL, NULL, '{place_name}', NULL, '{category}', 'VALID');
+        INSERT INTO store (id, created_at, last_modified_at, address, description, phone, store_name, store_picture_url, category, status, latitude, longitude)
+        VALUES ({self.store_id}, NULL, NULL, NULL, NULL, NULL, '{place_name}', NULL, '{category}', 'VALID', '{latitude}', '{longitude}');
         """
         self.store_queries.append(store_query)
 

@@ -36,7 +36,7 @@ class StoreServiceTest {
     @DisplayName("가게 ID로 가게 메뉴를 조회할 수 있다.")
     void findMenusByStoreId() {
         //given
-        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null, null,
                 StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>(), new ArrayList<>());
         Menu menu1 = new Menu(1L, store, "돈코츠라멘", 10000, null, MenuStatus.VALID);
         Menu menu2 = new Menu(1L, store, "미소라멘", 8000, null, MenuStatus.VALID);

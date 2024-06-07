@@ -34,9 +34,9 @@ class StoreControllerTest extends ControllerTest {
     @Test
     @DisplayName("가게 목록을 조회할 수 있다.")
     void findStores() throws Exception {
-        StoreInfoResponse store1 = new StoreInfoResponse(1L, "봉수육", "경기 수원시 장안구 화산로", "",
+        StoreInfoResponse store1 = new StoreInfoResponse(1L, "봉수육", 1.0, 2.0, "경기 수원시 장안구 화산로", "",
                 "KOREAN", 4.5);
-        StoreInfoResponse store2 = new StoreInfoResponse(1L, "미가라멘", "경기 수원시 장안구 화산로", "",
+        StoreInfoResponse store2 = new StoreInfoResponse(1L, "미가라멘", 2.0, 4.0, "경기 수원시 장안구 화산로", "",
                 "JAPANESE", 4.23);
         List<StoreInfoResponse> storesResponse = List.of(store1, store2);
 

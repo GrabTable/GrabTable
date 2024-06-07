@@ -57,7 +57,7 @@ class SharedOrderServiceTest {
         //given
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null, null,
                 StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>(), new ArrayList<>());
         Reservation reservation = new Reservation(user, store);
         SharedOrder sharedOrder = reservation.getSharedOrder();
@@ -103,7 +103,7 @@ class SharedOrderServiceTest {
         //given
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null, null,
                 StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>(), new ArrayList<>());
         Reservation reservation = new Reservation(user, store);
         SharedOrder sharedOrder = reservation.getSharedOrder();

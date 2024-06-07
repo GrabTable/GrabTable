@@ -13,6 +13,8 @@ import lombok.ToString;
 public class StoreInfoResponse {
     private Long id;
     private String storeName;
+    private Double latitude;
+    private Double longitude;
     private String address;
     private String storePictureUrl;
     private String category;
@@ -22,6 +24,8 @@ public class StoreInfoResponse {
         return new StoreInfoResponse(
                 store.getId(),
                 store.getStoreName(),
+                store.getPosition().getLatitude(),
+                store.getPosition().getLongitude(),
                 store.getAddress(),
                 store.getStorePictureUrl(),
                 store.getCategory().toString(),

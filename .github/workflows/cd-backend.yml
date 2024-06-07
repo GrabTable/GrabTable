@@ -53,16 +53,14 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY" >> $GITHUB_OUTPUT
+    - name: Build and push image
+      uses: docker/build-push-action@v5
+      with:
+        file: ./Dockerfile
+        push: true
+        tags: ${{ steps.login-ecr.outputs.registry }}/grabtable:latest
 
     - name: Stop existing ECS tasks
       run: |

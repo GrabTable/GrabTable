@@ -61,6 +61,7 @@ jobs:
         context: .
         file: ./backend/grabtable/Dockerfile
         push: true
+        build-args: 'JAR_FILE=build/libs/*SNAPSHOT.jar'
         tags: ${{ steps.login-ecr.outputs.registry }}/grabtable:latest
 
     - name: Stop existing ECS tasks

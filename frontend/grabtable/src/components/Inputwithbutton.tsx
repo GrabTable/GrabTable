@@ -1,9 +1,9 @@
 'use client'
-import React, { useState, ChangeEvent } from 'react'
-import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/Input'
-import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import React, { ChangeEvent, useState } from 'react'
 
 type Props = {
   input: string
@@ -11,9 +11,20 @@ type Props = {
 
 export function InputWithButton(props?: Props): JSX.Element {
   const [inputValue, setInputValue] = useState<string>(props?.input || '')
+  const router = useRouter()
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setInputValue(event.target.value)
+  }
+
+  const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (event.key === 'Enter') {
+      router.push(`/restaurants?search=${encodeURIComponent(inputValue)}`)
+    }
+  }
+
+  const handleClick = () => {
+    router.push(`/restaurants?search=${encodeURIComponent(inputValue)}`)
   }
 
   return (
@@ -31,17 +42,17 @@ export function InputWithButton(props?: Props): JSX.Element {
           placeholder="Search.."
           value={inputValue}
           onChange={handleInputChange}
+          onKeyDown={handleEnter}
           className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-100
         hover:scale-100 active:scale-110 transition cursor-pointer borderBlack dark:bg-white/10"
         />
 
         <Button
           asChild
+          onClick={handleClick}
           className="group bg-violet-400 px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-105 hover:scale-105 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
         >
-          <Link href={`/restaurants?search=${encodeURIComponent(inputValue)}`}>
-            search
-          </Link>
+          search
         </Button>
       </motion.div>
     </div>

@@ -6,7 +6,7 @@ resource "aws_lb_target_group" "terraform_target_group" {
 
   health_check {
     path    = "/actuator/health"
-    matcher = "200-300"
+    matcher = "200-599"
   }
 }
 

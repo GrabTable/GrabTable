@@ -2,11 +2,6 @@ name: Deploy to Amazon ECS
 
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        options:
-          - main
-          - hotfix-terraform-babo
   push:
     branches:
       - "65-feature-be-cd"
@@ -79,12 +74,12 @@ jobs:
         fi
 
     - uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.8.3
+      with:
+        terraform_version: 1.8.3
     
     - name: Terraform Init
-        working-directory: ./infra/projects/grabtable
-        run: terraform init
+      working-directory: ./infra/projects/grabtable
+      run: terraform init
 
     - name: Terraform Plan
       working-directory: ./infra/projects/grabtable

@@ -58,6 +58,7 @@ jobs:
     - name: Build and push image
       uses: docker/build-push-action@v5
       with:
+        context: .
         file: ./Dockerfile
         push: true
         tags: ${{ steps.login-ecr.outputs.registry }}/grabtable:latest

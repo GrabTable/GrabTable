@@ -40,17 +40,17 @@ const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
 
     const onLoadKakaoAPI = () => {
       window.kakao.maps.load(() => {
-        var container = document.getElementById('map')
+        const container = document.getElementById('map')
         if (!container) return
-        var options = {
+        const options = {
           center: new window.kakao.maps.LatLng(37.2987099, 126.9713822),
           level: 4,
         }
 
-        var map = new window.kakao.maps.Map(container, options)
+        const map = new window.kakao.maps.Map(container, options)
 
-        let markers: any[] = []
-        let overlays: any[] = []
+        const markers: any[] = []
+        const overlays: any[] = []
 
         stores.forEach((store) => {
           const markerPosition = new window.kakao.maps.LatLng(

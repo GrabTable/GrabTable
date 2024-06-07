@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import RestaurantCard from '@/components/RestaurantCard'
 import { baseUrl } from '@/lib/constants'
+import KakaoMap from '@/components/kakaoMap'
 
 type Restaurant = {
   address: string
@@ -13,6 +14,8 @@ type Restaurant = {
   id: number
   storeName: string
   storePictureUrl: string
+  latitude: number
+  longitude: number
 }
 
 export default function Home() {
@@ -53,15 +56,17 @@ export default function Home() {
         throw new Error('Something went wrong')
       }
       const data = await response.json()
+      console.log(data)
       filterStores(data)
     } catch (error) {
       console.error('Failed to fetch stores:', error)
     }
   }
-  console.log(stores)
+
   return (
     <div className="mx-48">
       <InputWithButton input={search || category || ''} />
+      <KakaoMap stores={stores} />
       <section className="flex min-h-screen flex-col items-center justify-between scroll-mt-[0rem]">
         <div className="w-full">
           {stores.map((store: Restaurant) => (

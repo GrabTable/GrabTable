@@ -2,6 +2,7 @@ package edu.skku.grabtable.store.domain;
 
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.review.domain.Review;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -29,6 +30,9 @@ public class Store extends BaseTimeEntity {
     private String storeName;
 
     private String address;
+
+    @Embedded
+    private StorePosition position;
 
     private String storePictureUrl;
 

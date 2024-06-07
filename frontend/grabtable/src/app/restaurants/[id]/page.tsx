@@ -1,114 +1,32 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { Review } from '@/app/types/review'
+import { Store } from '@/app/types/store'
+import { StarRating } from '@/components/StarRating'
+import Spinner from '@/components/spinner'
+import { Input } from '@/components/ui/Input'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableRow,
-} from '@/components/ui/table'
-import { StarRating } from '@/components/StarRating'
-import { Input } from '@/components/ui/Input'
-import * as React from 'react'
-import { redirect, useParams, useRouter } from 'next/navigation'
-import { Badge } from '@/components/ui/badge'
-import { PiHandGrabbingDuotone } from 'react-icons/pi'
-import { getSession } from '@/lib/next-auth/session'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import Spinner from '@/components/spinner'
-import { baseUrl } from '@/lib/constants'
-
-const restaurant_mock = {
-  id: 1,
-  name: '봉수육',
-  address: '수원시 장안구 서부로 2066',
-  picture_url: '/restaurant.png',
-  phone: '0311231234',
-  description: '율전동 맛집',
-  status: 1,
-  category: '한식',
-}
-
-const reviews_mock = [
-  {
-    id: 1,
-    profile_image: '/favicon.ico',
-    username: '율전이1',
-    review_platform: 'naver',
-    rating: 1,
-    message: '맛있어요 따봉',
-  },
-  {
-    id: 2,
-    profile_image: '/favicon.ico',
-    username: '율전이2',
-    review_platform: 'naver',
-    rating: 2,
-    message: '맛있어요 따봉',
-  },
-  {
-    id: 3,
-    profile_image: '/favicon.ico',
-    username: '율전이3',
-    review_platform: 'naver',
-    rating: 3,
-    message: '맛있어요 따봉',
-  },
-  {
-    id: 4,
-    profile_image: '/favicon.ico',
-    username: '율전이4',
-    review_platform: 'naver',
-    rating: 4,
-    message: '맛있어요 따봉',
-  },
-  {
-    id: 5,
-    profile_image: '/favicon.ico',
-    username: '율전이5',
-    review_platform: 'naver',
-    rating: 5,
-    message: '맛있어요 따봉',
-  },
-]
-
-type Category = 'KOREAN' | 'ASIAN' | 'WESTERN' | 'CHINESE' | 'JAPANESE'
-
-type Restaurant = {
-  id: number
-  storeName: string
-  address: string
-  storePictureUrl: string
-  phone: string
-  description: string
-  category: Category
-}
-
-type Review = {
-  id: string
-  username: string
-  storeName: string
-  reviewPlatform: string
-  message: string
-  rating: number
-}
-
-type Reviews = Review[]
+import { BASE_URL } from '@/lib/constants'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import Image from 'next/image'
+import { useParams, useRouter } from 'next/navigation'
+import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { PiHandGrabbingDuotone } from 'react-icons/pi'
 
 export default function Restaurant() {
   const ref = useRef<HTMLDivElement>(null)
@@ -123,24 +41,24 @@ export default function Restaurant() {
   const store_id = useParams<{ id: string }>()['id']
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [restaurant, setRestaurant] = useState<Restaurant>()
+  const [restaurant, setRestaurant] = useState<Store>()
   const fetchStore = async () => {
     try {
-      const response = await fetch(`${baseUrl}/v1/stores/${store_id}`)
+      const response = await fetch(`${BASE_URL}/v1/stores/${store_id}`)
       if (!response.ok) {
         throw new Error('error')
       }
-      const data: Restaurant = await response.json()
+      const data: Store = await response.json()
       setRestaurant(data)
     } catch (error) {
       console.error('error', error)
     }
   }
 
-  const [reviews, setReviews] = useState<Reviews>([])
+  const [reviews, setReviews] = useState<Review[]>([])
   const fetchReview = async () => {
     try {
-      const response = await fetch(`${baseUrl}/v1/reviews/stores/${store_id}`)
+      const response = await fetch(`${BASE_URL}/v1/reviews/stores/${store_id}`)
       if (!response.ok) {
         throw new Error('error')
       }
@@ -178,7 +96,7 @@ export default function Restaurant() {
       }
 
       try {
-        const response = await fetch(`${baseUrl}/v1/reservations`, {
+        const response = await fetch(`${BASE_URL}/v1/reservations`, {
           method: 'POST',
           body: JSON.stringify({
             storeId: store_id,

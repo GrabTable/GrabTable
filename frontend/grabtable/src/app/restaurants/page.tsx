@@ -1,36 +1,24 @@
 'use client'
 import { InputWithButton } from '@/components/Inputwithbutton'
-import { useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import RestaurantCard from '@/components/RestaurantCard'
-import { baseUrl } from '@/lib/constants'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-}
+import { BASE_URL } from '@/lib/constants'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { StoreResponse } from '../types/storeResponse'
 
 export default function Home() {
   const params = useSearchParams()
   const search = params.get('search')
   const category = params.get('category')
 
-  const [stores, setStores] = useState<Restaurant[]>([])
+  const [stores, setStores] = useState<StoreResponse[]>([])
 
   useEffect(() => {
     fetchStores()
   }, [search, category])
 
-  if (!search && !category) {
-    console.log('no search and no category!')
-  }
-
-  const filterStores = (stores: Restaurant[]) => {
+  const filterStores = (stores: StoreResponse[]) => {
     if (search) {
       setStores(
         stores.filter((store) =>
@@ -47,24 +35,22 @@ export default function Home() {
   }
 
   const fetchStores = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/v1/stores`)
-      if (!response.ok) {
-        throw new Error('Something went wrong')
-      }
-      const data = await response.json()
-      filterStores(data)
-    } catch (error) {
-      console.error('Failed to fetch stores:', error)
-    }
+    await fetch(`${BASE_URL}/v1/stores`)
+      .then(async (response) => {
+        const body = await response.json()
+        filterStores(body)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch stores:', error)
+      })
   }
-  console.log(stores)
+
   return (
     <div className="mx-48">
       <InputWithButton input={search || category || ''} />
       <section className="flex min-h-screen flex-col items-center justify-between scroll-mt-[0rem]">
         <div className="w-full">
-          {stores.map((store: Restaurant) => (
+          {stores.map((store: StoreResponse) => (
             <Link
               key={store.id}
               href={`/restaurants/${store['id']}`}

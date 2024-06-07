@@ -1,10 +1,10 @@
 import { Button } from '@/components/ui/button'
-import { FaRegClipboard } from 'react-icons/fa'
-import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
+import { FaRegClipboard } from 'react-icons/fa'
 
-type InviteCodeProps = {
+interface InviteCodeProps {
   inviteCode: string
 }
 

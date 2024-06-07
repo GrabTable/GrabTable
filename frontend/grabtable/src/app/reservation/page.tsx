@@ -1,14 +1,14 @@
 'use client'
-import { Suspense, useEffect, useState } from 'react'
-import MyReservation from './MyReservation'
-import NoReservation from './NoReservation'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
-import { useRouter } from 'next/navigation'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
+import { BASE_URL } from '@/lib/constants'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
+import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useState } from 'react'
 import InviteCode from './InvitateCode'
-import { baseUrl } from '@/lib/constants'
+import MyReservation from './MyReservation'
+import NoReservation from './NoReservation'
 
 export default function Page() {
   const router = useRouter()
@@ -36,7 +36,7 @@ export default function Page() {
       }
 
       try {
-        const response = await fetch(`${baseUrl}/v1/reservations/me`, {
+        const response = await fetch(`${BASE_URL}/v1/reservations/me`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: 'Bearer ' + session.formData['access_token'],
@@ -51,7 +51,7 @@ export default function Page() {
             setisHost(true)
           }
           const response2 = await fetch(
-            `${baseUrl}/v1/stores/${data.storeId}/menus`,
+            `${BASE_URL}/v1/stores/${data.storeId}/menus`,
             {
               headers: {
                 'Content-Type': 'application/json',

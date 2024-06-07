@@ -15,104 +15,18 @@ import {
 } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { baseUrl } from '@/lib/constants'
+import { BASE_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
-
-interface CartItem {
-  menuName: string
-  quantity: number
-  unitPrice: number
-}
-
-type Menu = {
-  id: number
-  menuName: string
-  price: number
-  menuPictureUrl: string
-}
-
-type MyCart = {
-  id: number
-  quantity: number
-  menuName: string
-  price: number
-  totalPrice: number
-}
-type Cart = {
-  id: number
-  user: null
-  menuName: string
-  price: number
-  order: any
-  sharedOrder: any
-  quantity: number
-}
-
-interface CartItem {
-  menuName: string
-  quantity: number
-  unitPrice: number
-  totalPrice: number
-}
-
-type UserCartsInfo = {
-  id: number
-  username: string
-  profileImageUrl: string
-  currentCarts: Cart[]
-}
-type Orders = {
-  id: number
-  storeId: number
-  host: UserCartsInfo
-  invitees: UserCartsInfo[]
-  inviteCode: string
-  orders: {
-    id: number
-    userId: number
-    carts: CartItem[]
-  }[]
-}
-type MenuQuantity = {
-  menuId: number
-  quantity: number
-  menuName: string
-}
-
-export type CartResponse = {
-  id: number
-  menuName: string
-  price: number
-  quantity: number
-  totalPrice: number
-}
-
-export type UserCartsInfoResponse = {
-  id: number
-  username: string
-  profileImageUrl: string
-  currentCarts: CartResponse[]
-}
-export type OrderResponse = {
-  id: number
-  userId: number
-  carts: CartResponse[]
-  status: string
-}
-
-export type ReservationDetailResponse = {
-  id: number
-  storeId: number
-  host: UserCartsInfoResponse
-  invitees: UserCartsInfoResponse[]
-  inviteCode: string
-  orders: OrderResponse[]
-}
+import { Cart } from '../types/cart'
+import { Menu } from '../types/menu'
+import { OrderResponse } from '../types/orderResponse'
+import { ReservationDetailResponse } from '../types/reservationDetailResponse'
+import { UserCartsInfoResponse } from '../types/userCartsInfoResponse'
 
 interface MyReservationProps {
   storeID: number
@@ -121,12 +35,12 @@ interface MyReservationProps {
 }
 
 export default function MyReservation(props: MyReservationProps) {
-  const { menus, storeID, isHost } = props
+  const { menus, isHost } = props
   const { toast } = useToast()
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [myCarts, setMyCarts] = useState<MyCart[]>([])
+  const [myCarts, setMyCarts] = useState<Cart[]>([])
   const [reservationInfo, setReservationInfo] =
     useState<ReservationDetailResponse>()
 
@@ -136,7 +50,7 @@ export default function MyReservation(props: MyReservationProps) {
       const EventSource = EventSourcePolyfill || window.EventSource
 
       const eventSource = new EventSource(
-        `${baseUrl}/v1/reservations/me/subscribe`,
+        `${BASE_URL}/v1/reservations/me/subscribe`,
         {
           headers: {
             Authorization: 'Bearer ' + session.formData['access_token'],
@@ -169,19 +83,14 @@ export default function MyReservation(props: MyReservationProps) {
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
 
-  // useEffect(() => {
-  //   getMyCart().then((data) => setMyCarts(data))
-  // })
-
-  const addCart = async (body: MenuQuantity) => {
+  const addCart = async (menuId: number, quantity: number) => {
     const session = await getSessionFromClient()
-    const { menuId, quantity, menuName } = body
 
     if (quantity === 0) {
-      // 0개를 추가하면 그냥 무시
       return
     }
-    const response = await fetch(`${baseUrl}/v1/carts`, {
+
+    await fetch(`${BASE_URL}/v1/carts`, {
       method: 'POST',
       body: JSON.stringify({
         menuId: menuId,
@@ -193,18 +102,26 @@ export default function MyReservation(props: MyReservationProps) {
       },
       credentials: 'include',
     })
-    toast({
-      title: 'Successfully added!',
-      description: 'grab more!',
-      duration: 1000,
-    })
+      .then(() =>
+        toast({
+          title: 'Successfully added!',
+          description: 'grab more!',
+          duration: 1000,
+        }),
+      )
+      .catch((error) => {
+        toast({
+          title: 'Failed to add',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
   }
 
   const editCart = async (cartId: number, quantity: number) => {
     const session = await getSessionFromClient()
     if (quantity === 0) {
-      // 삭제하기
-      const response = await fetch(`${baseUrl}/v1/carts/${cartId}`, {
+      await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -212,17 +129,25 @@ export default function MyReservation(props: MyReservationProps) {
         },
         credentials: 'include',
       })
-      toast({
-        variant: 'destructive',
-        description: 'Successfully deleted!',
-        duration: 1000,
-      })
-      getMyCart().then((data) => setMyCarts(data))
-      return
+        .then(() => {
+          toast({
+            title: 'Successfully deleted!',
+            duration: 1000,
+          })
+          getMyCart().then((data) => setMyCarts(data))
+          return
+        })
+        .catch((error) => {
+          toast({
+            title: 'Failed to delete',
+            description: 'Please try again',
+            duration: 1000,
+          })
+        })
     }
 
     // 0개가 아니라면, 수정
-    const response = await fetch(`${baseUrl}/v1/carts/${cartId}`, {
+    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         quantity: quantity,
@@ -233,18 +158,26 @@ export default function MyReservation(props: MyReservationProps) {
       },
       credentials: 'include',
     })
-    toast({
-      title: 'Successfully modified!',
-      description: 'grab more!',
-      duration: 1000,
-    })
-    getMyCart().then((data) => setMyCarts(data))
-    return
+      .then(() => {
+        toast({
+          title: 'Successfully updated!',
+          duration: 1000,
+        })
+        getMyCart().then((data) => setMyCarts(data))
+        return
+      })
+      .catch((error) => {
+        toast({
+          title: 'Failed to update',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
   }
 
   const getReservationDetail = async (): Promise<ReservationDetailResponse> => {
     const session = await getSessionFromClient()
-    const response = await fetch(`${baseUrl}/v1/reservations/me`, {
+    const response = await fetch(`${BASE_URL}/v1/reservations/me`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + session.formData['access_token'],
@@ -274,7 +207,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   const getMyCart = async () => {
     const session = await getSessionFromClient()
-    const response = await fetch(`${baseUrl}/v1/carts/me`, {
+    const response = await fetch(`${BASE_URL}/v1/carts/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -290,6 +223,7 @@ export default function MyReservation(props: MyReservationProps) {
   const handlePayment = () => {
     window.location.href = '/reservation/payment'
   }
+
   const hostUser = {
     username: reservationInfo?.host.username,
     profileImageUrl: reservationInfo?.host.profileImageUrl,
@@ -330,7 +264,7 @@ export default function MyReservation(props: MyReservationProps) {
   const confimation = async () => {
     setLoading(true)
     const session = await getSessionFromClient()
-    const response = await fetch(`${baseUrl}/v1/reservations/confirm`, {
+    const response = await fetch(`${BASE_URL}/v1/reservations/confirm`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -369,8 +303,8 @@ export default function MyReservation(props: MyReservationProps) {
             </TableHeader>
             <TableBody>
               {menus.map((menu) => {
-                const cartItem: MyCart | undefined = myCarts?.find(
-                  (cart: MyCart) => cart.menuName === menu.menuName,
+                const cartItem: Cart | undefined = myCarts?.find(
+                  (cart: Cart) => cart.menuName === menu.menuName,
                 )
                 const getInitialQuantity = () => {
                   return cartItem?.quantity ? cartItem?.quantity : 0
@@ -428,13 +362,7 @@ export default function MyReservation(props: MyReservationProps) {
                               />
                               <Button
                                 className="bg-green-400 hover:bg-green-600 rounded-full"
-                                onClick={() =>
-                                  addCart({
-                                    menuId: menu.id,
-                                    quantity: quantity,
-                                    menuName: menu.menuName,
-                                  })
-                                }
+                                onClick={() => addCart(menu.id, quantity)}
                               >
                                 Add
                               </Button>

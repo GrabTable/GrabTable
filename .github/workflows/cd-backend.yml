@@ -2,6 +2,11 @@ name: Deploy to Amazon ECS
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        options:
+          - main
+          - hotfix-terraform-babo
   push:
     branches:
       - "65-feature-be-cd"

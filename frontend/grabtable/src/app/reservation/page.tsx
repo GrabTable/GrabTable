@@ -17,58 +17,73 @@ export default function Page() {
   const [storeID, setStoreID] = useState(0)
   const [menus, setMenus] = useState([])
   const [isHost, setisHost] = useState(false)
-
   const { toast } = useToast()
 
-  useEffect(() => {
-    ;(async () => {
-      const session = await getSessionFromClient()
-      if (!session) {
-        toast({
-          title: 'Login first',
-          description: 'You need to log in to continue.',
-          duration: 1000,
-        })
-        setTimeout(() => {
-          router.push('/mypage')
-        }, 1300)
-        return
-      }
+  const handleGuest = (): void => {
+    toast({
+      title: 'Login first',
+      description: 'You need to log in to continue.',
+      duration: 1000,
+    })
+    setTimeout(() => {
+      router.push('/mypage')
+    }, 1300)
+  }
 
-      try {
-        const response = await fetch(`${BASE_URL}/v1/reservations/me`, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + session.formData['access_token'],
-          },
-          credentials: 'include',
-        })
-        const data = await response.json()
-        if (response.ok) {
-          setInviteCode(data.inviteCode)
-          setStoreID(data.storeId)
-          if (data.host.id === session.formData['userInfo'].id) {
-            setisHost(true)
-          }
-          const response2 = await fetch(
-            `${BASE_URL}/v1/stores/${data.storeId}/menus`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + session.formData['access_token'],
-              },
-              credentials: 'include',
-            },
-          )
-          const data2 = await response2.json()
-          setMenus(data2)
-          setHasReservation(true)
+  const getMyReservation = async (session: any) => {
+    await fetch(`${BASE_URL}/v1/reservations/me`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
+      },
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setHasReservation(true)
+        setInviteCode(data.inviteCode)
+        setStoreID(data.storeId)
+        if (data.host.id === session.formData['userInfo'].id) {
+          setisHost(true)
         }
-      } catch (error) {
-        console.error('error', error)
-      }
-    })()
-  }, [router, toast])
+      })
+      .catch((error) => {
+        setHasReservation(false)
+      })
+  }
+
+  const getMenus = async (session: any) => {
+    await fetch(`${BASE_URL}/v1/stores/${storeID}/menus`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
+      },
+      credentials: 'include',
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setMenus(data)
+      })
+      .catch((error) => {
+        setHasReservation(false)
+      })
+  }
+
+  const fetchData = async () => {
+    const session = await getSessionFromClient()
+
+    if (!session) {
+      handleGuest()
+    }
+
+    getMyReservation(session).then(() => {
+      getMenus(session)
+    })
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [hasReservation, storeID])
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-8">
@@ -77,7 +92,13 @@ export default function Page() {
           {hasReservation ? (
             <div>
               <InviteCode inviteCode={inviteCode} />
-              <MyReservation menus={menus} storeID={storeID} isHost={isHost} />
+              {menus.length && (
+                <MyReservation
+                  menus={menus}
+                  storeID={storeID}
+                  isHost={isHost}
+                />
+              )}
             </div>
           ) : (
             <NoReservation />

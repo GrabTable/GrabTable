@@ -2,13 +2,13 @@
     {
         "name": "terraform-container-definition",
         "image": "${ecr_repository_url}:latest",
-        "cpu": 1024,
+        "cpu": 256,
         "memory": 1024,
         "memoryReservation": 100,
         "portMappings": [
             {
                 "containerPort": 8000,
-                "hostPort": 0,
+                "hostPort": 8000,
                 "protocol": "tcp"
             }
         ],

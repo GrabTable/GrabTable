@@ -33,6 +33,7 @@ const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
       .desc .ellipsis {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
       .desc .jibun {font-size: 11px;color: #888;margin-top: -2px;}
       .info .img {position: absolute;top: 6px;left: 5px;width: 73px;height: 71px;border: 1px solid #ddd;color: #888;overflow: hidden;}
+      .info .img img {width: 100%; height: 100%; object-fit: cover;} /* 이미지 크기를 컴포넌트 크기에 맞춤 */
       .info:after {content: '';position: absolute;margin-left: -12px;left: 50%;bottom: 0;width: 22px;height: 12px;background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')}
       .info .link {color: #5085BB;}
     `
@@ -72,7 +73,7 @@ const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
                 </div>
                 <div class="body">
                   <div class="img">
-                    <img src="${store.storePictureUrl}" width="50" height="50" alt="No image">
+                    <img src="${store.storePictureUrl}" alt="No image">
                   </div>
                   <div class="desc">
                     <div class="ellipsis">${store.address}</div>

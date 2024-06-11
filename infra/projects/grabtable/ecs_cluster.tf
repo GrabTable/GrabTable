@@ -10,7 +10,7 @@ resource "aws_ecs_task_definition" "terraform_ecs_task_definition" {
   family                   = "terraform-ecs-task-definition"
   requires_compatibilities = ["EC2"]
   network_mode             = "bridge"
-  container_definitions = templatefile("task-definitions/task.tftpl", {
+  container_definitions = templatefile("task-definitions/task-definition.json", {
     ecr_repository_url = data.aws_ecr_repository.terraform_ecr_repository.repository_url
   })
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn

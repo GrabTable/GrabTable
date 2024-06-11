@@ -65,7 +65,7 @@ class ReviewServiceTest {
     void findReviewsByStoreId() {
         //given
         User user = new User(1L, "userA", new ArrayList<>());
-        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null, null,
                 StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>(), new ArrayList<>());
         Review review = Review.of(store, user, "a", 3.0);
         Review review2 = Review.of(store, user, "b", 4.0);
@@ -86,7 +86,7 @@ class ReviewServiceTest {
     void getReviewSummary() {
         //given
         User user = new User(1L, "userA", new ArrayList<>());
-        Store store = new Store(1L, "Ramen", "Seoul", null, null, null,
+        Store store = new Store(1L, "Ramen", "Seoul", null, null, null, null,
                 StoreStatus.VALID, StoreCategory.JAPANESE, new ArrayList<>(), new ArrayList<>());
         Review review = Review.of(store, user, "a", 3.0);
         Review review2 = Review.of(store, user, "b", 4.0);

@@ -45,7 +45,7 @@ class ReservationServiceTest {
     void host_create_fail() {
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
+        Store store = new Store(1L, "storeA", "Seoul", null, "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
 
@@ -67,7 +67,7 @@ class ReservationServiceTest {
     void host_participate_fail() {
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", null, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
+        Store store = new Store(1L, "storeA", "Seoul", null, "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
         Reservation reservation = new Reservation(user, store);
@@ -89,7 +89,7 @@ class ReservationServiceTest {
         Reservation reservation = new Reservation(1L, null, null, null, null, null, ReservationStatus.ONGOING);
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
+        Store store = new Store(1L, "storeA", "Seoul", null, "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
 
@@ -111,7 +111,7 @@ class ReservationServiceTest {
         Reservation reservation2 = new Reservation(2L, null, null, null, null, null, ReservationStatus.ONGOING);
         User user = new User(1L, "kakaoUser", "url", "userA", "1234", "email", "phone", reservation, new ArrayList<>(),
                 new ArrayList<>());
-        Store store = new Store(1L, "storeA", "Seoul", "url", "phone", "desc", StoreStatus.VALID,
+        Store store = new Store(1L, "storeA", "Seoul", null, "url", "phone", "desc", StoreStatus.VALID,
                 StoreCategory.JAPANESE,
                 new ArrayList<>(), new ArrayList<>());
 

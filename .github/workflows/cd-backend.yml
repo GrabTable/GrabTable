@@ -53,17 +53,16 @@ jobs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+    - name: Build and push image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./backend/grabtable/Dockerfile
+        push: true
+        build-args: 'JAR_FILE=build/libs/*SNAPSHOT.jar'
+        tags: ${{ steps.login-ecr.outputs.registry }}/grabtable:latest
 
     - name: Stop existing ECS tasks
       run: |
@@ -74,18 +73,18 @@ jobs:
           done
         fi
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
+    - uses: hashicorp/setup-terraform@v3
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+        terraform_version: 1.8.3
+    
+    - name: Terraform Init
+      working-directory: ./infra/projects/grabtable
+      run: terraform init
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+    - name: Terraform Plan
+      working-directory: ./infra/projects/grabtable
+      run: terraform plan -target=aws_ecs_service.terraform_ecs_service
+
+    - name: Terraform Apply
+      working-directory: ./infra/projects/grabtable
+      run: terraform apply -auto-approve -target=aws_ecs_service.terraform_ecs_service

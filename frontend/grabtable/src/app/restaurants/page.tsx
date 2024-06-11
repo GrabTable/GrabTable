@@ -6,6 +6,19 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { StoreResponse } from '../types/storeResponse'
+import { baseUrl } from '@/lib/constants'
+import KakaoMap from '@/components/kakaoMap'
+
+type Restaurant = {
+  address: string
+  averageRating: number
+  category: string
+  id: number
+  storeName: string
+  storePictureUrl: string
+  latitude: number
+  longitude: number
+}
 
 export default function Home() {
   const params = useSearchParams()
@@ -48,6 +61,7 @@ export default function Home() {
   return (
     <div className="mx-48">
       <InputWithButton input={search || category || ''} />
+      <KakaoMap stores={stores} />
       <section className="flex min-h-screen flex-col items-center justify-between scroll-mt-[0rem]">
         <div className="w-full">
           {stores.map((store: StoreResponse) => (

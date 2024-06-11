@@ -12,7 +12,7 @@ import NoReservation from './NoReservation'
 
 export default function Page() {
   const router = useRouter()
-  const [hasReservation, setHasReservation] = useState(false)
+  const [hasReservation, setHasReservation] = useState(true)
   const [inviteCode, setInviteCode] = useState('')
   const [storeID, setStoreID] = useState(0)
   const [menus, setMenus] = useState([])

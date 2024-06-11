@@ -1,4 +1,6 @@
 FROM amazoncorretto:17-alpine
+
+ARG JAR_FILE=build/libs/grabtable-0.0.1-SNAPSHOT.jar
 WORKDIR /home/app
 COPY ${JAR_FILE} /home/app/app.jar
 EXPOSE 8000

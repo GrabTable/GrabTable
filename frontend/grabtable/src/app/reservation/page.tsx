@@ -1,4 +1,5 @@
 'use client'
+import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
@@ -17,6 +18,7 @@ export default function Page() {
   const [storeID, setStoreID] = useState(0)
   const [menus, setMenus] = useState([])
   const [isHost, setisHost] = useState(false)
+  const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
   const handleGuest = (): void => {
@@ -38,7 +40,13 @@ export default function Page() {
       },
       credentials: 'include',
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json()
+        } else {
+          throw new Error('No reservation')
+        }
+      })
       .then((data) => {
         setHasReservation(true)
         setInviteCode(data.inviteCode)
@@ -74,16 +82,26 @@ export default function Page() {
 
     if (!session) {
       handleGuest()
+      return
     }
 
-    getMyReservation(session).then(() => {
-      getMenus(session)
-    })
+    await getMyReservation(session)
+    await getMenus(session)
+    setLoading(false)
   }
 
   useEffect(() => {
     fetchData()
   }, [hasReservation, storeID])
+
+  if (loading) {
+    return (
+      <>
+        <Spinner />
+        <Toaster />
+      </>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-8">

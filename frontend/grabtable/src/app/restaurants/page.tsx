@@ -1,37 +1,25 @@
 'use client'
 import { InputWithButton } from '@/components/Inputwithbutton'
 import RestaurantCard from '@/components/RestaurantCard'
+import KakaoMap from '@/components/kakaoMap'
 import { BASE_URL } from '@/lib/constants'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { StoreResponse } from '../types/storeResponse'
-import { baseUrl } from '@/lib/constants'
-import KakaoMap from '@/components/kakaoMap'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-  latitude: number
-  longitude: number
-}
+import { Restaurant } from '../types/restaurant'
 
 export default function Home() {
   const params = useSearchParams()
   const search = params.get('search')
   const category = params.get('category')
 
-  const [stores, setStores] = useState<StoreResponse[]>([])
+  const [stores, setStores] = useState<Restaurant[]>([])
 
   useEffect(() => {
     fetchStores()
   }, [search, category])
 
-  const filterStores = (stores: StoreResponse[]) => {
+  const filterStores = (stores: Restaurant[]) => {
     if (search) {
       setStores(
         stores.filter((store) =>
@@ -64,7 +52,7 @@ export default function Home() {
       <KakaoMap stores={stores} />
       <section className="flex min-h-screen flex-col items-center justify-between scroll-mt-[0rem]">
         <div className="w-full">
-          {stores.map((store: StoreResponse) => (
+          {stores.map((store: Restaurant) => (
             <Link
               key={store.id}
               href={`/restaurants/${store['id']}`}

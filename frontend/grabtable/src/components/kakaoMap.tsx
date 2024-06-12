@@ -1,16 +1,6 @@
+import { Restaurant } from '@/app/types/restaurant'
 import { useEffect } from 'react'
 import 'react-kakao-maps-sdk'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-  latitude: number
-  longitude: number
-}
 
 const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
   useEffect(() => {

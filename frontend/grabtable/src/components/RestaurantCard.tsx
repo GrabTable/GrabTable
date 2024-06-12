@@ -2,18 +2,10 @@
 
 import { useRef } from 'react'
 // import { projectsData } from '@/lib/data'
-import Image from 'next/image'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { Restaurant } from '@/app/types/restaurant'
 import { Badge } from '@/components/ui/badge'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-}
+import { motion, useScroll, useTransform } from 'framer-motion'
+import Image from 'next/image'
 
 export default function Project({
   id,

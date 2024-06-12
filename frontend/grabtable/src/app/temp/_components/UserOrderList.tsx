@@ -1,3 +1,4 @@
+import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
 import {
   Accordion,
   AccordionContent,
@@ -6,15 +7,16 @@ import {
 } from '@/components/ui/accordion'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { UserCart } from '../_types/type'
 import UserOrderTable from './UserOrderTable'
 
 interface UserOrderListProps {
-  data: UserCart
-  children?: React.ReactNode
+  data: UserCartsInfoResponse
+  isPaid: boolean
 }
 
-export default function UserOrderList({ data, children }: UserOrderListProps) {
+export default function UserOrderList(props: UserOrderListProps) {
+  const { data, isPaid } = props
+
   return (
     <>
       <Accordion type="single" collapsible>
@@ -25,15 +27,20 @@ export default function UserOrderList({ data, children }: UserOrderListProps) {
               <AvatarFallback>{data.username}</AvatarFallback>
             </Avatar>
             <h3>{data.username}</h3>
-            <Badge
-              className="text-green-400 border-green-400"
-              variant="outline"
-            >
-              Paid
-            </Badge>
+            {isPaid ? (
+              <Badge
+                className="text-green-400 border-green-400"
+                variant="outline"
+              >
+                Paid
+              </Badge>
+            ) : (
+              <Badge className="text-red-400 border-red-400" variant="outline">
+                Unpaid
+              </Badge>
+            )}
           </AccordionTrigger>
           <AccordionContent>
-            {children}
             <p className="text-base font-medium my-1">Paid</p>
             <UserOrderTable data={data.currentCarts} />
           </AccordionContent>

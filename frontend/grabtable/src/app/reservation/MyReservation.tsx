@@ -1,9 +1,7 @@
 'use client'
 import MenuTable from '@/components/MenuTable'
-import { UserCard } from '@/components/UserCard'
 import Spinner from '@/components/spinner'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
@@ -12,11 +10,11 @@ import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
+import OrderCard from '../temp/_components/OrderCard'
 import { Cart } from '../types/cart'
 import { Menu } from '../types/menu'
-import { OrderResponse } from '../types/orderResponse'
 import { ReservationDetailResponse } from '../types/reservationDetailResponse'
-import { UserCartsInfoResponse } from '../types/userCartsInfoResponse'
+import { User } from '../types/user'
 
 interface MyReservationProps {
   storeID: number
@@ -31,6 +29,7 @@ export default function MyReservation(props: MyReservationProps) {
   const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [myCarts, setMyCarts] = useState<Cart[]>([])
+  const [myInfo, setMyInfo] = useState<User>()
   const [reservationInfo, setReservationInfo] =
     useState<ReservationDetailResponse>()
 
@@ -75,6 +74,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   useEffect(() => {
     getMyCart().then((data) => setMyCarts(data))
+    getMyInfo().then((data) => setMyInfo(data))
   }, [])
 
   const addCart = async (menuId: number, quantity: number) => {
@@ -171,34 +171,18 @@ export default function MyReservation(props: MyReservationProps) {
       })
   }
 
-  const getReservationDetail = async (): Promise<ReservationDetailResponse> => {
+  const getMyInfo = async (): Promise<User> => {
     const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_URL}/v1/reservations/me`, {
+    const response = await fetch(`${BASE_URL}/v1/user/me`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + session.formData['access_token'],
       },
       credentials: 'include',
     })
-    const data = await response.json()
 
-    if (!response.ok) throw new Error('Failed to fetch orders')
-
-    const orderedUserIds = data.orders.map(
-      (order: OrderResponse) => order.userId,
-    ) // 주문들의 ID 배열 생성
-
-    const allParticipantIds = [
-      data.host.id,
-      ...data.invitees.map((invitee: UserCartsInfoResponse) => invitee.id),
-    ]
-
-    const allMatched = allParticipantIds.every((participantId) =>
-      orderedUserIds.includes(participantId),
-    )
-
-    setOrderConfirm(allMatched)
-    return data as ReservationDetailResponse
+    return response.json()
   }
 
   const getMyCart = async (): Promise<Cart[]> => {
@@ -303,28 +287,12 @@ export default function MyReservation(props: MyReservationProps) {
         {/* <Page/> */}
       </div>
 
-      <div className="w-[50rem] p-4">
-        <div className="border-2 bg-white/50 dark:bg-black/50 rounded-xl p-4 h-fit">
-          <div className="text-xl font-bold mb-4">Group Order</div>
-          <Separator className="mb-4 h-[2px]" />
-          {/* <UserListView orders={orders} /> */}
-          <div className="flex flex-col space-y-4">
-            {reservationInfo && hostUser && inviteesUsers && (
-              <UserCard key={hostUser.username} user={hostUser} />
-            )}
-            {(inviteesUsers || []).map((invitee: any, index: any) => (
-              <UserCard key={invitee.username + index} user={invitee} />
-            ))}
-          </div>
-          <div className="flex justify-end mt-4">
-            {isHost && orderConfirm && (
-              <Button className="w-full bg-violet-500" onClick={confimation}>
-                Reservation confirmation
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      <OrderCard
+        reservationInfo={reservationInfo}
+        myInfo={myInfo}
+        myCarts={myCarts}
+      />
+
       <Toaster />
     </div>
   )

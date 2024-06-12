@@ -2,14 +2,13 @@ import Category from '@/components/Category'
 import { InputWithButton } from '@/components/Inputwithbutton'
 import Image from 'next/image'
 import About from './about'
-import SectionDivider from './section-divider'
 import Contact from './contact'
-import MyPage from './temp/page'
+import SectionDivider from './section-divider'
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      {/* <Image
+      <Image
         src="/big-icon.svg"
         alt={'no image'}
         width={500}
@@ -33,7 +32,7 @@ export default function Home() {
       </section>
       <section id="contact" className="scroll-mt-28">
         <Contact />
-      </section> */}
+      </section>
     </main>
   )
 }

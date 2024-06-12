@@ -7,5 +7,6 @@ export type ReservationDetailResponse = {
   host: UserCartsInfoResponse
   invitees: UserCartsInfoResponse[]
   inviteCode: string
+  sharedOrder: OrderResponse
   orders: OrderResponse[]
 }

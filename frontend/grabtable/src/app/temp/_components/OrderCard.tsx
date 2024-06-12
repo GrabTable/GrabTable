@@ -1,203 +1,34 @@
 'use client'
-import { Separator } from '@/components/ui/separator'
-import UserOrderList from './UserOrderList'
+import { Cart } from '@/app/types/cart'
+import { ReservationDetailResponse } from '@/app/types/reservationDetailResponse'
+import { User } from '@/app/types/user'
+import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
 import { Button } from '@/components/ui/button'
-import { Cart, Reservation, User, UserCart } from '../_types/type'
-import MyCartTable from './MyCartTable'
-import { useEffect, useState } from 'react'
-import SharedCartTable from './SharedCartTable'
-import UserOrderTable from './UserOrderTable'
-import { RiKakaoTalkFill } from 'react-icons/ri'
-import { FaWonSign } from 'react-icons/fa6'
+import { Separator } from '@/components/ui/separator'
 import { useToast } from '@/components/ui/use-toast'
+import { useState } from 'react'
+import UserOrderList from './UserOrderList'
 
-async function getReservation(): Promise<Reservation> {
-  // TODO: fetch data from API
-  return {
-    id: 1,
-    storeId: 1,
-    host: {
-      id: 1,
-      username: 'host',
-      profileImageUrl: '/favicon.ico',
-      currentCarts: [],
-    },
-    invitees: [
-      {
-        id: 1,
-        username: 'me',
-        profileImageUrl: '/favicon.ico',
-        currentCarts: [
-          {
-            id: 101,
-            menuName: 'cake',
-            price: 1000,
-            quantity: 2,
-            totalPrice: 2000,
-          },
-        ],
-      },
-      {
-        id: 2,
-        username: 'user2',
-        profileImageUrl: '',
-        currentCarts: [
-          {
-            id: 102,
-            quantity: 2,
-            menuName: 'cake',
-            price: 1000,
-            totalPrice: 2000,
-          },
-        ],
-      },
-    ],
-    inviteCode: 'invite-code',
-    sharedOrder: [
-      {
-        id: 103,
-        menuName: 'orange',
-        price: 1500,
-        quantity: 2,
-        totalPrice: 2000,
-      },
-    ],
-    orders: [
-      {
-        id: 1,
-        username: 'me',
-        profileImageUrl: '/favicon.ico',
-        currentCarts: [
-          {
-            id: 104,
-            menuName: 'orange',
-            price: 1500,
-            quantity: 2,
-            totalPrice: 2000,
-          },
-        ],
-      },
-      {
-        id: 2,
-        username: 'user2',
-        profileImageUrl: '',
-        currentCarts: [
-          {
-            id: 105,
-            quantity: 2,
-            menuName: 'orange',
-            price: 1500,
-            totalPrice: 2000,
-          },
-        ],
-      },
-      {
-        id: 3,
-        username: 'user3',
-        profileImageUrl: '',
-        currentCarts: [
-          {
-            id: 106,
-            quantity: 2,
-            menuName: 'orange',
-            price: 1500,
-            totalPrice: 2000,
-          },
-        ],
-      },
-    ],
-  }
+interface OrderCardProps {
+  reservationInfo: ReservationDetailResponse | undefined
+  myInfo: User | undefined
+  myCarts: Cart[]
 }
 
-async function getMe(): Promise<User> {
-  // TODO: fetch data from API
-  return {
-    id: 1,
-    socialLoginId: '',
-    profileImageUrl: '',
-    username: 'me',
-    email: 'email@gmail.com',
-    phone: '12312341234',
-  }
+type UserCartsWithPaidStatus = {
+  userCarts: UserCartsInfoResponse
+  isPaid: boolean
 }
 
-async function getMyCart(): Promise<Cart[]> {
-  return [
-    {
-      id: 7,
-      menuName: 'cake',
-      price: 1000,
-      quantity: 2,
-      totalPrice: 2000,
-    },
-  ]
-}
-
-export default function OrderCard() {
-  const [reservation, setReservation] = useState<Reservation>({
-    id: 1,
-    storeId: 1,
-    host: {
-      id: 1,
-      username: 'host',
-      profileImageUrl: '/favicon.ico',
-      currentCarts: [],
-    },
-    invitees: [],
-    inviteCode: 'invite-code',
-    sharedOrder: [],
-    orders: [],
-  })
-  const [me, setMe] = useState<User>({
-    id: 1,
-    socialLoginId: '',
-    profileImageUrl: '',
-    username: 'none',
-    email: 'none',
-    phone: 'none',
-  })
-  const [myCart, setMyCart] = useState<Cart[]>([])
-  const [myOrder, setMyOrder] = useState<UserCart>({
-    id: me.id,
-    username: me.username,
-    profileImageUrl: me.profileImageUrl,
-    currentCarts: [],
-  })
+export default function OrderCard(props: OrderCardProps) {
+  const { reservationInfo, myInfo, myCarts } = props
   const [sharedOrder, setSharedOrder] = useState<Cart[]>([])
-  const [membersOrder, setMembersOrder] = useState<UserCart[]>([])
   const [isPaid, setIsPaid] = useState(false)
 
   const { toast } = useToast()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const reservationData = await getReservation()
-      const meData = await getMe()
-      const myCartData = await getMyCart()
-
-      setReservation(reservationData)
-      setMe(meData)
-      setMyCart(myCartData)
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    setMyOrder(
-      reservation.orders.find((order) => order.id === me?.id) || {
-        id: me.id,
-        username: me.username,
-        profileImageUrl: me.profileImageUrl,
-        currentCarts: [],
-      },
-    )
-    setSharedOrder(reservation.sharedOrder)
-    setMembersOrder(reservation?.orders.filter((order) => order.id !== me?.id))
-  }, [reservation, me])
-
   const handleShare = (id: number) => {
-    const cartItem = myCart.find((cart) => cart.id == id)
-    setMyCart(myCart.filter((cart) => cart.id !== id))
+    const cartItem = myCarts.find((cart) => cart.id == id)
     if (cartItem) {
       setSharedOrder([...sharedOrder, cartItem])
     }
@@ -212,6 +43,59 @@ export default function OrderCard() {
     })
   }
 
+  const myUserCartsWithPaidStatus: UserCartsWithPaidStatus = {
+    userCarts: {
+      id: myInfo?.id || 0,
+      username: myInfo?.username || '',
+      profileImageUrl: myInfo?.profileImageUrl || '',
+      currentCarts:
+        myCarts.length > 0
+          ? myCarts
+          : reservationInfo?.orders.find((order) => order.userId === myInfo?.id)
+              ?.carts || [],
+    },
+    isPaid: !!reservationInfo?.orders.find(
+      (order) => order.userId === myInfo?.id,
+    ),
+  }
+
+  const getOtherOrdersWithPaidStatus = (): UserCartsWithPaidStatus[] => {
+    const otherUserCarts: UserCartsInfoResponse[] = [
+      ...(reservationInfo?.invitees.filter(
+        (invitee) => invitee.id !== myInfo?.id,
+      ) || []),
+    ]
+
+    if (reservationInfo?.host.id !== myInfo?.id) {
+      otherUserCarts.push({
+        id: reservationInfo?.host.id || 0,
+        username: reservationInfo?.host.username || '',
+        profileImageUrl: reservationInfo?.host.profileImageUrl || '',
+        currentCarts: reservationInfo?.host.currentCarts || [],
+      })
+    }
+
+    const otherUserCartsWithPaidStatus = otherUserCarts.map((otherUserCart) => {
+      const foundOrder = reservationInfo?.orders.find(
+        (o) => o.userId === otherUserCart.id,
+      )
+
+      if (foundOrder) {
+        return {
+          userCarts: {
+            ...otherUserCart,
+            currentCarts: foundOrder.carts,
+          },
+          isPaid: true,
+        }
+      } else {
+        return { userCarts: { ...otherUserCart }, isPaid: false }
+      }
+    })
+
+    return otherUserCartsWithPaidStatus
+  }
+
   return (
     <>
       <div className="w-full mt-4">
@@ -220,15 +104,21 @@ export default function OrderCard() {
           <Separator className="mb-4 h-[2px]" />
 
           <p className="text-lg font-semibold mt-4">My Order</p>
-          <UserOrderList data={myOrder}>
-            <p className="text-base font-medium my-1">Cart</p>
-            <MyCartTable
-              data={myCart}
-              share={(id: number) => handleShare(id)}
-            />
-          </UserOrderList>
+          <UserOrderList
+            data={myUserCartsWithPaidStatus.userCarts}
+            isPaid={myUserCartsWithPaidStatus.isPaid}
+          />
 
-          <p className="text-lg font-semibold mt-4">Shared Order</p>
+          <p className="text-lg font-semibold mt-4">Members Order</p>
+          {getOtherOrdersWithPaidStatus().map((otherOrderWithPaidStatus) => (
+            <UserOrderList
+              key={otherOrderWithPaidStatus.userCarts.id}
+              data={otherOrderWithPaidStatus.userCarts}
+              isPaid={otherOrderWithPaidStatus.isPaid}
+            />
+          ))}
+
+          {/* <p className="text-lg font-semibold mt-4">Shared Order</p>
           <p className="text-base font-medium my-1">Cart</p>
           {isPaid ? (
             <div className="flex justify-end my-4">Already paid!</div>
@@ -253,12 +143,7 @@ export default function OrderCard() {
             save={(id: number, quantity: number) => handleSave(id, quantity)}
           />
           <p className="text-base font-medium my-1">Paid</p>
-          <UserOrderTable data={[]} />
-
-          <p className="text-lg font-semibold mt-4">Members Order</p>
-          {membersOrder.map((memberOrder) => (
-            <UserOrderList key={memberOrder.id} data={memberOrder} />
-          ))}
+          <UserOrderTable data={[]} /> */}
 
           <div className="flex justify-end mt-4">
             <Button

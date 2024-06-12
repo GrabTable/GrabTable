@@ -1,24 +1,14 @@
 'use client'
+import MenuTable from '@/components/MenuTable'
 import { UserCard } from '@/components/UserCard'
 import Spinner from '@/components/spinner'
-import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/button'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
@@ -83,6 +73,10 @@ export default function MyReservation(props: MyReservationProps) {
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
 
+  useEffect(() => {
+    getMyCart().then((data) => setMyCarts(data))
+  }, [])
+
   const addCart = async (menuId: number, quantity: number) => {
     const session = await getSessionFromClient()
 
@@ -102,13 +96,15 @@ export default function MyReservation(props: MyReservationProps) {
       },
       credentials: 'include',
     })
-      .then(() =>
+      .then(() => {
         toast({
           title: 'Successfully added!',
           description: 'grab more!',
           duration: 1000,
-        }),
-      )
+        })
+        getMyCart().then((data) => setMyCarts(data))
+        return
+      })
       .catch((error) => {
         toast({
           title: 'Failed to add',
@@ -205,7 +201,7 @@ export default function MyReservation(props: MyReservationProps) {
     return data as ReservationDetailResponse
   }
 
-  const getMyCart = async () => {
+  const getMyCart = async (): Promise<Cart[]> => {
     const session = await getSessionFromClient()
     const response = await fetch(`${BASE_URL}/v1/carts/me`, {
       method: 'GET',
@@ -217,7 +213,7 @@ export default function MyReservation(props: MyReservationProps) {
     })
 
     if (!response.ok) throw new Error('Failed to fetch Mycart')
-    return await response.json()
+    return response.json()
   }
 
   const handlePayment = () => {
@@ -292,91 +288,12 @@ export default function MyReservation(props: MyReservationProps) {
     <div className="flex justify-between">
       <div className="w-full mr-4 ">
         {loading && <Spinner />}
-        <ScrollArea className="h-[50rem]">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[300px]">Image</TableHead>
-                <TableHead className="w-[80px]">Menu</TableHead>
-                <TableHead className="w-[100px]" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {menus.map((menu) => {
-                const cartItem: Cart | undefined = myCarts?.find(
-                  (cart: Cart) => cart.menuName === menu.menuName,
-                )
-                const getInitialQuantity = () => {
-                  return cartItem?.quantity ? cartItem?.quantity : 0
-                }
-
-                const [quantity, setQuantity] = useState(getInitialQuantity)
-                useEffect(() => {
-                  setQuantity(cartItem?.quantity || 0)
-                }, [cartItem?.quantity || 0])
-                return (
-                  <TableRow key={menu.id}>
-                    <TableCell>
-                      <Image
-                        src={'/Western.jpeg'}
-                        alt="No Restaurant Image"
-                        width={300}
-                        height={200}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <p className="font-medium">{menu.menuName}</p>₩
-                      {menu.price}
-                    </TableCell>
-                    <TableCell className="w-fit">
-                      <div className="flex justify-end">
-                        <div className="flex items-center justify-center space-x-2">
-                          {cartItem ? (
-                            <>
-                              <Input
-                                type="number"
-                                min={0}
-                                value={quantity}
-                                onChange={(e) => {
-                                  setQuantity(parseInt(e.target.value))
-                                }}
-                                className="w-[4rem]"
-                              />
-                              <Button
-                                className="bg-yellow-300 hover:bg-yellow-500 text-black rounded-full"
-                                onClick={() => editCart(cartItem.id, quantity)}
-                              >
-                                Edit
-                              </Button>
-                            </>
-                          ) : (
-                            <>
-                              <Input
-                                type="number"
-                                min={0}
-                                defaultValue={0}
-                                onChange={(e) => {
-                                  setQuantity(parseInt(e.target.value))
-                                }}
-                                className="w-[4rem]"
-                              />
-                              <Button
-                                className="bg-green-400 hover:bg-green-600 rounded-full"
-                                onClick={() => addCart(menu.id, quantity)}
-                              >
-                                Add
-                              </Button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </ScrollArea>
+        <MenuTable
+          menus={menus}
+          carts={myCarts}
+          addCart={addCart}
+          editCart={editCart}
+        />
         <Button
           className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
           onClick={handlePayment}

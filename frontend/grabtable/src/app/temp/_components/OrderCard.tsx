@@ -5,13 +5,16 @@ import { User } from '@/app/types/user'
 import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { useToast } from '@/components/ui/use-toast'
-import { useState } from 'react'
+import { toast } from '@/components/ui/use-toast'
+import { BASE_URL } from '@/lib/constants'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { useRouter } from 'next/navigation'
+import SharedCartTable from './SharedCartTable'
 import UserOrderList from './UserOrderList'
 
 interface OrderCardProps {
-  reservationInfo: ReservationDetailResponse | undefined
-  myInfo: User | undefined
+  reservationInfo: ReservationDetailResponse
+  myInfo: User
   myCarts: Cart[]
 }
 
@@ -22,25 +25,81 @@ type UserCartsWithPaidStatus = {
 
 export default function OrderCard(props: OrderCardProps) {
   const { reservationInfo, myInfo, myCarts } = props
-  const [sharedOrder, setSharedOrder] = useState<Cart[]>([])
-  const [isPaid, setIsPaid] = useState(false)
+  const router = useRouter()
+  const sharedOrder = reservationInfo?.sharedOrder
 
-  const { toast } = useToast()
-
-  const handleShare = (id: number) => {
-    const cartItem = myCarts.find((cart) => cart.id == id)
-    if (cartItem) {
-      setSharedOrder([...sharedOrder, cartItem])
-    }
+  const deleteCart = async (cartId: number, accessToken: string) => {
+    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+      credentials: 'include',
+    })
+      .then(() => {
+        toast({
+          title: 'Successfully deleted!',
+          duration: 1000,
+        })
+        return
+      })
+      .catch((error) => {
+        toast({
+          title: 'Failed to delete',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
   }
 
-  const handleSave = (id: number, quantity: number) => {
-    setSharedOrder((prev) => {
-      return prev.map((orderItem) => {
-        if (orderItem.id == id) return { ...orderItem, quantity: quantity }
-        return orderItem
-      })
+  const editCart = async (
+    cartId: number,
+    quantity: number,
+    accessToken: string,
+  ) => {
+    if (quantity === 0) {
+      deleteCart(cartId, accessToken)
+      return
+    }
+
+    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        quantity: quantity,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+      credentials: 'include',
     })
+      .then(() => {
+        toast({
+          title: 'Successfully updated!',
+          duration: 1000,
+        })
+        return
+      })
+      .catch((error) => {
+        toast({
+          title: 'Failed to update',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
+  }
+
+  const onQuantityChange = async (cartId: number, quantity: number) => {
+    const session = await getSessionFromClient()
+    const accessToken = session.formData['access_token']
+
+    if (quantity === 0) {
+      deleteCart(cartId, accessToken)
+      return
+    }
+
+    editCart(cartId, quantity, accessToken)
   }
 
   const myUserCartsWithPaidStatus: UserCartsWithPaidStatus = {
@@ -96,6 +155,34 @@ export default function OrderCard(props: OrderCardProps) {
     return otherUserCartsWithPaidStatus
   }
 
+  const confirmReservation = async () => {
+    const session = await getSessionFromClient()
+    await fetch(`${BASE_URL}/v1/reservations/confirm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
+      },
+      credentials: 'include',
+    }).then(async (res) => {
+      if (res.status !== 201) {
+        const data = await res.json()
+        toast({
+          title: data.message,
+          description: 'Please try again',
+          duration: 1000,
+        })
+      } else {
+        toast({
+          title: 'Confirmed',
+          description: 'Enjoy!',
+          duration: 1000,
+        })
+        router.push('/')
+      }
+    })
+  }
+
   return (
     <>
       <div className="w-full mt-4">
@@ -107,48 +194,25 @@ export default function OrderCard(props: OrderCardProps) {
           <UserOrderList
             data={myUserCartsWithPaidStatus.userCarts}
             isPaid={myUserCartsWithPaidStatus.isPaid}
+            onQuantityChange={onQuantityChange}
+            viewOnly={false}
           />
 
           <p className="text-lg font-semibold mt-4">Members Order</p>
           {getOtherOrdersWithPaidStatus().map((otherOrderWithPaidStatus) => (
             <UserOrderList
-              key={otherOrderWithPaidStatus.userCarts.id}
               data={otherOrderWithPaidStatus.userCarts}
               isPaid={otherOrderWithPaidStatus.isPaid}
+              viewOnly={true}
             />
           ))}
 
-          {/* <p className="text-lg font-semibold mt-4">Shared Order</p>
-          <p className="text-base font-medium my-1">Cart</p>
-          {isPaid ? (
-            <div className="flex justify-end my-4">Already paid!</div>
-          ) : (
-            <div className="flex justify-end items-center text-lg gap-2 m-4">
-              <FaWonSign />
-              1000
-              <Button
-                className="bg-yellow-300 hover:bg-yellow-400 text-black text-lg"
-                onClick={() => {
-                  setIsPaid(true)
-                  setSharedOrder([])
-                }}
-              >
-                <RiKakaoTalkFill className="mr-2" /> Pay
-              </Button>
-            </div>
-          )}
+          <SharedCartTable data={sharedOrder} />
 
-          <SharedCartTable
-            data={sharedOrder}
-            save={(id: number, quantity: number) => handleSave(id, quantity)}
-          />
-          <p className="text-base font-medium my-1">Paid</p>
-          <UserOrderTable data={[]} /> */}
-
-          <div className="flex justify-end mt-4">
+          <div className="mt-4">
             <Button
               className=" bg-violet-500 rounded-full"
-              onClick={() => console.log('add cart')}
+              onClick={confirmReservation}
             >
               Confirm Reservation
             </Button>

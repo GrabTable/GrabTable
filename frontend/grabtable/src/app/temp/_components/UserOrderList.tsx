@@ -12,11 +12,15 @@ import UserOrderTable from './UserOrderTable'
 interface UserOrderListProps {
   data: UserCartsInfoResponse
   isPaid: boolean
+  onQuantityChange?: (id: number, quantity: number) => void
+  viewOnly?: boolean
 }
 
-export default function UserOrderList(props: UserOrderListProps) {
-  const { data, isPaid } = props
-
+export default function UserOrderList({
+  data,
+  isPaid,
+  onQuantityChange = () => {},
+}: UserOrderListProps) {
   return (
     <>
       <Accordion type="single" collapsible>
@@ -41,8 +45,11 @@ export default function UserOrderList(props: UserOrderListProps) {
             )}
           </AccordionTrigger>
           <AccordionContent>
-            <p className="text-base font-medium my-1">Paid</p>
-            <UserOrderTable data={data.currentCarts} />
+            <p className="text-base font-medium my-1">Cart</p>
+            <UserOrderTable
+              data={data.currentCarts}
+              onQuantityChange={onQuantityChange}
+            />
           </AccordionContent>
         </AccordionItem>
       </Accordion>

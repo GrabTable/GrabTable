@@ -1,16 +1,21 @@
 'use client'
 import { DataTable } from '@/components/DataTable'
 import { ColumnDef } from '@tanstack/react-table'
-import { Cart } from '../_types/type'
-import { FaCircleXmark } from 'react-icons/fa6'
-import { FaWonSign } from 'react-icons/fa6'
 import { useEffect, useState } from 'react'
+import { FaMinus, FaPlus, FaWonSign } from 'react-icons/fa6'
+import { Cart } from '../_types/type'
 
 interface UserOrderTableProps {
   data: Cart[]
+  onQuantityChange?: (id: number, quantity: number) => void
+  viewOnly?: boolean
 }
 
-export default function UserOrderTable({ data }: UserOrderTableProps) {
+export default function UserOrderTable({
+  data,
+  onQuantityChange = () => {},
+  viewOnly = false,
+}: UserOrderTableProps) {
   const columns: ColumnDef<Cart>[] = [
     {
       accessorKey: 'id',
@@ -33,11 +38,28 @@ export default function UserOrderTable({ data }: UserOrderTableProps) {
     {
       accessorKey: 'quantity',
       header: 'Quantity',
-      cell: ({ row }) => (
-        <div className="flex items-center gap-1">
-          <FaCircleXmark className="text-blue-900" /> {row.original.quantity}
-        </div>
-      ),
+      cell: ({ row }) =>
+        !viewOnly ? (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() =>
+                onQuantityChange(row.original.id, row.original.quantity - 1)
+              }
+            >
+              <FaMinus className="text-red-600 cursor-pointer" />
+            </button>
+            {row.original.quantity}
+            <button
+              onClick={() =>
+                onQuantityChange(row.original.id, row.original.quantity + 1)
+              }
+            >
+              <FaPlus className="text-green-600 cursor-pointer" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1">{row.original.quantity}</div>
+        ),
     },
     {
       accessorKey: 'totalPrice',
@@ -53,6 +75,7 @@ export default function UserOrderTable({ data }: UserOrderTableProps) {
 
   const [total, setTotal] = useState<number>(0)
   useEffect(() => {
+    if (!data) return
     setTotal(data.reduce((prev: number, cur: Cart) => prev + cur.totalPrice, 0))
   })
 

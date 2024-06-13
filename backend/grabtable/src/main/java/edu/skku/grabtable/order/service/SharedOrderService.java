@@ -16,8 +16,10 @@ import edu.skku.grabtable.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SharedOrderService {
     private final OrderRepository orderRepository;

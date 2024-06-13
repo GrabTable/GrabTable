@@ -52,6 +52,8 @@ export default function MyReservation(props: MyReservationProps) {
         const data = JSON.parse(event.data) // 이벤트 데이터 파싱
         console.log(data)
         setReservationInfo(data)
+        getMyCart().then((data) => setMyCarts(data))
+        getMyInfo().then((data) => setMyInfo(data))
       })
 
       eventSource.onerror = (error) => {
@@ -71,11 +73,6 @@ export default function MyReservation(props: MyReservationProps) {
 
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
-
-  useEffect(() => {
-    getMyCart().then((data) => setMyCarts(data))
-    getMyInfo().then((data) => setMyInfo(data))
-  }, [])
 
   const addCart = async (menuId: number, quantity: number) => {
     const session = await getSessionFromClient()
@@ -114,38 +111,17 @@ export default function MyReservation(props: MyReservationProps) {
       })
   }
 
-  const editCart = async (cartId: number, quantity: number) => {
+  const addCartInSharedOrder = async (menuId: number, quantity: number) => {
     const session = await getSessionFromClient()
+
     if (quantity === 0) {
-      await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['access_token'],
-        },
-        credentials: 'include',
-      })
-        .then(() => {
-          toast({
-            title: 'Successfully deleted!',
-            duration: 1000,
-          })
-          getMyCart().then((data) => setMyCarts(data))
-          return
-        })
-        .catch((error) => {
-          toast({
-            title: 'Failed to delete',
-            description: 'Please try again',
-            duration: 1000,
-          })
-        })
+      return
     }
 
-    // 0개가 아니라면, 수정
-    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
-      method: 'PATCH',
+    await fetch(`${BASE_URL}/v1/carts/shared`, {
+      method: 'POST',
       body: JSON.stringify({
+        menuId: menuId,
         quantity: quantity,
       }),
       headers: {
@@ -156,15 +132,14 @@ export default function MyReservation(props: MyReservationProps) {
     })
       .then(() => {
         toast({
-          title: 'Successfully updated!',
+          title: 'Successfully added!',
+          description: 'grab more!',
           duration: 1000,
         })
-        getMyCart().then((data) => setMyCarts(data))
-        return
       })
       .catch((error) => {
         toast({
-          title: 'Failed to update',
+          title: 'Failed to add',
           description: 'Please try again',
           duration: 1000,
         })
@@ -204,68 +179,8 @@ export default function MyReservation(props: MyReservationProps) {
     window.location.href = '/reservation/payment'
   }
 
-  const hostUser = {
-    username: reservationInfo?.host.username,
-    profileImageUrl: reservationInfo?.host.profileImageUrl,
-    id: reservationInfo?.host.id,
-    cartItems: reservationInfo?.host.currentCarts.map(
-      (cart: {
-        menuName: any
-        quantity: any
-        price: any
-        totalPrice: any
-      }) => ({
-        menuName: cart.menuName,
-        quantity: cart.quantity,
-        unitPrice: cart.price,
-        totalPrice: cart.totalPrice,
-      }),
-    ),
-  }
-
-  const inviteesUsers = reservationInfo?.invitees.map(
-    (invitee: {
-      username: any
-      profileImageUrl: any
-      id: number
-      currentCarts: any[]
-    }) => ({
-      username: invitee.username,
-      id: invitee.id,
-      profileImageUrl: invitee.profileImageUrl,
-      cartItems: invitee.currentCarts.map((cart) => ({
-        menuName: cart.menuName,
-        quantity: cart.quantity,
-        unitPrice: cart.price,
-        totalPrice: cart.totalPrice,
-      })),
-    }),
-  )
-  const confimation = async () => {
-    setLoading(true)
-    const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_URL}/v1/reservations/confirm`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
-      },
-      credentials: 'include',
-    })
-
-    setTimeout(() => {
-      toast({
-        title: 'Confirmed',
-        description: 'Enjoy!',
-        duration: 1000,
-      })
-
-      setTimeout(() => {
-        router.push('/')
-      }, 1500)
-
-      setLoading(false)
-    }, 1000)
+  if (!reservationInfo || !myInfo) {
+    return <Spinner />
   }
 
   return (
@@ -274,9 +189,8 @@ export default function MyReservation(props: MyReservationProps) {
         {loading && <Spinner />}
         <MenuTable
           menus={menus}
-          carts={myCarts}
           addCart={addCart}
-          editCart={editCart}
+          addCartInSharedOrder={addCartInSharedOrder}
         />
         <Button
           className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
@@ -284,7 +198,6 @@ export default function MyReservation(props: MyReservationProps) {
         >
           <RiKakaoTalkFill className="mr-2" /> Pay
         </Button>
-        {/* <Page/> */}
       </div>
 
       <OrderCard

@@ -1,118 +1,193 @@
 'use client'
-import { DataTable } from '@/components/DataTable'
-import { ColumnDef } from '@tanstack/react-table'
-import { Cart } from '../_types/type'
-import { FaEdit } from 'react-icons/fa'
-import { FaSave } from 'react-icons/fa'
-import { FaWonSign } from 'react-icons/fa6'
-import { useEffect, useState } from 'react'
+import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
+import { SharedOrderResponse } from '@/app/types/sharedOrderResponse'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/Input'
+import { useToast } from '@/components/ui/use-toast'
+import { BASE_URL } from '@/lib/constants'
+import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { useRouter } from 'next/navigation'
+import Script from 'next/script'
+import { useState } from 'react'
+import { FaWonSign } from 'react-icons/fa6'
+import { RiKakaoTalkFill } from 'react-icons/ri'
+import UserOrderTable from './UserOrderTable'
 
 interface SharedCartTableProps {
-  data: Cart[]
-  save: (id: number, quantity: number) => void
+  data: SharedOrderResponse
 }
 
-export default function SharedCartTable({ data, save }: SharedCartTableProps) {
-  const [editingRow, setEditingRow] = useState<Set<number>>(new Set())
-  const [rowQuantity, setRowQuantity] = useState<{ [key: string]: number }>({})
+export default function SharedCartTable({ data }: SharedCartTableProps) {
+  const { toast } = useToast()
 
-  const handleSave = (id: number) => {
-    if (rowQuantity[id]) save(id, rowQuantity[id])
+  const [amount, setAmount] = useState(data?.leftAmount || 0)
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10)
+    setAmount(value)
   }
 
-  const columns: ColumnDef<Cart>[] = [
-    {
-      accessorKey: '',
-      header: '#',
-      cell: ({ row }) => <>{row.index + 1}</>,
-    },
-    {
-      accessorKey: 'menuName',
-      header: 'Menu',
-    },
-    {
-      accessorKey: 'price',
-      header: 'Price',
-      cell: ({ row }) => (
-        <div className="flex items-center gap-1">
-          <FaWonSign />
-          {row.original.price}
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'quantity',
-      header: 'Quantity',
-      cell: ({ row }) => (
-        <>
-          {editingRow.has(row.original.id) ? (
-            <Input
-              type="number"
-              min={0}
-              defaultValue={
-                rowQuantity[row.original.id]
-                  ? rowQuantity[row.original.id]
-                  : row.original.quantity
-              }
-              onChange={(e) => {
-                setRowQuantity((prev) => ({
-                  ...prev,
-                  [row.original.id]: parseInt(e.target.value),
-                }))
-              }}
-              className="w-[4rem]"
-            />
-          ) : (
-            <div>{row.original.quantity}</div>
-          )}
-        </>
-      ),
-    },
-    {
-      accessorKey: 'id',
-      header: 'Edit/Save',
-      cell: ({ row }) => (
-        <>
-          <Button
-            className={
-              editingRow.has(row.original.id)
-                ? 'bg-pink-500 hover:bg-pink-700 rounded-full'
-                : 'bg-yellow-500 hover:bg-yellow-700 rounded-full'
-            }
-            onClick={() => {
-              if (editingRow.has(row.original.id)) {
-                setEditingRow((prev) => {
-                  const newEditingRow = new Set(prev)
-                  newEditingRow.delete(row.original.id)
-                  return newEditingRow
-                })
-                handleSave(row.original.id)
-              } else {
-                setEditingRow((prev) => new Set(prev.add(row.original.id)))
-              }
-            }}
-          >
-            {editingRow.has(row.original.id) ? <FaSave /> : <FaEdit />}
-          </Button>
-        </>
-      ),
-    },
-  ]
+  const router = useRouter()
+  const IMP_CODE = 'imp67708454'
 
-  const [total, setTotal] = useState<number>(0)
-  useEffect(() => {
-    setTotal(data.reduce((prev: number, cur: Cart) => prev + cur.totalPrice, 0))
-  }, [])
+  const onClickPayment = () => {
+    if (amount <= 0 || amount > data.leftAmount) {
+      return
+    }
+
+    if (!window.IMP) {
+      return
+    }
+    const { IMP } = window
+    IMP.init(IMP_CODE)
+
+    const payData: RequestPayParams = {
+      pg: 'kakaopay', // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
+      pay_method: 'card', // 결제수단
+      merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+      amount: 1000, // 결제금액
+      name: 'GrabTable 결제', // 주문명
+      buyer_name: '홍길동', // 구매자 이름
+      buyer_tel: '01012341234', // 구매자 전화번호
+      buyer_email: 'example@example.com', // 구매자 이메일
+      buyer_addr: '신사동 661-16', // 구매자 주소
+      buyer_postcode: '06018', // 구매자 우편번호
+    }
+
+    IMP.request_pay(payData, callback)
+  }
+
+  async function callback(response: RequestPayResponse) {
+    const request: any = {
+      impUid: response.imp_uid,
+      amount: response.paid_amount,
+    }
+    const session = await getSessionFromClient()
+    const res = await fetch(`${BASE_URL}/v1/shared-orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + session.formData['access_token'],
+      },
+      credentials: 'include',
+      body: JSON.stringify(request),
+    }).then((res) => {
+      if (res.status !== 200) {
+        toast({
+          title: 'Failed to pay',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      }
+      router.push('/reservation')
+    })
+  }
+
+  const deleteCartInSharedOrder = async (
+    cartId: number,
+    accessToken: string,
+  ) => {
+    await fetch(`${BASE_URL}/v1/carts/shared/${cartId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+      credentials: 'include',
+    })
+      .then(() => {
+        toast({
+          title: 'Successfully deleted!',
+          duration: 1000,
+        })
+        return
+      })
+      .catch((error) => {
+        toast({
+          title: 'Failed to delete',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
+  }
+
+  const editCartInSharedOrder = async (
+    cartId: number,
+    quantity: number,
+    accessToken: string,
+  ) => {
+    await fetch(`${BASE_URL}/v1/carts/shared/${cartId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        quantity: quantity,
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + accessToken,
+      },
+      credentials: 'include',
+    })
+      .then(() => {
+        toast({
+          title: 'Successfully updated!',
+          duration: 1000,
+        })
+        return
+      })
+      .catch((error) => {
+        toast({
+          title: 'Failed to update',
+          description: 'Please try again',
+          duration: 1000,
+        })
+      })
+  }
+
+  const onQuantityChange = async (cartId: number, quantity: number) => {
+    const session = await getSessionFromClient()
+    const accessToken = session.formData['access_token']
+
+    if (quantity === 0) {
+      deleteCartInSharedOrder(cartId, accessToken)
+      return
+    }
+
+    editCartInSharedOrder(cartId, quantity, accessToken)
+  }
 
   return (
     <>
-      <DataTable columns={columns} data={data} />
-      <div className="flex items-center gap-1 justify-end my-2 mr-2">
-        TOTAL: <FaWonSign />
-        {total}
+      <p className="text-lg font-semibold mt-4">Shared Order</p>
+      <p className="text-base font-medium my-1">Cart</p>
+      <UserOrderTable data={data.carts} onQuantityChange={onQuantityChange} />
+
+      <div className="flex justify-end items-center text-lg gap-2 m-4">
+        <FaWonSign />
+        <input
+          type="number"
+          value={amount}
+          onChange={handleInputChange}
+          className="border border-gray-300 rounded-md p-2 pl-8 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 no-spinner"
+          placeholder="Enter amount"
+        />
+        <Button
+          onClick={onClickPayment}
+          className="bg-yellow-300 hover:bg-yellow-400 text-black text-lg flex items-center"
+        >
+          <RiKakaoTalkFill className="mr-2" /> Pay
+        </Button>
       </div>
+      <p className="text-base font-medium my-1">Paid</p>
+      {data?.orders.map((order) => (
+        <UserOrderTable
+          key={order.id}
+          data={order.carts}
+          onQuantityChange={onQuantityChange}
+        />
+      ))}
+      <Script
+        src="https://cdn.iamport.kr/v1/iamport.js"
+        strategy="lazyOnload"
+      />
     </>
   )
 }

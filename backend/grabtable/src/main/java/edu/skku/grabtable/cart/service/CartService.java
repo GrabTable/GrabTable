@@ -76,6 +76,7 @@ public class CartService {
         validateAlreadyExistingCartInSharedOrder(sharedOrder, menu);
         validateStoreContainsMenu(user, menu);
         validateUserHasReservation(user);
+        validateNoPaidInSharedOrder(user);
 
         Cart cart = new Cart(sharedOrder, menu, quantity);
         cartRepository.save(cart);
@@ -86,6 +87,7 @@ public class CartService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
         validateAuthInSharedOrder(user, cart);
+        validateNoPaidInSharedOrder(user);
 
         cart.changeQuantity(cartUpdateRequest.getQuantity());
     }
@@ -95,6 +97,7 @@ public class CartService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
         validateAuthInSharedOrder(user, cart);
+        validateNoPaidInSharedOrder(user);
 
         cartRepository.deleteById(cart.getId());
     }
@@ -150,6 +153,16 @@ public class CartService {
 
         if (cart.getSharedOrder() == null || !Objects.equals(cart.getSharedOrder().getId(), sharedOrder.getId())) {
             throw new BadRequestException(ExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    private void validateNoPaidInSharedOrder(User user) {
+        Reservation reservation = reservationRepository.findByUser(user)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+        SharedOrder sharedOrder = reservation.getSharedOrder();
+
+        if (!sharedOrder.getOrders().isEmpty()) {
+            throw new BadRequestException(ExceptionCode.HAS_PAID_IN_SHARED_ORDER);
         }
     }
 

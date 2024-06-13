@@ -1,4 +1,3 @@
-import { Cart } from '@/app/types/cart'
 import { Menu } from '@/app/types/menu'
 import MenuCard from './MenuCard'
 import { ScrollArea } from './ui/scroll-area'
@@ -6,13 +5,15 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from './ui/table'
 
 interface MenuTableProps {
   menus: Menu[]
-  carts: Cart[]
   addCart: (menuId: number, quantity: number) => void
-  editCart: (cartId: number, quantity: number) => void
+  addCartInSharedOrder: (menuId: number, quantity: number) => void
 }
 
-export default function MenuTable(props: MenuTableProps) {
-  const { menus, carts, addCart, editCart } = props
+export default function MenuTable({
+  menus,
+  addCart,
+  addCartInSharedOrder,
+}: MenuTableProps) {
   return (
     <ScrollArea className="h-[50rem]">
       <Table>
@@ -25,17 +26,12 @@ export default function MenuTable(props: MenuTableProps) {
         </TableHeader>
         <TableBody>
           {menus.map((menu) => {
-            const cartItem: Cart | undefined = carts?.find((cart: Cart) => {
-              console.log(`Comparing ${menu.menuName} with ${cart.menuName}`)
-              return cart.menuName === menu.menuName
-            })
             return (
               <MenuCard
                 key={menu.id}
                 menu={menu}
-                cartItem={cartItem}
                 addCart={addCart}
-                editCart={editCart}
+                addCartInSharedOrder={addCartInSharedOrder}
               />
             )
           })}

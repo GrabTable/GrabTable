@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer'
-import Header from '@/components/Header_temp'
+import Header from '@/components/Header'
 import ThemeSwitch from '@/components/Theme-switch'
 import ActiveSectionContextProvider from '@/context/active-section-context'
 import ThemeContextProvider from '@/context/theme-context'

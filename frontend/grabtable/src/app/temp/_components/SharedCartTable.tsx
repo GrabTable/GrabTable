@@ -1,6 +1,6 @@
 'use client'
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { SharedOrderResponse } from '@/app/types/sharedOrderResponse'
+import { ReservationDetailResponse } from '@/app/types/reservationDetailResponse'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
@@ -11,15 +11,16 @@ import { useState } from 'react'
 import { FaWonSign } from 'react-icons/fa6'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import UserOrderTable from './UserOrderTable'
+import UserSharedOrderList from './UserSharedOrderList'
 
 interface SharedCartTableProps {
-  data: SharedOrderResponse
+  data: ReservationDetailResponse
 }
 
 export default function SharedCartTable({ data }: SharedCartTableProps) {
   const { toast } = useToast()
 
-  const [amount, setAmount] = useState(data?.leftAmount || 0)
+  const [amount, setAmount] = useState(data.sharedOrder.leftAmount || 0)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10)
@@ -30,7 +31,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
   const IMP_CODE = 'imp67708454'
 
   const onClickPayment = () => {
-    if (amount <= 0 || amount > data.leftAmount) {
+    if (amount <= 0 || amount > data.sharedOrder.leftAmount) {
       return
     }
 
@@ -159,10 +160,13 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       <p className="text-lg font-semibold mt-4">Shared Order</p>
       <p className="text-base font-medium my-1">Cart</p>
       {data.orders.length === 0 ? (
-        <UserOrderTable data={data.carts} onQuantityChange={onQuantityChange} />
+        <UserOrderTable
+          data={data.sharedOrder.carts}
+          onQuantityChange={onQuantityChange}
+        />
       ) : (
         <UserOrderTable
-          data={data.carts}
+          data={data.sharedOrder.carts}
           onQuantityChange={onQuantityChange}
           faded={true}
         />
@@ -170,7 +174,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
 
       <div className="flex items-center gap-1 justify-end my-2 mr-2">
         LEFT AMOUNT: <FaWonSign />
-        {data.leftAmount}
+        {data.sharedOrder.leftAmount}
       </div>
 
       <div className="flex justify-end items-center text-lg gap-2 m-4">
@@ -191,11 +195,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
         </Button>
       </div>
       <p className="text-base font-medium my-1">Paid</p>
-      {data?.orders.map((order) => (
-        <div>
-          <p>{order.paidAmount}</p>
-        </div>
-      ))}
+      <UserSharedOrderList data={data} />
       <Script
         src="https://cdn.iamport.kr/v1/iamport.js"
         strategy="lazyOnload"

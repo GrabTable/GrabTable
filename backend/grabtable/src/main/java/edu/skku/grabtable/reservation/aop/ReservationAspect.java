@@ -18,6 +18,7 @@ public class ReservationAspect {
 
     @Pointcut("execution(* edu.skku.grabtable.cart.controller.CartController.addCart(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.updateCart(..)) || " +
+            "execution(* edu.skku.grabtable.cart.controller.CartController.deleteCart(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.addCartInSharedOrder(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.updateCartInSharedOrder(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.deleteCartInSharedOrder(..))")

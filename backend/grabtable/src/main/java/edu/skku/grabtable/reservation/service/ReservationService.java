@@ -6,7 +6,6 @@ import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
@@ -23,8 +22,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -50,7 +47,6 @@ public class ReservationService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RedisMessageListenerContainer redisMessageListenerContainer;
 
@@ -159,33 +155,33 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findByHostId(user.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        //예약의 모든 사용자의 현재 주문이 존재하는지 검사
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
-        List<Order> orders = orderRepository.findByReservation(reservation);
-        validateLengthOfInviteesAndOrders(invitees, orders);
+        //공유 주문과 개인 주문의 합이 하나도 없을 경우 확정 불가
+        validateMoreThanOneOrderExists(reservation);
 
         //공유 주문 완료되었는지 검사
-        validateSharedOrder(reservation);
+        validateSharedOrderIsFullyPaid(reservation);
 
         //예약을 확정 처리
         reservation.confirm();
 
         //invitee들의 예약 연관관계 해제
+        List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
             invitee.clearReservation();
         }
     }
 
-    private void validateSharedOrder(Reservation reservation) {
-        SharedOrder sharedOrder = reservation.getSharedOrder();
-        if (sharedOrder.calculateLeftAmount() > 0) {
-            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+    private void validateMoreThanOneOrderExists(Reservation reservation) {
+        if (reservation.getSharedOrder().getOrders().isEmpty() &&
+                orderRepository.findByReservation(reservation).isEmpty()) {
+            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
         }
     }
 
-    private void validateLengthOfInviteesAndOrders(List<User> invitees, List<Order> orders) {
-        if (invitees.size() + 1 != orders.size()) {
-            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
+    private void validateSharedOrderIsFullyPaid(Reservation reservation) {
+        SharedOrder sharedOrder = reservation.getSharedOrder();
+        if (sharedOrder.calculateLeftAmount() > 0) {
+            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
         }
     }
 

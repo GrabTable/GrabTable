@@ -1,15 +1,9 @@
-import { CartItem } from './cartItem'
-import { UserCartsInfo } from './userCartsInfo'
+import { Cart } from './cart'
 
-export type Orders = {
+export type Order = {
   id: number
-  storeId: number
-  host: UserCartsInfo
-  invitees: UserCartsInfo[]
-  inviteCode: string
-  orders: {
-    id: number
-    userId: number
-    carts: CartItem[]
-  }[]
+  userId: number
+  paidAmount: number
+  carts: Cart[]
+  status: string
 }

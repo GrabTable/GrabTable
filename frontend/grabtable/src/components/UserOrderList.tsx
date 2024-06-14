@@ -1,6 +1,5 @@
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { PostOrderResponse } from '@/app/types/postOrderResponse'
-import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
+import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import {
   Accordion,
   AccordionContent,
@@ -16,9 +15,10 @@ import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import UserOrderTable from './UserOrderTable'
+import { useToast } from './ui/use-toast'
 
 interface UserOrderListProps {
-  data: UserCartsInfoResponse
+  data: UserCartsInfo
   isPaid: boolean
   onQuantityChange?: (id: number, quantity: number) => void
   viewOnly?: boolean
@@ -32,6 +32,7 @@ export default function UserOrderList({
   viewOnly = false,
   payable = false,
 }: UserOrderListProps) {
+  const { toast } = useToast()
   const router = useRouter()
   const IMP_CODE = 'imp67708454'
 
@@ -73,7 +74,16 @@ export default function UserOrderList({
       credentials: 'include',
       body: JSON.stringify(request),
     })
-    const postResponse: Promise<PostOrderResponse> = res.json()
+
+    if (!res.ok) {
+      const resJson = await res.json()
+      toast({
+        title: resJson.message,
+        description: 'Please try again',
+        duration: 1000,
+      })
+      return
+    }
     router.push('/reservation')
   }
 

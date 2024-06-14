@@ -1,8 +1,8 @@
 'use client'
 import { Cart } from '@/app/types/cart'
-import { ReservationDetailResponse } from '@/app/types/reservationDetailResponse'
+import { Reservation } from '@/app/types/reservation'
 import { User } from '@/app/types/user'
-import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
+import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from '@/components/ui/use-toast'
@@ -13,13 +13,13 @@ import SharedCartTable from './SharedCartTable'
 import UserOrderList from './UserOrderList'
 
 interface OrderCardProps {
-  reservationInfo: ReservationDetailResponse
+  reservationInfo: Reservation
   myInfo: User
   myCarts: Cart[]
 }
 
 type UserCartsWithPaidStatus = {
-  userCarts: UserCartsInfoResponse
+  userCarts: UserCartsInfo
   isPaid: boolean
 }
 
@@ -118,7 +118,7 @@ export default function OrderCard(props: OrderCardProps) {
   }
 
   const getOtherOrdersWithPaidStatus = (): UserCartsWithPaidStatus[] => {
-    const otherUserCarts: UserCartsInfoResponse[] = [
+    const otherUserCarts: UserCartsInfo[] = [
       ...(reservationInfo?.invitees.filter(
         (invitee) => invitee.id !== myInfo?.id,
       ) || []),

@@ -8,10 +8,10 @@ import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import OrderCard from '../temp/_components/OrderCard'
+import OrderCard from '../../components/OrderCard'
 import { Cart } from '../types/cart'
 import { Menu } from '../types/menu'
-import { ReservationDetailResponse } from '../types/reservationDetailResponse'
+import { Reservation } from '../types/reservation'
 import { User } from '../types/user'
 
 interface MyReservationProps {
@@ -28,8 +28,7 @@ export default function MyReservation(props: MyReservationProps) {
   const [loading, setLoading] = useState(false)
   const [myCarts, setMyCarts] = useState<Cart[]>([])
   const [myInfo, setMyInfo] = useState<User>()
-  const [reservationInfo, setReservationInfo] =
-    useState<ReservationDetailResponse>()
+  const [reservationInfo, setReservationInfo] = useState<Reservation>()
 
   useEffect(() => {
     const getReservationDetailWithSse = async () => {
@@ -171,10 +170,6 @@ export default function MyReservation(props: MyReservationProps) {
 
     if (!response.ok) throw new Error('Failed to fetch Mycart')
     return response.json()
-  }
-
-  const handlePayment = () => {
-    window.location.href = '/reservation/payment'
   }
 
   if (!reservationInfo || !myInfo) {

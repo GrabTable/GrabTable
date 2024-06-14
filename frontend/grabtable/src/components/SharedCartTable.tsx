@@ -1,6 +1,6 @@
 'use client'
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { ReservationDetailResponse } from '@/app/types/reservationDetailResponse'
+import { Reservation } from '@/app/types/reservation'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
@@ -14,7 +14,7 @@ import UserOrderTable from './UserOrderTable'
 import UserSharedOrderList from './UserSharedOrderList'
 
 interface SharedCartTableProps {
-  data: ReservationDetailResponse
+  data: Reservation
 }
 
 export default function SharedCartTable({ data }: SharedCartTableProps) {

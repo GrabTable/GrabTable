@@ -1,9 +1,9 @@
 'use client'
+import { Cart } from '@/app/types/cart'
 import { DataTable } from '@/components/DataTable'
 import { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
 import { FaMinus, FaPlus, FaWonSign } from 'react-icons/fa6'
-import { Cart } from '../_types/type'
 
 interface UserOrderTableProps {
   data: Cart[]

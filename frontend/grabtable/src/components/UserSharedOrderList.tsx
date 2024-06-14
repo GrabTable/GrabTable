@@ -1,6 +1,6 @@
-import { OrderResponse } from '@/app/types/orderResponse'
-import { ReservationDetailResponse } from '@/app/types/reservationDetailResponse'
-import { UserCartsInfoResponse } from '@/app/types/userCartsInfoResponse'
+import { Order } from '@/app/types/order'
+import { Reservation } from '@/app/types/reservation'
+import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import {
   Accordion,
   AccordionContent,
@@ -12,14 +12,14 @@ import { Badge } from '@/components/ui/badge'
 import { FaWonSign } from 'react-icons/fa6'
 
 interface UserSharedOrderListProps {
-  data: ReservationDetailResponse
+  data: Reservation
 }
 
 export default function UserSharedOrderList({
   data,
 }: UserSharedOrderListProps) {
-  const users: UserCartsInfoResponse[] = data.invitees.concat(data.host)
-  const paidPartialOrders: OrderResponse[] = data.sharedOrder.orders
+  const users: UserCartsInfo[] = data.invitees.concat(data.host)
+  const paidPartialOrders: Order[] = data.sharedOrder.orders
 
   const findPartialOrdersByUser = (userId: number) =>
     paidPartialOrders.filter((order) => order.userId === userId)
@@ -35,7 +35,7 @@ export default function UserSharedOrderList({
                 <AvatarFallback>{user.username}</AvatarFallback>
               </Avatar>
               <h3>{user.username}</h3>
-              {findPartialOrdersByUser.length > 0 ? (
+              {findPartialOrdersByUser(user.id).length > 0 ? (
                 <Badge
                   className="text-green-400 border-green-400"
                   variant="outline"

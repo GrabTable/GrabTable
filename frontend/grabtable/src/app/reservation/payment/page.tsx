@@ -1,8 +1,8 @@
 'use client'
 
 import { Cart } from '@/app/types/cart'
-import { PostOrderResponse } from '@/app/types/postOrderResponse'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
@@ -12,6 +12,7 @@ import { RiKakaoTalkFill } from 'react-icons/ri'
 import { RequestPayParams, RequestPayResponse } from '../portone'
 
 export default function Page() {
+  const { toast } = useToast()
   const router = useRouter()
   const IMP_CODE = 'imp67708454'
 
@@ -53,7 +54,16 @@ export default function Page() {
       credentials: 'include',
       body: JSON.stringify(request),
     })
-    const postResponse: Promise<PostOrderResponse> = res.json()
+
+    if (!res.ok) {
+      const resJson = await res.json()
+      toast({
+        title: resJson.message,
+        description: 'Please try again',
+        duration: 1000,
+      })
+      return
+    }
     router.push('/reservation')
   }
   const [myCart, setMyCart] = useState<Cart[]>([])

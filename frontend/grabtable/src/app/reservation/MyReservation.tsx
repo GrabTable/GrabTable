@@ -1,7 +1,6 @@
 'use client'
 import MenuTable from '@/components/MenuTable'
 import Spinner from '@/components/spinner'
-import { Button } from '@/components/ui/button'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { BASE_URL } from '@/lib/constants'
@@ -9,7 +8,6 @@ import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { RiKakaoTalkFill } from 'react-icons/ri'
 import OrderCard from '../temp/_components/OrderCard'
 import { Cart } from '../types/cart'
 import { Menu } from '../types/menu'
@@ -192,20 +190,12 @@ export default function MyReservation(props: MyReservationProps) {
           addCart={addCart}
           addCartInSharedOrder={addCartInSharedOrder}
         />
-        <Button
-          className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
-          onClick={handlePayment}
-        >
-          <RiKakaoTalkFill className="mr-2" /> Pay
-        </Button>
       </div>
-
       <OrderCard
         reservationInfo={reservationInfo}
         myInfo={myInfo}
         myCarts={myCarts}
       />
-
       <Toaster />
     </div>
   )

@@ -26,7 +26,6 @@ type UserCartsWithPaidStatus = {
 export default function OrderCard(props: OrderCardProps) {
   const { reservationInfo, myInfo, myCarts } = props
   const router = useRouter()
-  const sharedOrder = reservationInfo?.sharedOrder
 
   const deleteCart = async (cartId: number, accessToken: string) => {
     await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
@@ -196,6 +195,7 @@ export default function OrderCard(props: OrderCardProps) {
             isPaid={myUserCartsWithPaidStatus.isPaid}
             onQuantityChange={onQuantityChange}
             viewOnly={false}
+            payable={true}
           />
 
           <p className="text-lg font-semibold mt-4">Members Order</p>
@@ -207,7 +207,7 @@ export default function OrderCard(props: OrderCardProps) {
             />
           ))}
 
-          <SharedCartTable data={sharedOrder} />
+          <SharedCartTable data={reservationInfo} />
 
           <div className="mt-4">
             <Button

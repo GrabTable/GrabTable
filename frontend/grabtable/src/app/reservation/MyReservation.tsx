@@ -177,7 +177,7 @@ export default function MyReservation(props: MyReservationProps) {
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex flex-col md:flex-row justify-between">
       <div className="w-full mr-4 ">
         {loading && <Spinner />}
         <MenuTable

@@ -2,8 +2,8 @@ import Category from '@/components/Category'
 import { InputWithButton } from '@/components/Inputwithbutton'
 import Image from 'next/image'
 import About from './about'
-import SectionDivider from './section-divider'
 import Contact from './contact'
+import SectionDivider from './section-divider'
 
 export default function Home() {
   return (

@@ -1,5 +1,5 @@
-import { nanoid } from 'nanoid'
 import { SignJWT, jwtVerify } from 'jose'
+import { nanoid } from 'nanoid'
 import { cookies } from 'next/headers'
 
 const secretKey = 'secret'

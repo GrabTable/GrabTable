@@ -7,6 +7,7 @@ import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.order.domain.SharedOrder;
+import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.store.domain.Menu;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CartService {
     private final CartRepository cartRepository;
     private final MenuRepository menuRepository;
+    private final OrderRepository orderRepository;
     private final ReservationRepository reservationRepository;
 
     @Transactional(readOnly = true)
@@ -38,6 +40,7 @@ public class CartService {
         validateAlreadyExistingCart(user, menu);
         validateStoreContainsMenu(user, menu);
         validateUserHasReservation(user);
+        validateUserHasPaidOrder(user);
 
         Cart cart = new Cart(user, menu, quantity);
         cartRepository.save(cart);
@@ -73,6 +76,7 @@ public class CartService {
         validateAlreadyExistingCartInSharedOrder(sharedOrder, menu);
         validateStoreContainsMenu(user, menu);
         validateUserHasReservation(user);
+        validateNoPaidInSharedOrder(user);
 
         Cart cart = new Cart(sharedOrder, menu, quantity);
         cartRepository.save(cart);
@@ -83,6 +87,7 @@ public class CartService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
         validateAuthInSharedOrder(user, cart);
+        validateNoPaidInSharedOrder(user);
 
         cart.changeQuantity(cartUpdateRequest.getQuantity());
     }
@@ -92,11 +97,22 @@ public class CartService {
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_CART_ID));
 
         validateAuthInSharedOrder(user, cart);
+        validateNoPaidInSharedOrder(user);
 
         cartRepository.deleteById(cart.getId());
     }
 
     /* === 검증 메서드 ==== */
+
+    private void validateUserHasPaidOrder(User user) {
+        Reservation reservation = reservationRepository.findByUser(user)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+
+        if (orderRepository.findByReservationAndUser(reservation, user).isPresent()) {
+            throw new BadRequestException(ExceptionCode.ALREADY_PAID_USER);
+        }
+    }
+
     private void validateStoreContainsMenu(User user, Menu menu) {
         Reservation reservation = reservationRepository.findByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
@@ -137,6 +153,16 @@ public class CartService {
 
         if (cart.getSharedOrder() == null || !Objects.equals(cart.getSharedOrder().getId(), sharedOrder.getId())) {
             throw new BadRequestException(ExceptionCode.UNAUTHORIZED_ACCESS);
+        }
+    }
+
+    private void validateNoPaidInSharedOrder(User user) {
+        Reservation reservation = reservationRepository.findByUser(user)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
+        SharedOrder sharedOrder = reservation.getSharedOrder();
+
+        if (!sharedOrder.getOrders().isEmpty()) {
+            throw new BadRequestException(ExceptionCode.HAS_PAID_IN_SHARED_ORDER);
         }
     }
 

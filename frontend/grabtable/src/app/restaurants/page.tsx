@@ -1,22 +1,12 @@
 'use client'
 import { InputWithButton } from '@/components/Inputwithbutton'
-import { useSearchParams } from 'next/navigation'
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import RestaurantCard from '@/components/RestaurantCard'
-import { baseUrl } from '@/lib/constants'
 import KakaoMap from '@/components/kakaoMap'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-  latitude: number
-  longitude: number
-}
+import { BASE_URL } from '@/lib/constants'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { Restaurant } from '../types/restaurant'
 
 export default function Home() {
   const params = useSearchParams()
@@ -28,10 +18,6 @@ export default function Home() {
   useEffect(() => {
     fetchStores()
   }, [search, category])
-
-  if (!search && !category) {
-    console.log('no search and no category!')
-  }
 
   const filterStores = (stores: Restaurant[]) => {
     if (search) {
@@ -50,17 +36,14 @@ export default function Home() {
   }
 
   const fetchStores = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/v1/stores`)
-      if (!response.ok) {
-        throw new Error('Something went wrong')
-      }
-      const data = await response.json()
-      console.log(data)
-      filterStores(data)
-    } catch (error) {
-      console.error('Failed to fetch stores:', error)
-    }
+    await fetch(`${BASE_URL}/v1/stores`)
+      .then(async (response) => {
+        const body = await response.json()
+        filterStores(body)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch stores:', error)
+      })
   }
 
   return (

@@ -1,16 +1,6 @@
 import { useEffect } from 'react'
 import 'react-kakao-maps-sdk'
-
-type Restaurant = {
-  address: string
-  averageRating: number
-  category: string
-  id: number
-  storeName: string
-  storePictureUrl: string
-  latitude: number
-  longitude: number
-}
+import { Restaurant } from '@/app/types/restaurant'
 
 const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
   useEffect(() => {
@@ -78,7 +68,7 @@ const KakaoMap = ({ stores }: { stores: Restaurant[] }) => {
                   <div class="desc">
                     <div class="ellipsis">${store.address}</div>
                     <div class="jibun ellipsis">${store.averageRating.toFixed(1)} ★</div>
-                    <div><a href="/restaurants/${store.id}" target="_blank" class="link">자세히 보기</a></div>
+                    <div><a href="/restaurants/${store.id}" class="link">자세히 보기</a></div>
                   </div>
                 </div>
               </div>

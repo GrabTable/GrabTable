@@ -1,13 +1,13 @@
 import Footer from '@/components/Footer'
+import Header from '@/components/Header'
 import ThemeSwitch from '@/components/Theme-switch'
-import Header from '@/components/header'
 import ActiveSectionContextProvider from '@/context/active-section-context'
 import ThemeContextProvider from '@/context/theme-context'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 import { Toaster } from 'react-hot-toast'
 import './globals.css'
-import { Suspense } from 'react'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {

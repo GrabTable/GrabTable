@@ -1,45 +1,27 @@
 'use client'
 
+import { Cart } from '@/app/types/cart'
 import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
+import { BASE_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import { RequestPayParams, RequestPayResponse } from '../portone'
-import { useRouter } from 'next/navigation'
-import { baseUrl } from '@/lib/constants'
 
 export default function Page() {
+  const { toast } = useToast()
   const router = useRouter()
-  type MyCart = {
-    id: number
-    quantity: number
-    menuName: string
-    price: number
-    totalPrice: number
-  }
-
-  interface Cart {
-    id: number
-    menuName: string
-    quantity: number
-    price: number
-    totalPrice: number
-  }
-
-  interface PostOrderResponse {
-    id: number
-    userId: number
-    carts: Cart[]
-    status: string
-  }
+  const IMP_CODE = 'imp67708454'
 
   const onClickPayment = () => {
     if (!window.IMP) {
       return
     }
     const { IMP } = window
-    IMP.init('imp67708454')
+    IMP.init(IMP_CODE)
 
     const data: RequestPayParams = {
       pg: 'kakaopay', // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
@@ -63,7 +45,7 @@ export default function Page() {
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch(`${baseUrl}/v1/orders`, {
+    const res = await fetch(`${BASE_URL}/v1/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,15 +54,24 @@ export default function Page() {
       credentials: 'include',
       body: JSON.stringify(request),
     })
-    const postResponse: Promise<PostOrderResponse> = res.json()
+
+    if (!res.ok) {
+      const resJson = await res.json()
+      toast({
+        title: resJson.message,
+        description: 'Please try again',
+        duration: 1000,
+      })
+      return
+    }
     router.push('/reservation')
   }
-  const [myCart, setMyCart] = useState<MyCart[]>([])
+  const [myCart, setMyCart] = useState<Cart[]>([])
 
   const getMyCart = async () => {
     try {
       const session = await getSessionFromClient()
-      const response = await fetch(`${baseUrl}/v1/carts/me`, {
+      const response = await fetch(`${BASE_URL}/v1/carts/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -100,18 +91,6 @@ export default function Page() {
   useEffect(() => {
     getMyCart()
   }, [])
-
-  // useEffect(() => {
-  //   // 페이지 로드 시 'alreadyRefreshed' 키를 확인
-  //   if (!localStorage.getItem('alreadyRefreshed')) {
-  //     // 'alreadyRefreshed' 키가 없다면 새로고침 수행
-  //     localStorage.setItem('alreadyRefreshed', 'true'); // 새로고침 후 이 키를 설정
-  //     window.location.reload();
-  //   } else {
-  //     // 새로고침 후에는 키를 제거하여 다음 방문 때 다시 새로고침 할 수 있도록 함
-  //     localStorage.removeItem('alreadyRefreshed');
-  //   }
-  // }, []);
 
   return (
     <>

@@ -19,11 +19,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  faded?: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  faded,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -52,7 +54,7 @@ export function DataTable<TData, TValue>({
             </TableRow>
           ))}
         </TableHeader>
-        <TableBody>
+        <TableBody className={faded ? 'bg-gray-400' : ''}>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow

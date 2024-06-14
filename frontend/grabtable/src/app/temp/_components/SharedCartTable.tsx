@@ -93,21 +93,21 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
         Authorization: 'Bearer ' + accessToken,
       },
       credentials: 'include',
-    })
-      .then(() => {
+    }).then(async (res) => {
+      const resJson = await res.json()
+      if (res.status === 200)
         toast({
           title: 'Successfully deleted!',
           duration: 1000,
         })
-        return
-      })
-      .catch((error) => {
+      else {
         toast({
-          title: 'Failed to delete',
+          title: resJson.message,
           description: 'Please try again',
           duration: 1000,
         })
-      })
+      }
+    })
   }
 
   const editCartInSharedOrder = async (
@@ -158,7 +158,20 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     <>
       <p className="text-lg font-semibold mt-4">Shared Order</p>
       <p className="text-base font-medium my-1">Cart</p>
-      <UserOrderTable data={data.carts} onQuantityChange={onQuantityChange} />
+      {data.orders.length === 0 ? (
+        <UserOrderTable data={data.carts} onQuantityChange={onQuantityChange} />
+      ) : (
+        <UserOrderTable
+          data={data.carts}
+          onQuantityChange={onQuantityChange}
+          faded={true}
+        />
+      )}
+
+      <div className="flex items-center gap-1 justify-end my-2 mr-2">
+        LEFT AMOUNT: <FaWonSign />
+        {data.leftAmount}
+      </div>
 
       <div className="flex justify-end items-center text-lg gap-2 m-4">
         <FaWonSign />
@@ -166,6 +179,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
           type="number"
           value={amount}
           onChange={handleInputChange}
+          onWheel={(e) => e.currentTarget.blur()}
           className="border border-gray-300 rounded-md p-2 pl-8 text-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 no-spinner"
           placeholder="Enter amount"
         />
@@ -178,11 +192,9 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       </div>
       <p className="text-base font-medium my-1">Paid</p>
       {data?.orders.map((order) => (
-        <UserOrderTable
-          key={order.id}
-          data={order.carts}
-          onQuantityChange={onQuantityChange}
-        />
+        <div>
+          <p>{order.paidAmount}</p>
+        </div>
       ))}
       <Script
         src="https://cdn.iamport.kr/v1/iamport.js"

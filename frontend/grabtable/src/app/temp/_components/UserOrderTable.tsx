@@ -9,12 +9,14 @@ interface UserOrderTableProps {
   data: Cart[]
   onQuantityChange?: (id: number, quantity: number) => void
   viewOnly?: boolean
+  faded?: boolean
 }
 
 export default function UserOrderTable({
   data,
   onQuantityChange = () => {},
   viewOnly = false,
+  faded = false,
 }: UserOrderTableProps) {
   const columns: ColumnDef<Cart>[] = [
     {
@@ -80,12 +82,12 @@ export default function UserOrderTable({
   })
 
   return (
-    <>
-      <DataTable columns={columns} data={data} />
+    <div>
+      <DataTable columns={columns} data={data} faded={faded} />
       <div className="flex items-center gap-1 justify-end my-2 mr-2">
         TOTAL: <FaWonSign />
         {total}
       </div>
-    </>
+    </div>
   )
 }

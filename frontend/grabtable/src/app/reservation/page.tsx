@@ -2,7 +2,7 @@
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
 import { useRouter } from 'next/navigation'
@@ -33,7 +33,7 @@ export default function Page() {
   }
 
   const getMyReservation = async (session: any) => {
-    await fetch(`${BASE_URL}/v1/reservations/me`, {
+    await fetch(`${BASE_API_URL}/v1/reservations/me`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + session.formData['access_token'],
@@ -61,7 +61,7 @@ export default function Page() {
   }
 
   const getMenus = async (session: any) => {
-    await fetch(`${BASE_URL}/v1/stores/${storeID}/menus`, {
+    await fetch(`${BASE_API_URL}/v1/stores/${storeID}/menus`, {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + session.formData['access_token'],

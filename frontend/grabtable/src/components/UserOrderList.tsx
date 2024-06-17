@@ -9,7 +9,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
@@ -65,7 +65,7 @@ export default function UserOrderList({
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_URL}/v1/orders`, {
+    const res = await fetch(`${BASE_API_URL}/v1/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

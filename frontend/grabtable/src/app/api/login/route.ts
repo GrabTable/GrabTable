@@ -1,11 +1,11 @@
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL, BASE_URL } from '@/lib/constants'
 import { login } from '@/lib/next-auth/session'
 import { parseCookie } from 'next/dist/compiled/@edge-runtime/cookies'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 
 async function sendPostRequest(body_code: string | null) {
-  const url = `${BASE_URL}/v1/auth/login/kakao` // 요청할 URL
+  const url = `${BASE_API_URL}/v1/auth/login/kakao` // 요청할 URL
 
   const data = {
     code: body_code, // 실제 코드 값으로 변경 필요
@@ -36,5 +36,5 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   await login(userSession)
 
-  return NextResponse.redirect('http://localhost:3000')
+  return NextResponse.redirect(BASE_URL)
 }

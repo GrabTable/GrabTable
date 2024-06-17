@@ -49,7 +49,7 @@ export default function Page() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
       body: JSON.stringify(request),
@@ -75,7 +75,7 @@ export default function Page() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['access_token'],
+          Authorization: 'Bearer ' + session.formData['accessToken'],
         },
         credentials: 'include',
       })

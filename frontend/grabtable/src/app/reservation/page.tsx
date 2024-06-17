@@ -36,7 +36,7 @@ export default function Page() {
     await fetch(`${BASE_API_URL}/v1/reservations/me`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -64,7 +64,7 @@ export default function Page() {
     await fetch(`${BASE_API_URL}/v1/stores/${storeID}/menus`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })

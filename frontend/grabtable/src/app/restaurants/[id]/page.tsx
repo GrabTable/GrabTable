@@ -105,7 +105,7 @@ export default function Restaurant() {
           }),
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + session.formData['access_token'],
+            Authorization: 'Bearer ' + session.formData['accessToken'],
           },
           credentials: 'include',
         })

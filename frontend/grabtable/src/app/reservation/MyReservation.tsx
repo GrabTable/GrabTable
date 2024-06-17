@@ -39,7 +39,7 @@ export default function MyReservation(props: MyReservationProps) {
         `${BASE_API_URL}/v1/reservations/me/subscribe`,
         {
           headers: {
-            Authorization: 'Bearer ' + session.formData['access_token'],
+            Authorization: 'Bearer ' + session.formData['accessToken'],
           },
           withCredentials: true,
         },
@@ -86,7 +86,7 @@ export default function MyReservation(props: MyReservationProps) {
       }),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -123,7 +123,7 @@ export default function MyReservation(props: MyReservationProps) {
       }),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -149,7 +149,7 @@ export default function MyReservation(props: MyReservationProps) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -163,7 +163,7 @@ export default function MyReservation(props: MyReservationProps) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })

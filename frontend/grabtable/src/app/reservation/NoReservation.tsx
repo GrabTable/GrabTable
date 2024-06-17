@@ -20,7 +20,7 @@ export default function NoReservation() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['access_token'],
+          Authorization: 'Bearer ' + session.formData['accessToken'],
         },
         credentials: 'include',
       },

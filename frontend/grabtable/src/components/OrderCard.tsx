@@ -91,7 +91,7 @@ export default function OrderCard(props: OrderCardProps) {
 
   const onQuantityChange = async (cartId: number, quantity: number) => {
     const session = await getSessionFromClient()
-    const accessToken = session.formData['access_token']
+    const accessToken = session.formData['accessToken']
 
     if (quantity === 0) {
       deleteCart(cartId, accessToken)
@@ -160,7 +160,7 @@ export default function OrderCard(props: OrderCardProps) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     }).then(async (res) => {

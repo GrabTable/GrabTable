@@ -19,7 +19,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
@@ -44,7 +44,7 @@ export default function Restaurant() {
   const [restaurant, setRestaurant] = useState<Store>()
   const fetchStore = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/v1/stores/${store_id}`)
+      const response = await fetch(`${BASE_API_URL}/v1/stores/${store_id}`)
       if (!response.ok) {
         throw new Error('error')
       }
@@ -58,7 +58,9 @@ export default function Restaurant() {
   const [reviews, setReviews] = useState<Review[]>([])
   const fetchReview = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/v1/reviews/stores/${store_id}`)
+      const response = await fetch(
+        `${BASE_API_URL}/v1/reviews/stores/${store_id}`,
+      )
       if (!response.ok) {
         throw new Error('error')
       }
@@ -96,7 +98,7 @@ export default function Restaurant() {
       }
 
       try {
-        const response = await fetch(`${BASE_URL}/v1/reservations`, {
+        const response = await fetch(`${BASE_API_URL}/v1/reservations`, {
           method: 'POST',
           body: JSON.stringify({
             storeId: store_id,

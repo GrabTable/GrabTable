@@ -3,7 +3,7 @@
 import { Cart } from '@/app/types/cart'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
@@ -45,7 +45,7 @@ export default function Page() {
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_URL}/v1/orders`, {
+    const res = await fetch(`${BASE_API_URL}/v1/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ export default function Page() {
   const getMyCart = async () => {
     try {
       const session = await getSessionFromClient()
-      const response = await fetch(`${BASE_URL}/v1/carts/me`, {
+      const response = await fetch(`${BASE_API_URL}/v1/carts/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -6,7 +6,7 @@ import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import SharedCartTable from './SharedCartTable'
@@ -28,7 +28,7 @@ export default function OrderCard(props: OrderCardProps) {
   const router = useRouter()
 
   const deleteCart = async (cartId: number, accessToken: string) => {
-    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
+    await fetch(`${BASE_API_URL}/v1/carts/${cartId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default function OrderCard(props: OrderCardProps) {
       return
     }
 
-    await fetch(`${BASE_URL}/v1/carts/${cartId}`, {
+    await fetch(`${BASE_API_URL}/v1/carts/${cartId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         quantity: quantity,
@@ -156,7 +156,7 @@ export default function OrderCard(props: OrderCardProps) {
 
   const confirmReservation = async () => {
     const session = await getSessionFromClient()
-    await fetch(`${BASE_URL}/v1/reservations/confirm`, {
+    await fetch(`${BASE_API_URL}/v1/reservations/confirm`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

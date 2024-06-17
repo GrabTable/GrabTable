@@ -3,7 +3,7 @@ import MenuTable from '@/components/MenuTable'
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useRouter } from 'next/navigation'
@@ -36,7 +36,7 @@ export default function MyReservation(props: MyReservationProps) {
       const EventSource = EventSourcePolyfill || window.EventSource
 
       const eventSource = new EventSource(
-        `${BASE_URL}/v1/reservations/me/subscribe`,
+        `${BASE_API_URL}/v1/reservations/me/subscribe`,
         {
           headers: {
             Authorization: 'Bearer ' + session.formData['access_token'],
@@ -78,7 +78,7 @@ export default function MyReservation(props: MyReservationProps) {
       return
     }
 
-    await fetch(`${BASE_URL}/v1/carts`, {
+    await fetch(`${BASE_API_URL}/v1/carts`, {
       method: 'POST',
       body: JSON.stringify({
         menuId: menuId,
@@ -115,7 +115,7 @@ export default function MyReservation(props: MyReservationProps) {
       return
     }
 
-    await fetch(`${BASE_URL}/v1/carts/shared`, {
+    await fetch(`${BASE_API_URL}/v1/carts/shared`, {
       method: 'POST',
       body: JSON.stringify({
         menuId: menuId,
@@ -145,7 +145,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   const getMyInfo = async (): Promise<User> => {
     const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_URL}/v1/user/me`, {
+    const response = await fetch(`${BASE_API_URL}/v1/user/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ export default function MyReservation(props: MyReservationProps) {
 
   const getMyCart = async (): Promise<Cart[]> => {
     const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_URL}/v1/carts/me`, {
+    const response = await fetch(`${BASE_API_URL}/v1/carts/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

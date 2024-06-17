@@ -3,7 +3,7 @@ import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
 import { Reservation } from '@/app/types/reservation'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_URL } from '@/lib/constants'
+import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
@@ -63,7 +63,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_URL}/v1/shared-orders`, {
+    const res = await fetch(`${BASE_API_URL}/v1/shared-orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     cartId: number,
     accessToken: string,
   ) => {
-    await fetch(`${BASE_URL}/v1/carts/shared/${cartId}`, {
+    await fetch(`${BASE_API_URL}/v1/carts/shared/${cartId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     quantity: number,
     accessToken: string,
   ) => {
-    await fetch(`${BASE_URL}/v1/carts/shared/${cartId}`, {
+    await fetch(`${BASE_API_URL}/v1/carts/shared/${cartId}`, {
       method: 'PATCH',
       body: JSON.stringify({
         quantity: quantity,

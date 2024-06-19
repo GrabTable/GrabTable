@@ -196,6 +196,9 @@ export default function OrderCard({
           <UserOrderList
             data={myUserCartsWithPaidStatus.userCarts}
             isPaid={myUserCartsWithPaidStatus.isPaid}
+            isHost={
+              reservationInfo.host.id === myUserCartsWithPaidStatus.userCarts.id
+            }
             onQuantityChange={onQuantityChange}
             viewOnly={false}
             payable={true}
@@ -206,6 +209,10 @@ export default function OrderCard({
             <UserOrderList
               data={otherOrderWithPaidStatus.userCarts}
               isPaid={otherOrderWithPaidStatus.isPaid}
+              isHost={
+                reservationInfo.host.id ===
+                myUserCartsWithPaidStatus.userCarts.id
+              }
               viewOnly={true}
             />
           ))}

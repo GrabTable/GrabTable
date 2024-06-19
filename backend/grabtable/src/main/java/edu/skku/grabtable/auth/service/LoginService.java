@@ -42,6 +42,19 @@ public class LoginService {
         return userTokens;
     }
 
+    public UserTokens testLogin(String socialLoginId, String nickname) {
+        User user = findOrCreateUser(
+                socialLoginId,
+                nickname,
+                ""
+        );
+
+        UserTokens userTokens = jwtUtil.createLoginToken(user.getId().toString());
+        RefreshToken refreshToken = new RefreshToken(user.getId(), userTokens.getRefreshToken());
+        refreshTokenRepository.save(refreshToken);
+        return userTokens;
+    }
+
     private User findOrCreateUser(String socialLoginId, String nickname, String profileImageUrl) {
         return userRepository.findBySocialLoginId(socialLoginId)
                 .orElseGet(() -> createUser(socialLoginId, nickname, profileImageUrl));

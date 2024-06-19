@@ -17,11 +17,10 @@ import { User } from '../types/user'
 interface MyReservationProps {
   storeID: number
   menus: Menu[]
-  isHost: boolean
 }
 
 export default function MyReservation(props: MyReservationProps) {
-  const { menus, isHost } = props
+  const { storeID, menus } = props
   const { toast } = useToast()
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false)

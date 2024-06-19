@@ -23,8 +23,11 @@ type UserCartsWithPaidStatus = {
   isPaid: boolean
 }
 
-export default function OrderCard(props: OrderCardProps) {
-  const { reservationInfo, myInfo, myCarts } = props
+export default function OrderCard({
+  reservationInfo,
+  myInfo,
+  myCarts,
+}: OrderCardProps) {
   const router = useRouter()
 
   const deleteCart = async (cartId: number, accessToken: string) => {

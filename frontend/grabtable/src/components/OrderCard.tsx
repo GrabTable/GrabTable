@@ -23,8 +23,11 @@ type UserCartsWithPaidStatus = {
   isPaid: boolean
 }
 
-export default function OrderCard(props: OrderCardProps) {
-  const { reservationInfo, myInfo, myCarts } = props
+export default function OrderCard({
+  reservationInfo,
+  myInfo,
+  myCarts,
+}: OrderCardProps) {
   const router = useRouter()
 
   const deleteCart = async (cartId: number, accessToken: string) => {
@@ -91,7 +94,7 @@ export default function OrderCard(props: OrderCardProps) {
 
   const onQuantityChange = async (cartId: number, quantity: number) => {
     const session = await getSessionFromClient()
-    const accessToken = session.formData['access_token']
+    const accessToken = session.formData['accessToken']
 
     if (quantity === 0) {
       deleteCart(cartId, accessToken)
@@ -160,7 +163,7 @@ export default function OrderCard(props: OrderCardProps) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     }).then(async (res) => {
@@ -193,6 +196,9 @@ export default function OrderCard(props: OrderCardProps) {
           <UserOrderList
             data={myUserCartsWithPaidStatus.userCarts}
             isPaid={myUserCartsWithPaidStatus.isPaid}
+            isHost={
+              reservationInfo.host.id === myUserCartsWithPaidStatus.userCarts.id
+            }
             onQuantityChange={onQuantityChange}
             viewOnly={false}
             payable={true}
@@ -203,6 +209,10 @@ export default function OrderCard(props: OrderCardProps) {
             <UserOrderList
               data={otherOrderWithPaidStatus.userCarts}
               isPaid={otherOrderWithPaidStatus.isPaid}
+              isHost={
+                reservationInfo.host.id ===
+                myUserCartsWithPaidStatus.userCarts.id
+              }
               viewOnly={true}
             />
           ))}

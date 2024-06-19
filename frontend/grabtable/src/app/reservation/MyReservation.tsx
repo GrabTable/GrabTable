@@ -17,11 +17,10 @@ import { User } from '../types/user'
 interface MyReservationProps {
   storeID: number
   menus: Menu[]
-  isHost: boolean
 }
 
 export default function MyReservation(props: MyReservationProps) {
-  const { menus, isHost } = props
+  const { storeID, menus } = props
   const { toast } = useToast()
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false)
@@ -39,7 +38,7 @@ export default function MyReservation(props: MyReservationProps) {
         `${BASE_API_URL}/v1/reservations/me/subscribe`,
         {
           headers: {
-            Authorization: 'Bearer ' + session.formData['access_token'],
+            Authorization: 'Bearer ' + session.formData['accessToken'],
           },
           withCredentials: true,
         },
@@ -86,7 +85,7 @@ export default function MyReservation(props: MyReservationProps) {
       }),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -123,7 +122,7 @@ export default function MyReservation(props: MyReservationProps) {
       }),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -149,7 +148,7 @@ export default function MyReservation(props: MyReservationProps) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -163,7 +162,7 @@ export default function MyReservation(props: MyReservationProps) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })

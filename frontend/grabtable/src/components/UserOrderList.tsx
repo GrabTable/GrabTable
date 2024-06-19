@@ -13,6 +13,7 @@ import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
+import { FaCrown } from 'react-icons/fa'
 import { RiKakaoTalkFill } from 'react-icons/ri'
 import UserOrderTable from './UserOrderTable'
 import { useToast } from './ui/use-toast'
@@ -20,6 +21,7 @@ import { useToast } from './ui/use-toast'
 interface UserOrderListProps {
   data: UserCartsInfo
   isPaid: boolean
+  isHost: boolean
   onQuantityChange?: (id: number, quantity: number) => void
   viewOnly?: boolean
   payable?: boolean
@@ -28,6 +30,7 @@ interface UserOrderListProps {
 export default function UserOrderList({
   data,
   isPaid,
+  isHost,
   onQuantityChange = () => {},
   viewOnly = false,
   payable = false,
@@ -69,7 +72,7 @@ export default function UserOrderList({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
       body: JSON.stringify(request),
@@ -96,7 +99,10 @@ export default function UserOrderList({
               <AvatarImage src={data.profileImageUrl} alt="@shadcn" />
               <AvatarFallback>{data.username}</AvatarFallback>
             </Avatar>
-            <h3>{data.username}</h3>
+            <h3 className="flex">
+              <FaCrown className="text-yellow-400 mr-2" />
+              {data.username}
+            </h3>
             {isPaid ? (
               <Badge
                 className="text-green-400 border-green-400"

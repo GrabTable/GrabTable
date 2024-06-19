@@ -67,7 +67,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
       body: JSON.stringify(request),
@@ -145,7 +145,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
 
   const onQuantityChange = async (cartId: number, quantity: number) => {
     const session = await getSessionFromClient()
-    const accessToken = session.formData['access_token']
+    const accessToken = session.formData['accessToken']
 
     if (quantity === 0) {
       deleteCartInSharedOrder(cartId, accessToken)

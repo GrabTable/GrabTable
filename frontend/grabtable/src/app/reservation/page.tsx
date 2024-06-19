@@ -17,7 +17,6 @@ export default function Page() {
   const [inviteCode, setInviteCode] = useState('')
   const [storeID, setStoreID] = useState(0)
   const [menus, setMenus] = useState([])
-  const [isHost, setisHost] = useState(false)
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
 
@@ -36,7 +35,7 @@ export default function Page() {
     await fetch(`${BASE_API_URL}/v1/reservations/me`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -51,9 +50,6 @@ export default function Page() {
         setHasReservation(true)
         setInviteCode(data.inviteCode)
         setStoreID(data.storeId)
-        if (data.host.id === session.formData['userInfo'].id) {
-          setisHost(true)
-        }
       })
       .catch((error) => {
         setHasReservation(false)
@@ -64,7 +60,7 @@ export default function Page() {
     await fetch(`${BASE_API_URL}/v1/stores/${storeID}/menus`, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['access_token'],
+        Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
     })
@@ -111,11 +107,7 @@ export default function Page() {
             <div>
               <InviteCode inviteCode={inviteCode} />
               {menus.length && (
-                <MyReservation
-                  menus={menus}
-                  storeID={storeID}
-                  isHost={isHost}
-                />
+                <MyReservation menus={menus} storeID={storeID} />
               )}
             </div>
           ) : (

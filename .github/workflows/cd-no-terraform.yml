@@ -11,7 +11,7 @@ defaults:
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: grabtable
-  ECS_SERVICE: terraform-ecs-service
+  ECS_SERVICE: alb-version-service
   ECS_CLUSTER: terraform-ecs-cluster
   ECS_TASK_DEFINITION: backend/grabtable/task-definition.json
   CONTAINER_NAME: terraform-container-definition

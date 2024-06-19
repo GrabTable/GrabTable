@@ -3,6 +3,7 @@ import { getSession, logout } from '@/lib/next-auth/session'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import SectionDivider from '../section-divider'
+import CustomAvatar from '@/components/CustomAvator'
 
 export default async function KakaoPayment() {
   const session = await getSession()
@@ -11,22 +12,25 @@ export default async function KakaoPayment() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Image src="/big-icon.svg" alt={'no image'} width={500} height={500} />
       {session ? (
-        <form
-          action={async () => {
-            'use server'
-            await logout()
-            redirect('/')
-          }}
-        >
-          <Button
-            type="submit"
-            variant="default"
-            className="bg-purple-300 hover:bg-purple-500 text-primary"
+        <>
+          <div>{session && <CustomAvatar />}</div>
+          <form
+            action={async () => {
+              'use server'
+              await logout()
+              redirect('/')
+            }}
           >
-            <Image src="/logout.png" alt="Logout" width={20} height={20} />
-            Logout
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              variant="default"
+              className="bg-purple-300 hover:bg-purple-500 text-primary"
+            >
+              <Image src="/logout.png" alt="Logout" width={20} height={20} />
+              Logout
+            </Button>
+          </form>
+        </>
       ) : (
         <form
           action={async (formData) => {

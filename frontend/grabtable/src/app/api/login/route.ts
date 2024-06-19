@@ -7,7 +7,6 @@ import { NextRequest, NextResponse } from 'next/server'
 async function sendPostRequest(body_code: string | null) {
   const url = `${BASE_API_URL}/v1/auth/login/kakao` // 요청할 URL
 
-
   const data = {
     code: body_code, // 실제 코드 값으로 변경 필요
   }

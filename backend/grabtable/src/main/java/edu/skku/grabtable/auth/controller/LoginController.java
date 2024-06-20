@@ -40,8 +40,6 @@ public class LoginController {
                 .maxAge(ONE_WEEK_SECONDS)
 //                .secure(true)
                 .httpOnly(true)
-                .sameSite("None")
-                .domain(".grabtable.net")
                 .path("/")
                 .build();
 

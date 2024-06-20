@@ -41,5 +41,5 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
   await login(userSession)
 
-  return NextResponse.redirect(`${BASE_URL}/mypage`) 
+  return NextResponse.redirect(`${BASE_URL}/mypage`)
 }

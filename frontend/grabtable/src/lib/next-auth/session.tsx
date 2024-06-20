@@ -15,10 +15,7 @@ export async function encrypt(payload: any) {
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const verified = await jwtVerify(
-    input,
-    key,
-  )
+  const verified = await jwtVerify(input, key)
   return verified.payload
 }
 

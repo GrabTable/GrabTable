@@ -23,7 +23,12 @@ async function sendPostRequest(body_code: string | null) {
     parseCookie(response.headers.get('set-cookie') || '').get(
       'refresh-token',
     ) || ''
-  cookies().set('refresh-token', refresh_token)
+  cookies().set('refresh-token', refresh_token, {
+    httpOnly: true,
+    secure: !!process.env.NEXT_PUBLIC_BASE_URL,
+    sameSite: !!process.env.NEXT_PUBLIC_BASE_URL ? 'none' : 'lax',
+    domain: !!process.env.NEXT_PUBLIC_BASE_URL ? '.grabtable.net' : 'localhost',
+  })
 
   return await response.json()
 }

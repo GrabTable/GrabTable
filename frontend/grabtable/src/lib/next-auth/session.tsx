@@ -2,8 +2,6 @@ import { SignJWT, jwtVerify } from 'jose'
 import { nanoid } from 'nanoid'
 import { cookies } from 'next/headers'
 
-const secretKey = 'secret'
-
 export async function encrypt(payload: any) {
   const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -30,13 +28,19 @@ export async function login(formData: any) {
   const session = await encrypt({ formData, expires })
 
   // Save the session in a cookie
-  cookies().set('session', session, { expires, httpOnly: true })
+  cookies().set('session', session, {
+    expires,
+    httpOnly: true,
+    secure: !!process.env.NEXT_PUBLIC_BASE_URL,
+    sameSite: !!process.env.NEXT_PUBLIC_BASE_URL ? 'none' : 'lax',
+    domain: !!process.env.NEXT_PUBLIC_BASE_URL ? '.grabtable.net' : 'localhost',
+  })
 }
 
 export async function logout() {
   // Destroy the session
   cookies().set('session', '', { expires: new Date(0) })
-  // cookies().set('refresh-token','',{expires: new Date(0)})
+  cookies().set('refresh-token', '', { expires: new Date(0) })
 }
 
 export async function getSession() {

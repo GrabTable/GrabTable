@@ -43,7 +43,7 @@ public class LoginService {
     }
 
     public UserTokens testLogin(String socialLoginId, String nickname) {
-        User user = new User("testUser", "testUser", null);
+        User user = new User(1L, "testUser", null);
 
         UserTokens userTokens = jwtUtil.createLoginToken(user.getId().toString());
         RefreshToken refreshToken = new RefreshToken(user.getId(), userTokens.getRefreshToken());

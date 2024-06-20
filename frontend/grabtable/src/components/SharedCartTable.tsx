@@ -155,11 +155,15 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     editCartInSharedOrder(cartId, quantity, accessToken)
   }
 
+  const checkSharedOrderModifiable = () => {
+    return data.sharedOrder.leftAmount === data.sharedOrder.totalAmount
+  }
+
   return (
     <>
       <p className="text-lg font-semibold mt-4">Shared Order</p>
       <p className="text-base font-medium my-1">Cart</p>
-      {data.orders.length === 0 ? (
+      {checkSharedOrderModifiable() ? (
         <UserOrderTable
           data={data.sharedOrder.carts}
           onQuantityChange={onQuantityChange}

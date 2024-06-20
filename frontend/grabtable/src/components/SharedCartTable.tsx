@@ -126,21 +126,23 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
         Authorization: 'Bearer ' + accessToken,
       },
       credentials: 'include',
-    })
-      .then(() => {
+    }).then(async (res) => {
+      const data = await res.json()
+      if (data.code === 5006) {
         toast({
-          title: 'Successfully updated!',
+          title: data.message,
+          description: 'You cannot modify cart after payment',
           duration: 1000,
         })
         return
+      }
+
+      toast({
+        title: 'Successfully updated!',
+        duration: 1000,
       })
-      .catch((error) => {
-        toast({
-          title: 'Failed to update',
-          description: 'Please try again',
-          duration: 1000,
-        })
-      })
+      return
+    })
   }
 
   const onQuantityChange = async (cartId: number, quantity: number) => {

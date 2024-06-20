@@ -40,9 +40,8 @@ export async function login(formData: any) {
 }
 
 export async function logout() {
-  // Destroy the session
-  cookies().set('session', '', { expires: new Date(0) })
-  cookies().set('refresh-token', '', { expires: new Date(0) })
+  cookies().delete('session')
+  cookies().delete('refresh-token')
 }
 
 export async function getSession() {

@@ -37,8 +37,20 @@ export async function login(formData: any) {
 }
 
 export async function logout() {
-  cookies().delete('session')
-  cookies().delete('refresh-token')
+  cookies().set('session', '', {
+    expires: new Date(0),
+    httpOnly: true,
+    secure: !!process.env.NEXT_PUBLIC_BASE_URL,
+    sameSite: !!process.env.NEXT_PUBLIC_BASE_URL ? 'none' : 'lax',
+    domain: !!process.env.NEXT_PUBLIC_BASE_URL ? '.grabtable.net' : 'localhost',
+  })
+  cookies().set('refresh-token', '', {
+    expires: new Date(0),
+    httpOnly: true,
+    secure: !!process.env.NEXT_PUBLIC_BASE_URL,
+    sameSite: !!process.env.NEXT_PUBLIC_BASE_URL ? 'none' : 'lax',
+    domain: !!process.env.NEXT_PUBLIC_BASE_URL ? '.grabtable.net' : 'localhost',
+  })
 }
 
 export async function getSession() {

@@ -4,8 +4,8 @@ import { User } from '@/app/types/user'
 import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 
 export default function CustomAvatar() {
   const [myInfo, setMyInfo] = useState<User | null>(null)

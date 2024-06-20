@@ -45,7 +45,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       pg: 'kakaopay', // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
       pay_method: 'card', // 결제수단
       merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-      amount: 1000, // 결제금액
+      amount: amount, // 결제금액
       name: 'GrabTable 결제', // 주문명
       buyer_name: '홍길동', // 구매자 이름
       buyer_tel: '01012341234', // 구매자 전화번호

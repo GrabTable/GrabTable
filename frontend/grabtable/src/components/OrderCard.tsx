@@ -38,21 +38,21 @@ export default function OrderCard({
         Authorization: 'Bearer ' + accessToken,
       },
       credentials: 'include',
-    })
-      .then(() => {
+    }).then(async (res) => {
+      if (!res.ok) {
+        const data = await res.json()
         toast({
-          title: 'Successfully deleted!',
-          duration: 1000,
-        })
-        return
-      })
-      .catch((error) => {
-        toast({
-          title: 'Failed to delete',
+          title: '이미 결제를 완료했습니다.',
           description: 'Please try again',
           duration: 1000,
         })
+        return
+      }
+      toast({
+        title: 'Successfully deleted!',
+        duration: 1000,
       })
+    })
   }
 
   const editCart = async (
@@ -75,21 +75,22 @@ export default function OrderCard({
         Authorization: 'Bearer ' + accessToken,
       },
       credentials: 'include',
-    })
-      .then(() => {
+    }).then(async (res) => {
+      if (!res.ok) {
+        const data = await res.json()
         toast({
-          title: 'Successfully updated!',
-          duration: 1000,
-        })
-        return
-      })
-      .catch((error) => {
-        toast({
-          title: 'Failed to update',
+          title: '이미 결제를 완료했습니다.',
           description: 'Please try again',
           duration: 1000,
         })
+        return
+      }
+      toast({
+        title: 'Successfully updated!',
+        duration: 1000,
       })
+      return
+    })
   }
 
   const onQuantityChange = async (cartId: number, quantity: number) => {
@@ -169,19 +170,29 @@ export default function OrderCard({
     }).then(async (res) => {
       if (res.status !== 201) {
         const data = await res.json()
+        if (data.code === 4003) {
+          toast({
+            title: '예약의 호스트가 아닙니다.',
+            description: 'Only Host can confirm reservation',
+            duration: 1000,
+          })
+          return
+        }
+
         toast({
           title: data.message,
           description: 'Please try again',
           duration: 1000,
         })
-      } else {
-        toast({
-          title: 'Confirmed',
-          description: 'Enjoy!',
-          duration: 1000,
-        })
-        router.push('/')
+        return
       }
+
+      toast({
+        title: 'Confirmed',
+        description: 'Enjoy!',
+        duration: 1000,
+      })
+      router.push('/')
     })
   }
 
@@ -200,7 +211,7 @@ export default function OrderCard({
               reservationInfo.host.id === myUserCartsWithPaidStatus.userCarts.id
             }
             onQuantityChange={onQuantityChange}
-            viewOnly={false}
+            viewOnly={myUserCartsWithPaidStatus.isPaid}
             payable={true}
           />
 
@@ -211,7 +222,7 @@ export default function OrderCard({
               isPaid={otherOrderWithPaidStatus.isPaid}
               isHost={
                 reservationInfo.host.id ===
-                myUserCartsWithPaidStatus.userCarts.id
+                otherOrderWithPaidStatus.userCarts.id
               }
               viewOnly={true}
             />

@@ -88,23 +88,24 @@ export default function MyReservation(props: MyReservationProps) {
         Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
-    })
-      .then(() => {
+    }).then(async (res) => {
+      const data = await res.json()
+      if (data.code === 5005) {
         toast({
-          title: 'Successfully added!',
-          description: 'grab more!',
+          title: '이미 결제를 완료했습니다.',
+          description: 'You cannot modify cart after payment',
           duration: 1000,
         })
-        getMyCart().then((data) => setMyCarts(data))
         return
+      }
+      toast({
+        title: 'Successfully added!',
+        description: 'grab more!',
+        duration: 1000,
       })
-      .catch((error) => {
-        toast({
-          title: 'Failed to add',
-          description: 'Please try again',
-          duration: 1000,
-        })
-      })
+      getMyCart().then((data) => setMyCarts(data))
+      return
+    })
   }
 
   const addCartInSharedOrder = async (menuId: number, quantity: number) => {
@@ -125,21 +126,22 @@ export default function MyReservation(props: MyReservationProps) {
         Authorization: 'Bearer ' + session.formData['accessToken'],
       },
       credentials: 'include',
+    }).then(async (res) => {
+      const data = await res.json()
+      if (data.code === 5006) {
+        toast({
+          title: data.message,
+          description: 'You cannot modify cart after payment',
+          duration: 1000,
+        })
+        return
+      }
+      toast({
+        title: 'Successfully added!',
+        description: 'grab more!',
+        duration: 1000,
+      })
     })
-      .then(() => {
-        toast({
-          title: 'Successfully added!',
-          description: 'grab more!',
-          duration: 1000,
-        })
-      })
-      .catch((error) => {
-        toast({
-          title: 'Failed to add',
-          description: 'Please try again',
-          duration: 1000,
-        })
-      })
   }
 
   const getMyInfo = async (): Promise<User> => {

@@ -100,7 +100,7 @@ export default function UserOrderList({
               <AvatarFallback>{data.username}</AvatarFallback>
             </Avatar>
             <h3 className="flex">
-              <FaCrown className="text-yellow-400 mr-2" />
+              {isHost && <FaCrown className="text-yellow-400 mr-2" />}
               {data.username}
             </h3>
             {isPaid ? (
@@ -121,8 +121,9 @@ export default function UserOrderList({
             <UserOrderTable
               data={data.currentCarts}
               onQuantityChange={onQuantityChange}
+              viewOnly={viewOnly}
             />
-            {payable && (
+            {payable && !isPaid && (
               <Button
                 className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
                 onClick={onClickPayment}

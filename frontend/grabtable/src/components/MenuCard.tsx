@@ -1,5 +1,4 @@
 import { Menu } from '@/app/types/menu'
-import Image from 'next/image'
 import { Button } from './ui/button'
 import { TableCell, TableRow } from './ui/table'
 
@@ -16,16 +15,11 @@ export default function MenuCard({
 }: MenuCardProps) {
   return (
     <TableRow key={menu.id}>
-      <TableCell>
-        <Image
-          src={'/Western.jpeg'}
-          alt="No Restaurant Image"
-          width={300}
-          height={200}
-        />
+      <TableCell className="w-48">
+        <p className="font-bold">{menu.menuName}</p>
       </TableCell>
       <TableCell className="text-right">
-        <p className="font-bold">{menu.menuName}</p>₩{menu.price}
+        <p className="font-bold">₩{menu.price}</p>
       </TableCell>
       <TableCell className="w-fit">
         <div className="flex justify-end">

@@ -19,8 +19,8 @@ export default function MenuTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px]">Image</TableHead>
             <TableHead className="w-[80px]">Menu</TableHead>
+            <TableHead className="w-[80px]">Price</TableHead>
             <TableHead className="w-[100px]" />
           </TableRow>
         </TableHeader>

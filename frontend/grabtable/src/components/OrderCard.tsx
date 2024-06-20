@@ -211,7 +211,7 @@ export default function OrderCard({
               isPaid={otherOrderWithPaidStatus.isPaid}
               isHost={
                 reservationInfo.host.id ===
-                myUserCartsWithPaidStatus.userCarts.id
+                otherOrderWithPaidStatus.userCarts.id
               }
               viewOnly={true}
             />

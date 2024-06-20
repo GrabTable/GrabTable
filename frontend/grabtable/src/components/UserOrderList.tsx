@@ -100,7 +100,7 @@ export default function UserOrderList({
               <AvatarFallback>{data.username}</AvatarFallback>
             </Avatar>
             <h3 className="flex">
-              <FaCrown className="text-yellow-400 mr-2" />
+              {isHost && <FaCrown className="text-yellow-400 mr-2" />}
               {data.username}
             </h3>
             {isPaid ? (

@@ -121,8 +121,9 @@ export default function UserOrderList({
             <UserOrderTable
               data={data.currentCarts}
               onQuantityChange={onQuantityChange}
+              viewOnly={viewOnly}
             />
-            {payable && (
+            {payable && !isPaid && (
               <Button
                 className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
                 onClick={onClickPayment}

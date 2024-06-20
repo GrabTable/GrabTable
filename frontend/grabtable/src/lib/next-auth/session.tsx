@@ -2,21 +2,20 @@ import { SignJWT, jwtVerify } from 'jose'
 import { nanoid } from 'nanoid'
 import { cookies } from 'next/headers'
 
+const key = new TextEncoder().encode(process.env.SESSION_SECRET)
+
 export async function encrypt(payload: any) {
   const token = await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setJti(nanoid())
     .setIssuedAt()
     .setExpirationTime('2h')
-    .sign(new TextEncoder().encode(process.env.SESSION_SECRET))
+    .sign(key)
   return token
 }
 
 export async function decrypt(input: string): Promise<any> {
-  const verified = await jwtVerify(
-    input,
-    new TextEncoder().encode(process.env.SESSION_SECRET),
-  )
+  const verified = await jwtVerify(input, key)
   return verified.payload
 }
 
@@ -38,9 +37,8 @@ export async function login(formData: any) {
 }
 
 export async function logout() {
-  // Destroy the session
-  cookies().set('session', '', { expires: new Date(0) })
-  cookies().set('refresh-token', '', { expires: new Date(0) })
+  cookies().delete('session')
+  cookies().delete('refresh-token')
 }
 
 export async function getSession() {

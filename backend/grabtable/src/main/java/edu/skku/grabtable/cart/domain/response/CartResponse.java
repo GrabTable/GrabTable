@@ -20,7 +20,7 @@ public class CartResponse {
                 cart.getId(),
                 cart.getMenuName(),
                 cart.getQuantity(),
-                cart.getPrice(),
+                cart.getUnitPrice(),
                 cart.calculateTotalPrice()
         );
     }

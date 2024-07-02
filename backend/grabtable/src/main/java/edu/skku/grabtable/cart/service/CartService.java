@@ -105,7 +105,7 @@ public class CartService {
     /* === 검증 메서드 ==== */
 
     private void validateUserHasPaidOrder(User user) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         if (orderRepository.findByReservationAndUser(reservation, user).isPresent()) {

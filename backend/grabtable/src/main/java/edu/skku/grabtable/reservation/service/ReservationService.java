@@ -174,14 +174,14 @@ public class ReservationService {
     private void validateMoreThanOneOrderExists(Reservation reservation) {
         if (reservation.getSharedOrder().getOrders().isEmpty() &&
                 orderRepository.findByReservation(reservation).isEmpty()) {
-            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
+            throw new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION);
         }
     }
 
     private void validateSharedOrderIsFullyPaid(Reservation reservation) {
         SharedOrder sharedOrder = reservation.getSharedOrder();
         if (sharedOrder.calculateLeftAmount() > 0) {
-            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+            throw new BadRequestException(ExceptionCode.UNPAID_AMOUNT_EXIST);
         }
     }
 

@@ -3,6 +3,7 @@ package edu.skku.grabtable.order.domain;
 import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.user.domain.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,11 +18,13 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE shared_order SET order_status = 'CANCELED' where id = ?")
 public class SharedOrder extends BaseTimeEntity {
 
     @Id
@@ -45,6 +48,12 @@ public class SharedOrder extends BaseTimeEntity {
         sharedOrder.reservation = reservation;
         sharedOrder.orderStatus = OrderStatus.PENDING;
         return sharedOrder;
+    }
+
+    public Order addOrder(User user, int amount) {
+        Order order = new Order(this, user, amount);
+        this.orders.add(order);
+        return order;
     }
 
     public int calculateTotalAmount() {

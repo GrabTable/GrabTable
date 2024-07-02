@@ -28,7 +28,7 @@ public class SharedOrderService {
     private final PaymentValidator validator;
 
     public OrderResponse processPayment(User user, PaymentRequest paymentRequest) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
         SharedOrder sharedOrder = reservation.getSharedOrder();
         validateSharedCarts(sharedOrder);

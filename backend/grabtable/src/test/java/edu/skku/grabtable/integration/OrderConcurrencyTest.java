@@ -100,7 +100,7 @@ public class OrderConcurrencyTest {
 
             //예약 생성
             reservationService.createNewReservation(user, store.getId());
-            Reservation reservation = reservationRepository.findByUser(user).orElseThrow();
+            Reservation reservation = reservationRepository.findOngoingReservationByUser(user).orElseThrow();
 
             //장바구니 추가 (총금액 10000원)
             cartService.createCart(user, menuA.getId(), 1);

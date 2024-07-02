@@ -102,7 +102,7 @@ class ReservationControllerTest extends ControllerTest {
         //given
         ReservationDetailResponse response = new ReservationDetailResponse(1L, 1L, null, null,
                 "invite-code", null, null);
-        when(reservationService.findReservationByUser(any()))
+        when(reservationService.findOngoingReservationByUser(any()))
                 .thenReturn(response);
 
         //when

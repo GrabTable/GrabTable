@@ -57,7 +57,7 @@ class OrderServiceTest {
         Reservation reservation = new Reservation(1L, user, null, null, null, "code", ReservationStatus.ONGOING);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 2000);
         //given
-        given(reservationRepository.findByUser(any()))
+        given(reservationRepository.findOngoingReservationByUser(any()))
                 .willReturn(Optional.of(reservation));
         given(cartRepository.findByUserId(any()))
                 .willReturn(List.of(cart));
@@ -78,7 +78,7 @@ class OrderServiceTest {
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 10000);
 
         //given
-        given(reservationRepository.findByUser(any()))
+        given(reservationRepository.findOngoingReservationByUser(any()))
                 .willReturn(Optional.of(reservation));
         given(cartRepository.findByUserId(any()))
                 .willReturn(List.of());

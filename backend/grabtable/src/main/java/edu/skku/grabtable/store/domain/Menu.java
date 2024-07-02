@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,10 @@ public class Menu extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private MenuStatus status;
 
+    @Builder
+    public Menu(Store store, String menuName, Integer price) {
+        this.store = store;
+        this.menuName = menuName;
+        this.price = price;
+    }
 }

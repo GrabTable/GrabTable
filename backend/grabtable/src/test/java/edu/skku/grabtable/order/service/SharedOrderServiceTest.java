@@ -15,6 +15,7 @@ import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.infrastructure.PaymentValidator;
 import edu.skku.grabtable.order.repository.OrderRepository;
+import edu.skku.grabtable.order.repository.SharedOrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.store.domain.Store;
@@ -43,6 +44,9 @@ class SharedOrderServiceTest {
     ReservationRepository reservationRepository;
 
     @Mock
+    SharedOrderRepository sharedOrderRepository;
+
+    @Mock
     CartRepository cartRepository;
 
     @Mock
@@ -65,8 +69,10 @@ class SharedOrderServiceTest {
         sharedOrder.getCarts().add(cart);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 2000);
 
-        given(reservationRepository.findByUser(any()))
+        given(reservationRepository.findOngoingReservationByUser(any()))
                 .willReturn(Optional.of(reservation));
+        given(sharedOrderRepository.findByReservation(any()))
+                .willReturn(Optional.of(sharedOrder));
         given(cartRepository.findBySharedOrderId(any()))
                 .willReturn(List.of(cart));
 
@@ -88,7 +94,7 @@ class SharedOrderServiceTest {
                 new ArrayList<>());
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 2000);
 
-        given(reservationRepository.findByUser(any()))
+        given(reservationRepository.findOngoingReservationByUser(any()))
                 .willReturn(Optional.empty());
 
         //when & then
@@ -110,8 +116,10 @@ class SharedOrderServiceTest {
         Cart cart = new Cart(1L, null, "coke", 2000, null, sharedOrder, 1);
         PaymentRequest paymentRequest = new PaymentRequest("impUid", 20000);
 
-        given(reservationRepository.findByUser(any()))
+        given(reservationRepository.findOngoingReservationByUser(any()))
                 .willReturn(Optional.of(reservation));
+        given(sharedOrderRepository.findByReservation(any()))
+                .willReturn(Optional.of(sharedOrder));
         given(cartRepository.findBySharedOrderId(any()))
                 .willReturn(List.of(cart));
 

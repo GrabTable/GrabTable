@@ -10,6 +10,7 @@ import edu.skku.grabtable.order.domain.request.PaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.infrastructure.PaymentValidator;
 import edu.skku.grabtable.order.repository.OrderRepository;
+import edu.skku.grabtable.order.repository.SharedOrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.user.domain.User;
@@ -25,12 +26,14 @@ public class SharedOrderService {
     private final OrderRepository orderRepository;
     private final ReservationRepository reservationRepository;
     private final CartRepository cartRepository;
+    private final SharedOrderRepository sharedOrderRepository;
     private final PaymentValidator validator;
 
     public OrderResponse processPayment(User user, PaymentRequest paymentRequest) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
-        SharedOrder sharedOrder = reservation.getSharedOrder();
+        SharedOrder sharedOrder = sharedOrderRepository.findByReservation(reservation)
+                .orElseThrow();
         validateSharedCarts(sharedOrder);
         validatePayingAmount(paymentRequest.getAmount(), sharedOrder.calculateLeftAmount());
         validator.verify(paymentRequest);
@@ -38,7 +41,7 @@ public class SharedOrderService {
     }
 
     private OrderResponse buildOrderResponse(User user, SharedOrder sharedOrder, int amount) {
-        Order order = new Order(user, sharedOrder, amount);
+        Order order = sharedOrder.addOrder(user, amount);
         orderRepository.save(order);
         return OrderResponse.of(order);
     }

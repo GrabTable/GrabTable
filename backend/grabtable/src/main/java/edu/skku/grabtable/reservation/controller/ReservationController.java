@@ -47,7 +47,7 @@ public class ReservationController {
     //select 6개 나감 (TODO)
     @GetMapping("/me")
     public ReservationDetailResponse findCurrentReservation(@AuthUser User user) {
-        return reservationService.findReservationByUser(user);
+        return reservationService.findOngoingReservationByUser(user);
     }
 
     @GetMapping("/me/subscribe")

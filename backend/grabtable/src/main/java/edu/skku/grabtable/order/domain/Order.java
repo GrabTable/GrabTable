@@ -68,7 +68,7 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.PAID;
     }
 
-    public Order(User user, SharedOrder sharedOrder, int amount) {
+    public Order(SharedOrder sharedOrder, User user, int amount) {
         this.sharedOrder = sharedOrder;
         this.user = user;
         changeCartsMapping(carts);

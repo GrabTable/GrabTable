@@ -28,10 +28,10 @@ public class OrderService {
     private final PaymentValidator validator;
 
     public OrderResponse processPayment(User user, PaymentRequest paymentRequest) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        validateUserCarts(user);
+        validateSameAmount(user, paymentRequest.getAmount());
         validator.verify(paymentRequest);
         return buildOrderResponse(user, reservation);
     }
@@ -43,10 +43,18 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    private void validateUserCarts(User user) {
+    private void validateSameAmount(User user, int requestedAmount) {
         List<Cart> carts = cartRepository.findByUserId(user.getId());
         if (carts.isEmpty()) {
             throw new BadRequestException(ExceptionCode.CURRENT_CARTS_EMPTY);
+        }
+
+        int actualAmount = carts.stream()
+                .mapToInt(Cart::calculateTotalPrice)
+                .sum();
+
+        if (actualAmount != requestedAmount) {
+            throw new BadRequestException(ExceptionCode.INVALID_PAY_AMOUNT);
         }
     }
 }

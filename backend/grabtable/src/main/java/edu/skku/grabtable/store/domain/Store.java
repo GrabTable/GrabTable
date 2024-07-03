@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -52,6 +53,7 @@ public class Store extends BaseTimeEntity {
     @OneToMany(mappedBy = "store")
     private List<Menu> menus = new ArrayList<>();
 
+    @Builder
     public Store(String storeName, String address) {
         this.storeName = storeName;
         this.address = address;

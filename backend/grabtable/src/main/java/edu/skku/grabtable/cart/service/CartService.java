@@ -67,7 +67,7 @@ public class CartService {
 
     /* === 공유 주문 기능 === */
     public void createCartInSharedOrder(User user, Long menuId, Integer quantity) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
         SharedOrder sharedOrder = reservation.getSharedOrder();
         Menu menu = menuRepository.findById(menuId)
@@ -105,7 +105,7 @@ public class CartService {
     /* === 검증 메서드 ==== */
 
     private void validateUserHasPaidOrder(User user) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         if (orderRepository.findByReservationAndUser(reservation, user).isPresent()) {
@@ -114,7 +114,7 @@ public class CartService {
     }
 
     private void validateStoreContainsMenu(User user, Menu menu) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         if (!menu.getStore().equals(reservation.getStore())) {
@@ -123,7 +123,7 @@ public class CartService {
     }
 
     private void validateUserHasReservation(User user) {
-        if (reservationRepository.findByUser(user).isEmpty()) {
+        if (reservationRepository.findOngoingReservationByUser(user).isEmpty()) {
             throw new BadRequestException(ExceptionCode.NO_RESERVATION_USER);
         }
     }
@@ -147,7 +147,7 @@ public class CartService {
     }
 
     private void validateAuthInSharedOrder(User user, Cart cart) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
         SharedOrder sharedOrder = reservation.getSharedOrder();
 
@@ -157,7 +157,7 @@ public class CartService {
     }
 
     private void validateNoPaidInSharedOrder(User user) {
-        Reservation reservation = reservationRepository.findByUser(user)
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
         SharedOrder sharedOrder = reservation.getSharedOrder();
 

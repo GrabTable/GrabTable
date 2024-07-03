@@ -19,10 +19,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT r
             FROM Reservation r
-            where r.host = :user
-            or :user MEMBER OF r.invitees
+            where (r.host = :user
+            or :user MEMBER OF r.invitees)
+            and r.status = 'ONGOING'
             """)
-    Optional<Reservation> findByUser(User user);
+    Optional<Reservation> findOngoingReservationByUser(User user);
 
     Optional<Reservation> findByHostId(Long userId);
 

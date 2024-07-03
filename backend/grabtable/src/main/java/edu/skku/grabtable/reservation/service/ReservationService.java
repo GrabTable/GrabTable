@@ -82,8 +82,8 @@ public class ReservationService {
         userRepository.save(user);
     }
 
-    public ReservationDetailResponse findReservationByUser(User user) {
-        Reservation reservation = reservationRepository.findByUser(user)
+    public ReservationDetailResponse findOngoingReservationByUser(User user) {
+        Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         List<OrderResponse> orders = orderRepository.findByReservation(reservation)
@@ -174,14 +174,14 @@ public class ReservationService {
     private void validateMoreThanOneOrderExists(Reservation reservation) {
         if (reservation.getSharedOrder().getOrders().isEmpty() &&
                 orderRepository.findByReservation(reservation).isEmpty()) {
-            throw new BadRequestException(ExceptionCode.NOT_ENOUGH_ORDER);
+            throw new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION);
         }
     }
 
     private void validateSharedOrderIsFullyPaid(Reservation reservation) {
         SharedOrder sharedOrder = reservation.getSharedOrder();
         if (sharedOrder.calculateLeftAmount() > 0) {
-            throw new BadRequestException(ExceptionCode.INVALID_REQUEST);
+            throw new BadRequestException(ExceptionCode.UNPAID_AMOUNT_EXIST);
         }
     }
 
@@ -204,14 +204,14 @@ public class ReservationService {
     public void send(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-        ReservationDetailResponse reservation = findReservationByUser(user);
+        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
         redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservation);
     }
 
     public SseEmitter createEmitter(User user) {
         Long userId = user.getId();
         SseEmitter emitter = new SseEmitter(10L * 1000 * 60); //10분
-        ReservationDetailResponse reservation = findReservationByUser(user);
+        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
         userEmitters.put(userId, emitter);
 
         try {

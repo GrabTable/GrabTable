@@ -29,7 +29,7 @@ public class Cart extends BaseTimeEntity {
 
     private String menuName;
 
-    private Integer price;
+    private Integer unitPrice;
 
     @ManyToOne
     private Order order;
@@ -42,14 +42,14 @@ public class Cart extends BaseTimeEntity {
     public Cart(User user, Menu menu, Integer quantity) {
         this.user = user;
         this.menuName = menu.getMenuName();
-        this.price = menu.getPrice();
+        this.unitPrice = menu.getPrice();
         this.quantity = quantity;
     }
 
     public Cart(SharedOrder sharedOrder, Menu menu, Integer quantity) {
         this.sharedOrder = sharedOrder;
         this.menuName = menu.getMenuName();
-        this.price = menu.getPrice();
+        this.unitPrice = menu.getPrice();
         this.quantity = quantity;
     }
 
@@ -58,7 +58,7 @@ public class Cart extends BaseTimeEntity {
     }
 
     public int calculateTotalPrice() {
-        return this.price * this.quantity;
+        return this.unitPrice * this.quantity;
     }
 
     public void disconnectUser() {

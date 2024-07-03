@@ -32,9 +32,6 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public List<ReviewResponse> getAllReviewsByUser(Long userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-
         List<Review> reviews = reviewRepository.findByUserId(userId);
 
         return reviews.stream().map(ReviewResponse::of).toList();

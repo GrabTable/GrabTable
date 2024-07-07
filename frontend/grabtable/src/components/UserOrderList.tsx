@@ -39,7 +39,12 @@ export default function UserOrderList({
   const router = useRouter()
   const IMP_CODE = 'imp67708454'
 
-  const onClickPayment = () => {
+  const payAmount = data.currentCarts.reduce(
+    (acc, cart) => acc + cart.totalPrice,
+    0,
+  )
+
+  const onClickPayment = (payAmount: number) => {
     if (!window.IMP) {
       return
     }
@@ -50,7 +55,7 @@ export default function UserOrderList({
       pg: 'kakaopay', // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
       pay_method: 'card', // 결제수단
       merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-      amount: 1000, // 결제금액
+      amount: payAmount, // 결제금액
       name: 'GrabTable 결제', // 주문명
       buyer_name: '홍길동', // 구매자 이름
       buyer_tel: '01012341234', // 구매자 전화번호
@@ -126,7 +131,7 @@ export default function UserOrderList({
             {payable && !isPaid && (
               <Button
                 className="w-full mt-4 bg-yellow-300 hover:bg-yellow-400 text-black text-xl"
-                onClick={onClickPayment}
+                onClick={() => onClickPayment(payAmount)}
               >
                 <RiKakaoTalkFill className="mr-2" /> Pay
               </Button>

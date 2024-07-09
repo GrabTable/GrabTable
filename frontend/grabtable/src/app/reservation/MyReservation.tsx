@@ -89,6 +89,15 @@ export default function MyReservation(props: MyReservationProps) {
       },
       credentials: 'include',
     }).then(async (res) => {
+      if (res.ok) {
+        toast({
+          title: 'Successfully added!',
+          description: 'grab more!',
+          duration: 1000,
+        })
+        getMyCart().then((data) => setMyCarts(data))
+        return
+      }
       const data = await res.json()
       if (data.code === 5005) {
         toast({
@@ -98,13 +107,6 @@ export default function MyReservation(props: MyReservationProps) {
         })
         return
       }
-      toast({
-        title: 'Successfully added!',
-        description: 'grab more!',
-        duration: 1000,
-      })
-      getMyCart().then((data) => setMyCarts(data))
-      return
     })
   }
 

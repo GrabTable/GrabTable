@@ -19,5 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             """)
     List<Order> findByReservation(Reservation reservation);
 
+    boolean existsByReservation(Reservation reservation);
+
     Optional<Order> findByReservationAndUser(Reservation reservation, User user);
 }

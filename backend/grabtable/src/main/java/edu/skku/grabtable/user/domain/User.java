@@ -45,7 +45,7 @@ public class User extends BaseTimeEntity {
 
     private String phone;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invited_reservation_id")
     private Reservation invitedReservation;
 

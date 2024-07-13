@@ -7,6 +7,8 @@ import edu.skku.grabtable.order.service.OrderService;
 import edu.skku.grabtable.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +22,12 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public OrderResponse processPayment(
+    public ResponseEntity<OrderResponse> processPayment(
             @AuthUser User user,
             @Valid @RequestBody PaymentRequest paymentRequest
     ) {
-        return orderService.processPayment(user, paymentRequest);
+        OrderResponse orderResponse = orderService.processPayment(user, paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
 }

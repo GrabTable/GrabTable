@@ -7,6 +7,8 @@ import edu.skku.grabtable.order.service.SharedOrderService;
 import edu.skku.grabtable.user.domain.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,10 +21,11 @@ public class SharedOrderController {
     private final SharedOrderService sharedOrderService;
 
     @PostMapping
-    public OrderResponse processPayment(
+    public ResponseEntity<OrderResponse> processPayment(
             @AuthUser User user,
             @Valid @RequestBody PaymentRequest paymentRequest
     ) {
-        return sharedOrderService.processPayment(user, paymentRequest);
+        OrderResponse orderResponse = sharedOrderService.processPayment(user, paymentRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 }

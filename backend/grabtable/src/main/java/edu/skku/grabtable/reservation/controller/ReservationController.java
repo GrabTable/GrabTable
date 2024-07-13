@@ -9,6 +9,7 @@ import edu.skku.grabtable.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,7 @@ public class ReservationController {
         return reservationService.findOngoingReservationByUser(user);
     }
 
-    @GetMapping("/me/subscribe")
+    @GetMapping(path = "/me/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthUser User user) {
         return reservationService.createEmitter(user);
     }

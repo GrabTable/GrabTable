@@ -6,12 +6,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.common.ControllerTest;
-import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.review.domain.ReviewPlatform;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
 import edu.skku.grabtable.review.domain.request.ReviewUpdateRequest;
 import edu.skku.grabtable.review.domain.response.ReviewResponse;
 import edu.skku.grabtable.review.service.ReviewService;
+import edu.skku.grabtable.user.domain.User;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -103,7 +103,7 @@ class ReviewControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         //then
         Mockito.verify(reviewService).upload(ArgumentMatchers.any(), ArgumentMatchers.any());
@@ -147,7 +147,7 @@ class ReviewControllerTest extends ControllerTest {
         //when
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/reviews/{reviewId}", "1"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         //then
         Mockito.verify(reviewService).delete(

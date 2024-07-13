@@ -51,7 +51,7 @@ public class UserControllerTest extends ControllerTest {
                 .thenReturn(user);
 
         //when
-        MvcResult result = mockMvc.perform(get("/v1/user/me")
+        MvcResult result = mockMvc.perform(get("/v1/users/me")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "access-token")
                         .cookie(new Cookie("refresh-token", "refresh-token")))
@@ -75,7 +75,7 @@ public class UserControllerTest extends ControllerTest {
         UserUpdateRequest userUpdateRequest = new UserUpdateRequest("url", "username", "email", "phone");
 
         //when
-        mockMvc.perform(patch("/v1/user")
+        mockMvc.perform(patch("/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userUpdateRequest)))
                 .andExpect(status().isOk())

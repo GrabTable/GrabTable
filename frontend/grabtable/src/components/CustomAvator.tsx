@@ -17,7 +17,7 @@ export default function CustomAvatar() {
         return
       }
 
-      const response = await fetch(`${BASE_API_URL}/v1/user/me`, {
+      const response = await fetch(`${BASE_API_URL}/v1/users/me`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

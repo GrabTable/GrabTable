@@ -52,7 +52,7 @@ class SharedOrderControllerTest extends ControllerTest {
                         .cookie(new Cookie("refresh-token", REFRESH_TOKEN))
                         .content(objectMapper.writeValueAsString(paymentRequest)))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn();
 
         OrderResponse actual = objectMapper.readValue(

@@ -10,6 +10,7 @@ import edu.skku.grabtable.review.domain.response.ReviewSummaryResponse;
 import edu.skku.grabtable.review.service.ReviewService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,27 +53,30 @@ public class ReviewController {
     }
 
     @PostMapping
-    public void upload(
+    public ResponseEntity<Void> upload(
             @AuthUser User user,
             @RequestBody @Valid ReviewRequest request
     ) {
         reviewService.upload(user.getId(), request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/{reviewId}")
-    public void update(
+    public ResponseEntity<Void> update(
             @AuthUser User user,
             @RequestBody @Valid ReviewUpdateRequest request,
             @PathVariable Long reviewId
     ) {
         reviewService.update(user.getId(), reviewId, request.getMessage(), request.getRating());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{reviewId}")
-    public void delete(
+    public ResponseEntity<Void> delete(
             @AuthUser User user,
             @PathVariable Long reviewId
     ) {
         reviewService.delete(user.getId(), reviewId);
+        return ResponseEntity.noContent().build();
     }
 }

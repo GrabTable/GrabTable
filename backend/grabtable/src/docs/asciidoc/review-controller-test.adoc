@@ -1,6 +1,6 @@
 == ReviewController
 
-=== 유저의 모든 리뷰 조회 (GET /v1/reviews/\{userId\})
+=== 유저의 모든 리뷰 조회 (GET /v1/reviews/users/\{userId\})
 
 ==== 요청
 
@@ -10,7 +10,7 @@ include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-reque
 
 include::{snippets}/review-controller-test/get-all-reviews-by-user-id/http-response.adoc[]
 
-=== 가게의 모든 리뷰 조회 (GET /v1/reviews/\{storeId\})
+=== 가게의 모든 리뷰 조회 (GET /v1/reviews/stores/\{storeId\})
 
 ==== 요청
 

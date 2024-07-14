@@ -108,7 +108,7 @@ class ReviewControllerTest extends ControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         //then
         Mockito.verify(reviewService).upload(any(), any());
@@ -152,7 +152,7 @@ class ReviewControllerTest extends ControllerTest {
         //when
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/reviews/{reviewId}", "1"))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         //then
         Mockito.verify(reviewService).delete(

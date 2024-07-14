@@ -1,5 +1,6 @@
 package edu.skku.grabtable.review.service;
 
+import edu.skku.grabtable.common.domain.response.SliceResponse;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.review.domain.Review;
@@ -31,18 +32,38 @@ public class ReviewService {
 
 
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getAllReviewsByUser(Long userId) {
-        List<Review> reviews = reviewRepository.findByUserId(userId);
+    public SliceResponse<ReviewResponse> getAllReviewsByUser(Long userId, Long cursor, Integer size) {
+        List<ReviewResponse> reviewResponses = reviewRepository.findByUserIdBeforeCursor(userId, cursor, size);
+        boolean hasNext = existsNextPage(reviewResponses, size);
 
-        return reviews.stream().map(ReviewResponse::of).toList();
+        Long nextCursor = null;
+        if (hasNext) {
+            reviewResponses.remove(reviewResponses.size() - 1);
+            nextCursor = reviewResponses.get(reviewResponses.size() - 1).getId();
+        }
+
+        return SliceResponse.of(reviewResponses, hasNext, nextCursor);
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getAllReviewsByStore(Long storeId) {
-        Store store = storeRepository.findById(storeId)
+    public SliceResponse<ReviewResponse> getAllReviewsByStore(Long storeId, Long cursor, Integer size) {
+        storeRepository.findById(storeId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
 
-        return store.getReviews().stream().map(ReviewResponse::of).toList();
+        List<ReviewResponse> reviewResponses = reviewRepository.findByStoreIdBeforeCursor(storeId, cursor, size);
+        boolean hasNext = existsNextPage(reviewResponses, size);
+
+        Long nextCursor = null;
+        if (hasNext) {
+            reviewResponses.remove(reviewResponses.size() - 1);
+            nextCursor = reviewResponses.get(reviewResponses.size() - 1).getId();
+        }
+
+        return SliceResponse.of(reviewResponses, hasNext, nextCursor);
+    }
+
+    private boolean existsNextPage(List<ReviewResponse> reviewResponses, int size) {
+        return reviewResponses.size() > size;
     }
 
     public void delete(Long userId, Long reviewId) {

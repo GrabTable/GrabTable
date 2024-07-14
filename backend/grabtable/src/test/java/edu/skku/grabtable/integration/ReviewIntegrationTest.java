@@ -60,7 +60,7 @@ public class ReviewIntegrationTest {
         reviewService.upload(findUser.getId(), new ReviewRequest(store.getId(), "맛있어요", 4.0));
 
         //when
-        ReviewResponse reviewResponse = reviewService.getAllReviewsByUser(findUser.getId()).get(0);
+        ReviewResponse reviewResponse = reviewService.getAllReviewsByUser(findUser.getId(), null, 20).getValues().get(0);
         System.out.println("findUser = " + findUser.getId());
         System.out.println("reviewResponse = " + reviewResponse);
         reviewService.delete(findUser.getId(), reviewResponse.getId());

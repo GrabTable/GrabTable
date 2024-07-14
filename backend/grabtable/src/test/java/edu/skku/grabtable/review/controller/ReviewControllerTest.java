@@ -1,11 +1,13 @@
 package edu.skku.grabtable.review.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.common.ControllerTest;
+import edu.skku.grabtable.common.domain.response.SliceResponse;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.review.domain.ReviewPlatform;
 import edu.skku.grabtable.review.domain.request.ReviewRequest;
@@ -50,17 +52,18 @@ class ReviewControllerTest extends ControllerTest {
                         ReviewPlatform.GRABTABLE, "별로였어요.", 1.0)
         );
 
+        SliceResponse<ReviewResponse> reviewResponseSlice = SliceResponse.of(reviewResponses, false, null);
+
         //given
-        Mockito.when(reviewService.getAllReviewsByUser(USER_ID)).thenReturn(reviewResponses);
+        Mockito.when(reviewService.getAllReviewsByUser(USER_ID, null, 20)).thenReturn(reviewResponseSlice);
 
         //when
-        mockMvc.perform(get("/v1/reviews/users/{id}", "1"))
+        mockMvc.perform(get("/v1/reviews/users/{id}", USER_ID))
                 .andDo(print())
                 .andExpect(status().isOk());
 
         //then
-        Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByUser(ArgumentMatchers.anyLong());
-
+        Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByUser(USER_ID, null, 20);
     }
 
     @Test
@@ -77,8 +80,10 @@ class ReviewControllerTest extends ControllerTest {
                         ReviewPlatform.GRABTABLE, "별로였어요.", 1.0)
         );
 
+        SliceResponse<ReviewResponse> reviewResponseSlice = SliceResponse.of(reviewResponses, false, null);
+
         //given
-        Mockito.when(reviewService.getAllReviewsByStore(STORE_ID)).thenReturn(reviewResponses);
+        Mockito.when(reviewService.getAllReviewsByStore(STORE_ID, null, 20)).thenReturn(reviewResponseSlice);
 
         //when
         mockMvc.perform(get("/v1/reviews/stores/1"))
@@ -86,7 +91,7 @@ class ReviewControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByStore(ArgumentMatchers.anyLong());
+        Mockito.verify(reviewService, Mockito.times(1)).getAllReviewsByStore(STORE_ID, null, 20);
     }
 
     @Test
@@ -96,7 +101,7 @@ class ReviewControllerTest extends ControllerTest {
         //given
         User user = new User(1L, "userA", new ArrayList<>());
         ReviewRequest request = new ReviewRequest(1L, "good", 3.5);
-        Mockito.doNothing().when(reviewService).upload(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.doNothing().when(reviewService).upload(any(), any());
 
         //when
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/reviews")
@@ -106,7 +111,7 @@ class ReviewControllerTest extends ControllerTest {
                 .andExpect(status().isOk());
 
         //then
-        Mockito.verify(reviewService).upload(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.verify(reviewService).upload(any(), any());
     }
 
     @Test
@@ -118,7 +123,7 @@ class ReviewControllerTest extends ControllerTest {
         Mockito.doNothing().when(reviewService).update(
                 ArgumentMatchers.anyLong(),
                 ArgumentMatchers.anyLong(),
-                ArgumentMatchers.any(),
+                any(),
                 ArgumentMatchers.anyDouble());
 
         //when
@@ -130,9 +135,9 @@ class ReviewControllerTest extends ControllerTest {
 
         //then
         Mockito.verify(reviewService).update(
-                ArgumentMatchers.any(),
+                any(),
                 ArgumentMatchers.anyLong(),
-                ArgumentMatchers.any(),
+                any(),
                 ArgumentMatchers.anyDouble());
     }
 
@@ -151,7 +156,7 @@ class ReviewControllerTest extends ControllerTest {
 
         //then
         Mockito.verify(reviewService).delete(
-                ArgumentMatchers.any(),
+                any(),
                 ArgumentMatchers.anyLong()
         );
     }

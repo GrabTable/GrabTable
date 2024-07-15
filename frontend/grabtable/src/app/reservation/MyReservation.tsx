@@ -39,7 +39,10 @@ export default function MyReservation(props: MyReservationProps) {
         {
           headers: {
             Authorization: 'Bearer ' + session.formData['accessToken'],
+            Accept: 'text/event-stream',
+            Cache: 'no-cache',
           },
+          heartbeatTimeout: 120000,
           withCredentials: true,
         },
       )
@@ -53,13 +56,7 @@ export default function MyReservation(props: MyReservationProps) {
       })
 
       eventSource.onerror = (error) => {
-        console.error('EventSource failed:', error)
-        if (eventSource.readyState === EventSource.CLOSED) {
-          console.log('Reconnecting SSE...')
-          setTimeout(() => {
-            getReservationDetailWithSse()
-          }, 3000) // 3초 후에 재연결 시도
-        }
+        eventSource.close()
       }
 
       return () => {

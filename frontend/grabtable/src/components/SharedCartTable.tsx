@@ -72,7 +72,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       credentials: 'include',
       body: JSON.stringify(request),
     }).then((res) => {
-      if (res.status !== 200) {
+      if (res.status !== 201) {
         toast({
           title: 'Failed to pay',
           description: 'Please try again',
@@ -95,19 +95,19 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       },
       credentials: 'include',
     }).then(async (res) => {
-      const resJson = await res.json()
-      if (res.status === 200)
+      if (res.ok) {
         toast({
           title: 'Successfully deleted!',
           duration: 1000,
         })
-      else {
-        toast({
-          title: resJson.message,
-          description: 'Please try again',
-          duration: 1000,
-        })
+        return
       }
+      const resJson = await res.json()
+      toast({
+        title: resJson.message,
+        description: 'Please try again',
+        duration: 1000,
+      })
     })
   }
 
@@ -127,6 +127,13 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       },
       credentials: 'include',
     }).then(async (res) => {
+      if (res.ok) {
+        toast({
+          title: 'Successfully updated!',
+          duration: 1000,
+        })
+        return
+      }
       const data = await res.json()
       if (data.code === 5006) {
         toast({
@@ -136,12 +143,6 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
         })
         return
       }
-
-      toast({
-        title: 'Successfully updated!',
-        duration: 1000,
-      })
-      return
     })
   }
 

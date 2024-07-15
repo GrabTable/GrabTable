@@ -2,7 +2,7 @@
 import { InputWithButton } from '@/components/Inputwithbutton'
 import RestaurantCard from '@/components/RestaurantCard'
 import KakaoMap from '@/components/kakaoMap'
-import { BASE_API_URL } from '@/lib/constants'
+import { getStores } from '@/lib/api/getStores'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -36,7 +36,7 @@ export default function Home() {
   }
 
   const fetchStores = async () => {
-    await fetch(`${BASE_API_URL}/v1/stores`)
+    await getStores()
       .then(async (response) => {
         const body = await response.json()
         filterStores(body)

@@ -1,8 +1,7 @@
 'use client'
 
 import { User } from '@/app/types/user'
-import { BASE_API_URL } from '@/lib/constants'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { getMyInfo } from '@/lib/api/getMyInfo'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
@@ -11,30 +10,10 @@ export default function CustomAvatar() {
   const [myInfo, setMyInfo] = useState<User | null>(null)
 
   useEffect(() => {
-    const getMyInfo = async (): Promise<void> => {
-      const session = await getSessionFromClient()
-      if (!session) {
-        return
-      }
-
-      const response = await fetch(`${BASE_API_URL}/v1/users/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session?.formData['accessToken'],
-        },
-        credentials: 'include',
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setMyInfo(data)
-      } else {
-        console.error('Failed to fetch user info')
-      }
-    }
-
-    getMyInfo()
+    const res = getMyInfo()
+    res.then((data) => {
+      setMyInfo(data)
+    })
   }, [])
 
   const profileImageUrl = myInfo?.profileImageUrl || ''

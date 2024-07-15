@@ -3,6 +3,8 @@ import MenuTable from '@/components/MenuTable'
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
+import { getMyCart } from '@/lib/api/getMyCart'
+import { getMyInfo } from '@/lib/api/getMyInfo'
 import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
@@ -26,7 +28,7 @@ export default function MyReservation(props: MyReservationProps) {
   const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [myCarts, setMyCarts] = useState<Cart[]>([])
-  const [myInfo, setMyInfo] = useState<User>()
+  const [myInfo, setMyInfo] = useState<User | null>()
   const [reservationInfo, setReservationInfo] = useState<Reservation>()
 
   useEffect(() => {
@@ -67,111 +69,6 @@ export default function MyReservation(props: MyReservationProps) {
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
 
-  const addCart = async (menuId: number, quantity: number) => {
-    const session = await getSessionFromClient()
-
-    if (quantity === 0) {
-      return
-    }
-
-    await fetch(`${BASE_API_URL}/v1/carts`, {
-      method: 'POST',
-      body: JSON.stringify({
-        menuId: menuId,
-        quantity: quantity,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    }).then(async (res) => {
-      if (res.ok) {
-        toast({
-          title: 'Successfully added!',
-          description: 'grab more!',
-          duration: 1000,
-        })
-        getMyCart().then((data) => setMyCarts(data))
-        return
-      }
-      const data = await res.json()
-      if (data.code === 5005) {
-        toast({
-          title: '이미 결제를 완료했습니다.',
-          description: 'You cannot modify cart after payment',
-          duration: 1000,
-        })
-        return
-      }
-    })
-  }
-
-  const addCartInSharedOrder = async (menuId: number, quantity: number) => {
-    const session = await getSessionFromClient()
-
-    if (quantity === 0) {
-      return
-    }
-
-    await fetch(`${BASE_API_URL}/v1/carts/shared`, {
-      method: 'POST',
-      body: JSON.stringify({
-        menuId: menuId,
-        quantity: quantity,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    }).then(async (res) => {
-      const data = await res.json()
-      if (data.code === 5006) {
-        toast({
-          title: data.message,
-          description: 'You cannot modify cart after payment',
-          duration: 1000,
-        })
-        return
-      }
-      toast({
-        title: 'Successfully added!',
-        description: 'grab more!',
-        duration: 1000,
-      })
-    })
-  }
-
-  const getMyInfo = async (): Promise<User> => {
-    const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_API_URL}/v1/user/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    })
-
-    return response.json()
-  }
-
-  const getMyCart = async (): Promise<Cart[]> => {
-    const session = await getSessionFromClient()
-    const response = await fetch(`${BASE_API_URL}/v1/carts/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    })
-
-    if (!response.ok) throw new Error('Failed to fetch Mycart')
-    return response.json()
-  }
-
   if (!reservationInfo || !myInfo) {
     return <Spinner />
   }
@@ -180,11 +77,7 @@ export default function MyReservation(props: MyReservationProps) {
     <div className="flex flex-col md:flex-row justify-between">
       <div className="w-full mr-4 ">
         {loading && <Spinner />}
-        <MenuTable
-          menus={menus}
-          addCart={addCart}
-          addCartInSharedOrder={addCartInSharedOrder}
-        />
+        <MenuTable menus={menus} />
       </div>
       <OrderCard
         reservationInfo={reservationInfo}

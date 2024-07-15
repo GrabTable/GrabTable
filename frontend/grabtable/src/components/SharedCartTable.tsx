@@ -3,6 +3,7 @@ import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
 import { Reservation } from '@/app/types/reservation'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
+import { postSharedOrder } from '@/lib/api/postSharedOrder'
 import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
@@ -62,16 +63,8 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       impUid: response.imp_uid,
       amount: response.paid_amount,
     }
-    const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_API_URL}/v1/shared-orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    }).then((res) => {
+
+    await postSharedOrder(request).then((res) => {
       if (res.status !== 201) {
         toast({
           title: 'Failed to pay',

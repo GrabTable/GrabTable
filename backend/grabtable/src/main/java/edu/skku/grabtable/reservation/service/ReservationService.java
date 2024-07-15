@@ -277,8 +277,6 @@ public class ReservationService {
                     .data(data));
         } catch (IOException e) {
             userEmitters.remove(userId);
-            log.error("SSE 연결 오류 발생, userId={}", userId);
-            throw new RuntimeException(e);
         }
     }
 

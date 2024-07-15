@@ -173,7 +173,7 @@ public class ReservationService {
 
     private void validateMoreThanOneOrderExists(Reservation reservation) {
         if (reservation.getSharedOrder().getOrders().isEmpty() &&
-                orderRepository.findByReservation(reservation).isEmpty()) {
+                !orderRepository.existsByReservation(reservation)) {
             throw new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION);
         }
     }

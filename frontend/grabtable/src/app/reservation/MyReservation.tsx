@@ -2,7 +2,6 @@
 import MenuTable from '@/components/MenuTable'
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
-import { useToast } from '@/components/ui/use-toast'
 import { getMyCart } from '@/lib/api/getMyCart'
 import { getMyInfo } from '@/lib/api/getMyInfo'
 import { BASE_API_URL } from '@/lib/constants'
@@ -23,7 +22,6 @@ interface MyReservationProps {
 
 export default function MyReservation(props: MyReservationProps) {
   const { storeID, menus } = props
-  const { toast } = useToast()
   const router = useRouter()
   const [orderConfirm, setOrderConfirm] = useState(false)
   const [loading, setLoading] = useState(false)

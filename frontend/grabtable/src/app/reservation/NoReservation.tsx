@@ -11,7 +11,6 @@ export default function NoReservation() {
   }
 
   const handleJoinReservation = async () => {
-    // TODO: Implement logic to join reservation using invite code
     console.log('Joining reservation with invite code:', inviteCode)
     await postJoinReservation(inviteCode)
     window.location.reload()

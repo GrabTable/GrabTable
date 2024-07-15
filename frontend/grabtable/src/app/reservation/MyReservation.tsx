@@ -10,10 +10,10 @@ import { EventSourcePolyfill } from 'event-source-polyfill'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import OrderCard from '../../components/OrderCard'
-import { Cart } from '../types/cart'
-import { Menu } from '../types/menu'
-import { Reservation } from '../types/reservation'
-import { User } from '../types/user'
+import { Cart } from '../../lib/types/cart'
+import { Menu } from '../../lib/types/menu'
+import { Reservation } from '../../lib/types/reservation'
+import { User } from '../../lib/types/user'
 
 interface MyReservationProps {
   storeID: number

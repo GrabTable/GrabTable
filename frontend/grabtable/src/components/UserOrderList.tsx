@@ -1,5 +1,4 @@
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import {
   Accordion,
   AccordionContent,
@@ -11,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { postOrder } from '@/lib/api/postOrder'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { UserCartsInfo } from '@/lib/types/userCartsInfo'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { FaCrown } from 'react-icons/fa'

@@ -6,7 +6,7 @@ import { getStores } from '@/lib/api/getStores'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Restaurant } from '../types/restaurant'
+import { Restaurant } from '../../lib/types/restaurant'
 
 export default function Home() {
   const params = useSearchParams()

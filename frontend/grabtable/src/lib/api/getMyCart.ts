@@ -1,6 +1,6 @@
-import { Cart } from '@/app/types/cart'
 import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { Cart } from '@/lib/types/cart'
 
 export const getMyCart = async (): Promise<Cart[]> => {
   const session = await getSessionFromClient()

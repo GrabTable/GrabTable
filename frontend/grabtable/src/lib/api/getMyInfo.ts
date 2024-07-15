@@ -1,5 +1,5 @@
-import { User } from '@/app/types/user'
 import { BASE_API_URL } from '@/lib/constants'
+import { User } from '@/lib/types/user'
 import getSessionFromClient from '../next-auth/getSessionFromClient'
 
 export const getMyInfo = async (): Promise<User | null> => {

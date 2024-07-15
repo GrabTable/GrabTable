@@ -1,6 +1,6 @@
-import { Menu } from '@/app/types/menu'
 import { postAddCart } from '@/lib/api/postAddCart'
 import { postAddCartInSharedOrder } from '@/lib/api/postAddCartInSharedOrder'
+import { Menu } from '@/lib/types/menu'
 import { Button } from './ui/button'
 import { TableCell, TableRow } from './ui/table'
 import { useToast } from './ui/use-toast'

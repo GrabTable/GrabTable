@@ -1,4 +1,4 @@
-import { Menu } from '@/app/types/menu'
+import { Menu } from '@/lib/types/menu'
 import MenuCard from './MenuCard'
 import { ScrollArea } from './ui/scroll-area'
 import { Table, TableBody, TableHead, TableHeader, TableRow } from './ui/table'

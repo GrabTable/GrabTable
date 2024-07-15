@@ -1,10 +1,10 @@
 'use client'
 
-import { Cart } from '@/app/types/cart'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 import { getMyCart } from '@/lib/api/getMyCart'
 import { postOrder } from '@/lib/api/postOrder'
+import { Cart } from '@/lib/types/cart'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { useEffect, useState } from 'react'

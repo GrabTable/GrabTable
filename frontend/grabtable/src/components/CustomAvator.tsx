@@ -1,7 +1,7 @@
 'use client'
 
-import { User } from '@/app/types/user'
 import { getMyInfo } from '@/lib/api/getMyInfo'
+import { User } from '@/lib/types/user'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'

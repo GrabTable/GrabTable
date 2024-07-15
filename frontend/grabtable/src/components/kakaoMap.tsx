@@ -1,4 +1,4 @@
-import { Restaurant } from '@/app/types/restaurant'
+import { Restaurant } from '@/lib/types/restaurant'
 import { useEffect } from 'react'
 import 'react-kakao-maps-sdk'
 

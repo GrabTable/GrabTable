@@ -1,18 +1,67 @@
 import { Menu } from '@/app/types/menu'
+import { postAddCart } from '@/lib/api/postAddCart'
+import { postAddCartInSharedOrder } from '@/lib/api/postAddCartInSharedOrder'
 import { Button } from './ui/button'
 import { TableCell, TableRow } from './ui/table'
+import { useToast } from './ui/use-toast'
 
 interface MenuCardProps {
   menu: Menu
-  addCart: (menuId: number, quantity: number) => void
-  addCartInSharedOrder: (menuId: number, quantity: number) => void
 }
 
-export default function MenuCard({
-  menu,
-  addCart,
-  addCartInSharedOrder,
-}: MenuCardProps) {
+export default function MenuCard({ menu }: MenuCardProps) {
+  const { toast } = useToast()
+
+  const addCart = async (menuId: number, quantity: number) => {
+    const res = await postAddCart(menu.id, 1)
+    if (res === undefined) return
+
+    if (res.ok) {
+      toast({
+        title: 'Successfully added!',
+        description: 'grab more!',
+        duration: 1000,
+      })
+      return
+    }
+
+    const data = await res.json()
+
+    if (data.code === 5005) {
+      toast({
+        title: '이미 결제를 완료했습니다.',
+        description: 'You cannot modify cart after payment',
+        duration: 1000,
+      })
+      return
+    }
+  }
+
+  const addCartInsharedOrder = async (menuId: number, quantity: number) => {
+    const res = await postAddCartInSharedOrder(menuId, quantity)
+    if (res === undefined) return
+
+    if (res.ok) {
+      toast({
+        title: 'Successfully added!',
+        description: 'grab more!',
+        duration: 1000,
+      })
+      return
+    }
+
+    const data = await res.json()
+
+    if (data.code === 5006) {
+      toast({
+        title: data.message,
+        description: 'You cannot modify cart after payment',
+        duration: 1000,
+      })
+      return
+    }
+  }
+
   return (
     <TableRow key={menu.id}>
       <TableCell className="w-48">
@@ -33,7 +82,7 @@ export default function MenuCard({
               </Button>
               <Button
                 className="bg-blue-400 hover:bg-blue-600 rounded-full"
-                onClick={() => addCartInSharedOrder(menu.id, 1)}
+                onClick={() => addCartInsharedOrder(menu.id, 1)}
               >
                 Add to Shared Cart
               </Button>

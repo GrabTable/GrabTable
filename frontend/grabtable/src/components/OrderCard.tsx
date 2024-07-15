@@ -6,7 +6,9 @@ import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { toast } from '@/components/ui/use-toast'
-import { BASE_API_URL } from '@/lib/constants'
+import { deleteCart } from '@/lib/api/deleteCart'
+import { fetchCart } from '@/lib/api/fetchCart'
+import { postConfirmReservation } from '@/lib/api/postConfirmReservation'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { useRouter } from 'next/navigation'
 import SharedCartTable from './SharedCartTable'
@@ -30,28 +32,22 @@ export default function OrderCard({
 }: OrderCardProps) {
   const router = useRouter()
 
-  const deleteCart = async (cartId: number, accessToken: string) => {
-    await fetch(`${BASE_API_URL}/v1/carts/${cartId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken,
-      },
-      credentials: 'include',
-    }).then(async (res) => {
-      if (!res.ok) {
-        const data = await res.json()
-        toast({
-          title: '이미 결제를 완료했습니다.',
-          description: 'Please try again',
-          duration: 1000,
-        })
-        return
-      }
+  const handleDeleteCart = async (cartId: number, accessToken: string) => {
+    const res = await deleteCart(cartId, accessToken)
+
+    if (!res.ok) {
+      const data = await res.json()
       toast({
-        title: 'Successfully deleted!',
+        title: '이미 결제를 완료했습니다.',
+        description: 'Please try again',
         duration: 1000,
       })
+      return
+    }
+
+    toast({
+      title: 'Successfully deleted!',
+      duration: 1000,
     })
   }
 
@@ -61,21 +57,11 @@ export default function OrderCard({
     accessToken: string,
   ) => {
     if (quantity === 0) {
-      deleteCart(cartId, accessToken)
+      handleDeleteCart(cartId, accessToken)
       return
     }
 
-    await fetch(`${BASE_API_URL}/v1/carts/${cartId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        quantity: quantity,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken,
-      },
-      credentials: 'include',
-    }).then(async (res) => {
+    await fetchCart(cartId, quantity, accessToken).then(async (res) => {
       if (!res.ok) {
         const data = await res.json()
         toast({
@@ -98,7 +84,7 @@ export default function OrderCard({
     const accessToken = session.formData['accessToken']
 
     if (quantity === 0) {
-      deleteCart(cartId, accessToken)
+      handleDeleteCart(cartId, accessToken)
       return
     }
 
@@ -159,17 +145,10 @@ export default function OrderCard({
   }
 
   const confirmReservation = async () => {
-    const session = await getSessionFromClient()
-    await fetch(`${BASE_API_URL}/v1/reservations/confirm`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    }).then(async (res) => {
+    await postConfirmReservation().then(async (res) => {
       if (res.status !== 201) {
         const data = await res.json()
+
         if (data.code === 4003) {
           toast({
             title: '예약의 호스트가 아닙니다.',

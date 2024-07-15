@@ -19,12 +19,13 @@ import {
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_API_URL } from '@/lib/constants'
+import { getStoreDetail } from '@/lib/api/getStoreDetail'
+import { getStoreReviews } from '@/lib/api/getStoreReviews'
+import { postCreateReservation } from '@/lib/api/postCreateReservation'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { PiHandGrabbingDuotone } from 'react-icons/pi'
 
@@ -36,39 +37,23 @@ export default function Restaurant() {
   })
   const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1])
   const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1])
-  const [date, setDate] = React.useState<Date>()
   const router = useRouter()
-  const store_id = useParams<{ id: string }>()['id']
+  const storeId = useParams<{ id: string }>()['id']
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [restaurant, setRestaurant] = useState<Store>()
+  const [reviews, setReviews] = useState<Review[]>([])
+
   const fetchStore = async () => {
-    try {
-      const response = await fetch(`${BASE_API_URL}/v1/stores/${store_id}`)
-      if (!response.ok) {
-        throw new Error('error')
-      }
-      const data: Store = await response.json()
-      setRestaurant(data)
-    } catch (error) {
-      console.error('error', error)
-    }
+    const response = await getStoreDetail(storeId)
+    const data: Store = await response.json()
+    setRestaurant(data)
   }
 
-  const [reviews, setReviews] = useState<Review[]>([])
   const fetchReview = async () => {
-    try {
-      const response = await fetch(
-        `${BASE_API_URL}/v1/reviews/stores/${store_id}`,
-      )
-      if (!response.ok) {
-        throw new Error('error')
-      }
-      const data = await response.json()
-      setReviews(data.slice(0, 10))
-    } catch (error) {
-      console.error('error', error)
-    }
+    const response = await getStoreReviews(storeId)
+    const data = await response.json()
+    setReviews(data.slice(0, 10))
   }
 
   useEffect(() => {
@@ -97,42 +82,28 @@ export default function Restaurant() {
         return
       }
 
-      try {
-        const response = await fetch(`${BASE_API_URL}/v1/reservations`, {
-          method: 'POST',
-          body: JSON.stringify({
-            storeId: store_id,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + session.formData['accessToken'],
-          },
-          credentials: 'include',
+      const res = await postCreateReservation(parseInt(storeId))
+      if (res.ok) {
+        toast({
+          title: 'You have successfully grab!',
+          description: 'Invite your friends and order some food!',
+          duration: 1000, // 1초 동안 토스트 띄우기
         })
-        if (response.ok) {
-          toast({
-            title: 'You have successfully grab!',
-            description: 'Invite your friends and order some food!',
-            duration: 1000, // 1초 동안 토스트 띄우기
-          })
-          setTimeout(() => {
-            router.push('/reservation')
-          }, 1300)
-          return
-        } else {
-          toast({
-            title: 'There is an ongoing reservation',
-            description: 'Please continue with your order!',
-            duration: 1000, // 1초 동안 토스트 띄우기
-          })
+        setTimeout(() => {
+          router.push('/reservation')
+        }, 1300)
+        return
+      } else {
+        toast({
+          title: 'There is an ongoing reservation',
+          description: 'Please continue with your order!',
+          duration: 1000, // 1초 동안 토스트 띄우기
+        })
 
-          // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
-          setTimeout(() => {
-            router.push('/reservation')
-          }, 1300)
-        }
-      } catch (error) {
-        console.error('error occurred!', error)
+        // 토스트 메시지가 끝나고 0.3초 뒤에 페이지 리다이렉션
+        setTimeout(() => {
+          router.push('/reservation')
+        }, 1300)
       }
     }, 500)
   }
@@ -216,9 +187,6 @@ export default function Restaurant() {
           <TableBody>
             {reviews.map((review: Review) => (
               <TableRow key={review.id}>
-                {/* <TableCell className='w-[10rem]'>
-                <Image src={review.profile_image ? review.profile_image : ''} width={100} height={100} alt={''} className='rounded-full' />
-              </TableCell> */}
                 <TableCell className="flex items-start flex-col">
                   <div className="flex items-center mt-4">
                     <div>{review.username || 'anonymous user'}</div>

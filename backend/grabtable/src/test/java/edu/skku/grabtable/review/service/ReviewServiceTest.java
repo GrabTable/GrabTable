@@ -17,7 +17,6 @@ import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -43,7 +42,7 @@ class ReviewServiceTest {
     ReviewService reviewService;
 
     @Test
-    @DisplayName("사용자가 작성한 리뷰를 조회하는데 다음 페이지가 존재하지 않는 경우에는 hasNext=false, Cursor=null 이 반환된다.")
+    @DisplayName("작성자의 리뷰들을 조회한다.")
     void findReviewsByUserIdLastPage() {
         //given
         List<ReviewResponse> reviewResponses = new ArrayList<>();
@@ -52,8 +51,10 @@ class ReviewServiceTest {
         reviewResponses.add(new ReviewResponse(1L, "userA", "storeB",
                 ReviewPlatform.GRABTABLE, "Yummy.", 5.0));
 
+        SliceResponse<ReviewResponse> response = SliceResponse.of(reviewResponses, false, null);
+
         when(reviewRepository.findByUserIdBeforeCursor(any(Long.class), any(Long.class), any(int.class)))
-                .thenReturn(reviewResponses);
+                .thenReturn(response);
 
         //when
         SliceResponse<ReviewResponse> result = reviewService.getAllReviewsByUser(1L, 1L, 20);
@@ -65,7 +66,7 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 작성한 리뷰를 조회하는데 다음 페이지가 존재하면 hasNext=true, Cursor에는 마지막 Review Id가 반환된다.")
+    @DisplayName("가게의 리뷰들을 조회한다.")
     void findReviewsByUserIdNotLastPage() {
         //given
         List<ReviewResponse> reviewResponses = new ArrayList<>();
@@ -74,16 +75,18 @@ class ReviewServiceTest {
         reviewResponses.add(new ReviewResponse(1L, "userA", "storeB",
                 ReviewPlatform.GRABTABLE, "Yummy.", 5.0));
 
+        SliceResponse<ReviewResponse> response = SliceResponse.of(reviewResponses, false, null);
+
         when(reviewRepository.findByUserIdBeforeCursor(any(Long.class), any(Long.class), any(int.class)))
-                .thenReturn(reviewResponses);
+                .thenReturn(response);
 
         //when
         SliceResponse<ReviewResponse> result = reviewService.getAllReviewsByUser(1L, 3L, 1);
 
         //then
-        assertThat(result.getHasNext()).isTrue();
-        assertThat(result.getValues().size()).isEqualTo(1);
-        assertThat(result.getCursor()).isEqualTo(2L);
+        assertThat(result.getHasNext()).isFalse();
+        assertThat(result.getValues().size()).isEqualTo(2);
+        assertThat(result.getCursor()).isEqualTo(null);
     }
 
     @Test
@@ -96,9 +99,13 @@ class ReviewServiceTest {
         Review review = Review.of(store, user, "a", 3.0);
         Review review2 = Review.of(store, user, "b", 4.0);
 
+        List<ReviewResponse> reviewResponses = List.of(ReviewResponse.of(review2), ReviewResponse.of(review));
+        SliceResponse<ReviewResponse> response = SliceResponse.of(reviewResponses, false,
+                null);
+
         when(storeRepository.findById(any(Long.class))).thenReturn(Optional.of(store));
         when(reviewRepository.findByStoreIdBeforeCursor(any(Long.class), any(), any(int.class)))
-                .thenReturn(List.of(ReviewResponse.of(review2), ReviewResponse.of(review)));
+                .thenReturn(response);
 
         //when
         SliceResponse<ReviewResponse> result = reviewService.getAllReviewsByStore(store.getId(),

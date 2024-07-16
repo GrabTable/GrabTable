@@ -19,6 +19,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT r
             FROM Reservation r
+            JOIN FETCH r.host h
+            JOIN FETCH r.sharedOrder so
+            LEFT JOIN FETCH so.carts c
             where (r.host = :user
             or :user MEMBER OF r.invitees)
             and r.status = 'ONGOING'

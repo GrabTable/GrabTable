@@ -1,10 +1,10 @@
 'use client'
 
-import { Cart } from '@/app/types/cart'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_API_URL } from '@/lib/constants'
-import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { getMyCart } from '@/lib/api/getMyCart'
+import { postOrder } from '@/lib/api/postOrder'
+import { Cart } from '@/lib/types/cart'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
@@ -15,6 +15,16 @@ export default function Page() {
   const { toast } = useToast()
   const router = useRouter()
   const IMP_CODE = 'imp67708454'
+
+  const [myCart, setMyCart] = useState<Cart[]>([])
+
+  useEffect(() => {
+    getMyCart().then((data) => setMyCart(data))
+  }, [])
+
+  const calculateTotalPrice = () => {
+    return myCart.reduce((acc, item) => acc + item.totalPrice, 0)
+  }
 
   const onClickPayment = () => {
     if (!window.IMP) {
@@ -27,7 +37,7 @@ export default function Page() {
       pg: 'kakaopay', // PG사 : https://developers.portone.io/docs/ko/tip/pg-2 참고
       pay_method: 'card', // 결제수단
       merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
-      amount: 1000, // 결제금액
+      amount: calculateTotalPrice(), // 결제금액
       name: 'GrabTable 결제', // 주문명
       buyer_name: '홍길동', // 구매자 이름
       buyer_tel: '01012341234', // 구매자 전화번호
@@ -44,16 +54,7 @@ export default function Page() {
       impUid: response.imp_uid,
       amount: response.paid_amount,
     }
-    const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_API_URL}/v1/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
+    const res = await postOrder(request)
 
     if (!res.ok) {
       const resJson = await res.json()
@@ -66,31 +67,6 @@ export default function Page() {
     }
     router.push('/reservation')
   }
-  const [myCart, setMyCart] = useState<Cart[]>([])
-
-  const getMyCart = async () => {
-    try {
-      const session = await getSessionFromClient()
-      const response = await fetch(`${BASE_API_URL}/v1/carts/me`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + session.formData['accessToken'],
-        },
-        credentials: 'include',
-      })
-
-      if (!response.ok) throw new Error('Failed to fetch my cart')
-      const cartData = await response.json()
-      setMyCart(cartData)
-    } catch (error) {
-      console.error('Error fetching cart:', error)
-    }
-  }
-
-  useEffect(() => {
-    getMyCart()
-  }, [])
 
   return (
     <>

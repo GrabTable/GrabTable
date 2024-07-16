@@ -14,14 +14,13 @@ import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
+import edu.skku.grabtable.sse.repository.SseEmitterInMemoryRepository;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.repository.UserRepository;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -44,9 +43,9 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final SseEmitterInMemoryRepository sseEmitterRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final Map<Long, SseEmitter> userEmitters = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RedisMessageListenerContainer redisMessageListenerContainer;
 
@@ -173,7 +172,7 @@ public class ReservationService {
 
     private void validateMoreThanOneOrderExists(Reservation reservation) {
         if (reservation.getSharedOrder().getOrders().isEmpty() &&
-                orderRepository.findByReservation(reservation).isEmpty()) {
+                !orderRepository.existsByReservation(reservation)) {
             throw new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION);
         }
     }
@@ -210,9 +209,9 @@ public class ReservationService {
 
     public SseEmitter createEmitter(User user) {
         Long userId = user.getId();
-        SseEmitter emitter = new SseEmitter(10L * 1000 * 60); //10분
         ReservationDetailResponse reservation = findOngoingReservationByUser(user);
-        userEmitters.put(userId, emitter);
+        sseEmitterRepository.save(userId);
+        SseEmitter emitter = sseEmitterRepository.findById(userId);
 
         try {
             emitter.send(SseEmitter.event()
@@ -246,15 +245,15 @@ public class ReservationService {
 
     private void setEmitterCallbacks(Long userId, SseEmitter emitter, MessageListener messageListener) {
         emitter.onCompletion(() -> {
-            userEmitters.remove(userId);
+            sseEmitterRepository.deleteById(userId);
             redisMessageListenerContainer.removeMessageListener(messageListener);
         });
         emitter.onTimeout(() -> {
-            userEmitters.remove(userId);
+            sseEmitterRepository.deleteById(userId);
             redisMessageListenerContainer.removeMessageListener(messageListener);
         });
         emitter.onError((e) -> {
-            userEmitters.remove(userId);
+            sseEmitterRepository.deleteById(userId);
             redisMessageListenerContainer.removeMessageListener(messageListener);
         });
     }
@@ -276,7 +275,7 @@ public class ReservationService {
                     .name("reservation")
                     .data(data));
         } catch (IOException e) {
-            userEmitters.remove(userId);
+            sseEmitterRepository.deleteById(userId);
         }
     }
 

@@ -2,7 +2,8 @@
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_API_URL } from '@/lib/constants'
+import { getMyReservation } from '@/lib/api/getMyReservation'
+import { getStoreMenus } from '@/lib/api/getStoreMenus'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
 import { useRouter } from 'next/navigation'
@@ -31,14 +32,8 @@ export default function Page() {
     }, 1300)
   }
 
-  const getMyReservation = async (session: any) => {
-    await fetch(`${BASE_API_URL}/v1/reservations/me`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    })
+  const fetchMyReservation = async (session: any) => {
+    await getMyReservation()
       .then((res) => {
         if (res.status === 200) {
           return res.json()
@@ -56,14 +51,10 @@ export default function Page() {
       })
   }
 
-  const getMenus = async (session: any) => {
-    await fetch(`${BASE_API_URL}/v1/stores/${storeID}/menus`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-    })
+  const fetchMenus = async (session: any) => {
+    if (storeID === 0) return
+
+    await getStoreMenus(storeID)
       .then((res) => res.json())
       .then((data) => {
         setMenus(data)
@@ -81,8 +72,8 @@ export default function Page() {
       return
     }
 
-    await getMyReservation(session)
-    await getMenus(session)
+    await fetchMyReservation(session)
+    await fetchMenus(session)
     setLoading(false)
   }
 

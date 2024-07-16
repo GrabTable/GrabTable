@@ -33,16 +33,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public SliceResponse<ReviewResponse> getAllReviewsByUser(Long userId, Long cursor, Integer size) {
-        List<ReviewResponse> reviewResponses = reviewRepository.findByUserIdBeforeCursor(userId, cursor, size);
-        boolean hasNext = existsNextPage(reviewResponses, size);
-
-        Long nextCursor = null;
-        if (hasNext) {
-            reviewResponses.remove(reviewResponses.size() - 1);
-            nextCursor = reviewResponses.get(reviewResponses.size() - 1).getId();
-        }
-
-        return SliceResponse.of(reviewResponses, hasNext, nextCursor);
+        return reviewRepository.findByUserIdBeforeCursor(userId, cursor, size);
     }
 
     @Transactional(readOnly = true)
@@ -50,20 +41,7 @@ public class ReviewService {
         storeRepository.findById(storeId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
 
-        List<ReviewResponse> reviewResponses = reviewRepository.findByStoreIdBeforeCursor(storeId, cursor, size);
-        boolean hasNext = existsNextPage(reviewResponses, size);
-
-        Long nextCursor = null;
-        if (hasNext) {
-            reviewResponses.remove(reviewResponses.size() - 1);
-            nextCursor = reviewResponses.get(reviewResponses.size() - 1).getId();
-        }
-
-        return SliceResponse.of(reviewResponses, hasNext, nextCursor);
-    }
-
-    private boolean existsNextPage(List<ReviewResponse> reviewResponses, int size) {
-        return reviewResponses.size() > size;
+        return reviewRepository.findByStoreIdBeforeCursor(storeId, cursor, size);
     }
 
     public void delete(Long userId, Long reviewId) {

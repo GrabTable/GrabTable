@@ -1,6 +1,6 @@
 'use client'
-import { Cart } from '@/app/types/cart'
 import { DataTable } from '@/components/DataTable'
+import { Cart } from '@/lib/types/cart'
 import { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
 import { FaMinus, FaPlus, FaWonSign } from 'react-icons/fa6'

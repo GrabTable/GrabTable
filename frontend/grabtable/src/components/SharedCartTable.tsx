@@ -1,10 +1,12 @@
 'use client'
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { Reservation } from '@/app/types/reservation'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
-import { BASE_API_URL } from '@/lib/constants'
+import { deleteCartInSharedOrder } from '@/lib/api/deleteCartInSharedOrder'
+import { fetchCartInSharedOrder } from '@/lib/api/patchCartInSharedOrder'
+import { postSharedOrder } from '@/lib/api/postSharedOrder'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { Reservation } from '@/lib/types/reservation'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { useState } from 'react'
@@ -62,17 +64,9 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
       impUid: response.imp_uid,
       amount: response.paid_amount,
     }
-    const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_API_URL}/v1/shared-orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    }).then((res) => {
-      if (res.status !== 200) {
+
+    await postSharedOrder(request).then((res) => {
+      if (res.status !== 201) {
         toast({
           title: 'Failed to pay',
           description: 'Please try again',
@@ -83,31 +77,24 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     })
   }
 
-  const deleteCartInSharedOrder = async (
+  const handleDeleteCartInSharedOrder = async (
     cartId: number,
     accessToken: string,
   ) => {
-    await fetch(`${BASE_API_URL}/v1/carts/shared/${cartId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken,
-      },
-      credentials: 'include',
-    }).then(async (res) => {
-      const resJson = await res.json()
-      if (res.status === 200)
+    await deleteCartInSharedOrder(cartId, accessToken).then(async (res) => {
+      if (res.ok) {
         toast({
           title: 'Successfully deleted!',
           duration: 1000,
         })
-      else {
-        toast({
-          title: resJson.message,
-          description: 'Please try again',
-          duration: 1000,
-        })
+        return
       }
+      const resJson = await res.json()
+      toast({
+        title: resJson.message,
+        description: 'Please try again',
+        duration: 1000,
+      })
     })
   }
 
@@ -116,33 +103,26 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     quantity: number,
     accessToken: string,
   ) => {
-    await fetch(`${BASE_API_URL}/v1/carts/shared/${cartId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        quantity: quantity,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + accessToken,
+    await fetchCartInSharedOrder(cartId, quantity, accessToken).then(
+      async (res) => {
+        if (res.ok) {
+          toast({
+            title: 'Successfully updated!',
+            duration: 1000,
+          })
+          return
+        }
+        const data = await res.json()
+        if (data.code === 5006) {
+          toast({
+            title: data.message,
+            description: 'You cannot modify cart after payment',
+            duration: 1000,
+          })
+          return
+        }
       },
-      credentials: 'include',
-    }).then(async (res) => {
-      const data = await res.json()
-      if (data.code === 5006) {
-        toast({
-          title: data.message,
-          description: 'You cannot modify cart after payment',
-          duration: 1000,
-        })
-        return
-      }
-
-      toast({
-        title: 'Successfully updated!',
-        duration: 1000,
-      })
-      return
-    })
+    )
   }
 
   const onQuantityChange = async (cartId: number, quantity: number) => {
@@ -150,7 +130,7 @@ export default function SharedCartTable({ data }: SharedCartTableProps) {
     const accessToken = session.formData['accessToken']
 
     if (quantity === 0) {
-      deleteCartInSharedOrder(cartId, accessToken)
+      handleDeleteCartInSharedOrder(cartId, accessToken)
       return
     }
 

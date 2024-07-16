@@ -2,8 +2,8 @@
 
 import { useRef } from 'react'
 // import { projectsData } from '@/lib/data'
-import { Restaurant } from '@/app/types/restaurant'
 import { Badge } from '@/components/ui/badge'
+import { Restaurant } from '@/lib/types/restaurant'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 

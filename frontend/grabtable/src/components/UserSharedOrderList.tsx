@@ -1,6 +1,3 @@
-import { Order } from '@/app/types/order'
-import { Reservation } from '@/app/types/reservation'
-import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import {
   Accordion,
   AccordionContent,
@@ -9,6 +6,9 @@ import {
 } from '@/components/ui/accordion'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { Order } from '@/lib/types/order'
+import { Reservation } from '@/lib/types/reservation'
+import { UserCartsInfo } from '@/lib/types/userCartsInfo'
 import { FaWonSign } from 'react-icons/fa6'
 
 interface UserSharedOrderListProps {

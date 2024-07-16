@@ -1,11 +1,11 @@
+import CustomAvatar from '@/components/CustomAvator'
 import { Button } from '@/components/ui/button'
 import { getSession, logout } from '@/lib/next-auth/session'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import SectionDivider from '../section-divider'
-import CustomAvatar from '@/components/CustomAvator'
 
-export default async function KakaoPayment() {
+export default async function Page() {
   const session = await getSession()
 
   return (
@@ -51,7 +51,6 @@ export default async function KakaoPayment() {
           </button>
         </form>
       )}
-      {/* <pre>{JSON.stringify(session, null, 2)}</pre> */}
       <SectionDivider />
     </main>
   )

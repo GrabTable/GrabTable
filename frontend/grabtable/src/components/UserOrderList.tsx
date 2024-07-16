@@ -1,5 +1,4 @@
 import { RequestPayParams, RequestPayResponse } from '@/app/reservation/portone'
-import { UserCartsInfo } from '@/app/types/userCartsInfo'
 import {
   Accordion,
   AccordionContent,
@@ -9,8 +8,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { BASE_API_URL } from '@/lib/constants'
+import { postOrder } from '@/lib/api/postOrder'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
+import { UserCartsInfo } from '@/lib/types/userCartsInfo'
 import { useRouter } from 'next/navigation'
 import Script from 'next/script'
 import { FaCrown } from 'react-icons/fa'
@@ -73,15 +73,7 @@ export default function UserOrderList({
       amount: response.paid_amount,
     }
     const session = await getSessionFromClient()
-    const res = await fetch(`${BASE_API_URL}/v1/orders`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + session.formData['accessToken'],
-      },
-      credentials: 'include',
-      body: JSON.stringify(request),
-    })
+    const res = await postOrder(request)
 
     if (!res.ok) {
       const resJson = await res.json()

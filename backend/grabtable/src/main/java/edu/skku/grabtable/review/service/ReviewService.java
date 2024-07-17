@@ -38,8 +38,9 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public SliceResponse<ReviewResponse> getAllReviewsByStore(Long storeId, Long cursor, Integer size) {
-        storeRepository.findById(storeId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
+        if (!storeRepository.existsById(storeId)) {
+            throw new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID);
+        }
 
         return reviewRepository.findByStoreIdBeforeCursor(storeId, cursor, size);
     }

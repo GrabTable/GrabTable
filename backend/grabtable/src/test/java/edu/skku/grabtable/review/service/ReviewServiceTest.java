@@ -103,7 +103,7 @@ class ReviewServiceTest {
         SliceResponse<ReviewResponse> response = SliceResponse.of(reviewResponses, false,
                 null);
 
-        when(storeRepository.findById(any(Long.class))).thenReturn(Optional.of(store));
+        when(storeRepository.existsById(any(Long.class))).thenReturn(true);
         when(reviewRepository.findByStoreIdBeforeCursor(any(Long.class), any(), any(int.class)))
                 .thenReturn(response);
 

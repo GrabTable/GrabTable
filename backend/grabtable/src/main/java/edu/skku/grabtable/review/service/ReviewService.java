@@ -1,5 +1,6 @@
 package edu.skku.grabtable.review.service;
 
+import edu.skku.grabtable.common.domain.response.SliceResponse;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
 import edu.skku.grabtable.review.domain.Review;
@@ -31,18 +32,17 @@ public class ReviewService {
 
 
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getAllReviewsByUser(Long userId) {
-        List<Review> reviews = reviewRepository.findByUserId(userId);
-
-        return reviews.stream().map(ReviewResponse::of).toList();
+    public SliceResponse<ReviewResponse> getAllReviewsByUser(Long userId, Long cursor, Integer size) {
+        return reviewRepository.findByUserIdBeforeCursor(userId, cursor, size);
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponse> getAllReviewsByStore(Long storeId) {
-        Store store = storeRepository.findById(storeId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID));
+    public SliceResponse<ReviewResponse> getAllReviewsByStore(Long storeId, Long cursor, Integer size) {
+        if (!storeRepository.existsById(storeId)) {
+            throw new BadRequestException(ExceptionCode.NOT_FOUND_STORE_ID);
+        }
 
-        return store.getReviews().stream().map(ReviewResponse::of).toList();
+        return reviewRepository.findByStoreIdBeforeCursor(storeId, cursor, size);
     }
 
     public void delete(Long userId, Long reviewId) {

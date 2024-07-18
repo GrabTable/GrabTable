@@ -32,7 +32,7 @@
 |                              Backend & Frontend                               |                                Backend & Infra                                |                                    Frontend                                    |                               Frontend & Infra                                |                                    Backend                                     |
 | :---------------------------------------------------------------------------: | :---------------------------------------------------------------------------: | :----------------------------------------------------------------------------: | :---------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
 | <img src="https://avatars.githubusercontent.com/u/85350805?v=4" width=400px/> | <img src="https://avatars.githubusercontent.com/u/60565169?v=4" width=400px/> | <img src="https://avatars.githubusercontent.com/u/109865133?v=4" width=400px/> | <img src="https://avatars.githubusercontent.com/u/62930375?v=4" width=400px/> | <img src="https://avatars.githubusercontent.com/u/102043957?v=4" width=400px/> |
-|                       [영섭](https://github.com/000sub)                       |                      [찬영](https://github.com/jcy0308)                       |                       [형진](https://github.com/gitFILO)                       |                       [성현](https://github.com/goo314)                       |                       [진수](https://github.com/goo314)                        |
+|                       [영섭](https://github.com/000sub)                       |                      [찬영](https://github.com/jcy0308)                       |                       [형진](https://github.com/gitFILO)                       |                       [성현](https://github.com/goo314)                       |                      [진수](https://github.com/jinsu868)                       |
 
 ## 팀 문화
 
@@ -65,10 +65,10 @@
 ```
 - 식당 예약 참여자들이 실시간 더치페이를 할 수 있습니다.
     - SSE를 활용해 실시간 갱신 상태를 모든 참여자에게 전달합니다.
-    - 메시지 큐로 다중 WAS 환경에서 안정적인 실시간 서비스를 구성했습니다.
+    - pubsub 모델로 다중 WAS 환경에서 안정적인 실시간 서비스를 구성했습니다.
 - Oauth2 + JWT를 통한 인증/인가 처리를 할 수 있습니다.
     - 현재 카카오 소셜 로그인 기능을 제공합니다.
-    - 별도의 캐시 서버를 도입했습니다.
+    - 성능 향상을 위한 별도의 캐시 서버를 도입했습니다.
 - 제3자 결제 서비스를 활용하여 카카오페이 테스트 결제 기능을 제공합니다.
 - 부하 테스트 시스템 및 모니터링 시스템을 제공합니다.
 ```

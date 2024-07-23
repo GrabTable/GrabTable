@@ -53,7 +53,7 @@ export default function Restaurant() {
   const fetchReview = async () => {
     const response = await getStoreReviews(storeId)
     const data = await response.json()
-    setReviews(data.slice(0, 10))
+    setReviews(data.values)
   }
 
   useEffect(() => {

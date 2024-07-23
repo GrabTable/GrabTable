@@ -133,20 +133,29 @@ public class ReservationService {
 
     public void cancel(User user) {
         if (user.getInvitedReservation() != null) {
-            user.clearReservation();
+            leaveFromReservation(user);
             return;
         }
+        destroyReservation(user);
+    }
 
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+    public void leaveFromReservation(User invitee) {
+        invitee.clearReservation();
+        cartRepository.findByUserId(invitee.getId())
+                .forEach(Cart::disconnectUser);
+    }
+
+    public void destroyReservation(User host) {
+        Reservation reservation = reservationRepository.findByHostId(host.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         reservationRepository.delete(reservation);
 
         List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
+            invitee.clearReservation();
             cartRepository.findByUserId(invitee.getId())
                     .forEach(Cart::disconnectUser);
-            invitee.clearReservation();
         }
     }
 

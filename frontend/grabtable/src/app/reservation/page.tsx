@@ -3,23 +3,22 @@ import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { getMyReservation } from '@/lib/api/getMyReservation'
-import { getStoreMenus } from '@/lib/api/getStoreMenus'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { ReactQueryProvider } from '@/lib/useReactQuery'
 import { useRouter } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
-import InviteCode from './InvitateCode'
+import { useEffect, useState } from 'react'
 import MyReservation from './MyReservation'
 import NoReservation from './NoReservation'
 
 export default function Page() {
   const router = useRouter()
-  const [hasReservation, setHasReservation] = useState(true)
+  const [hasReservation, setHasReservation] = useState(false)
   const [inviteCode, setInviteCode] = useState('')
   const [storeID, setStoreID] = useState(0)
-  const [menus, setMenus] = useState([])
   const [loading, setLoading] = useState(true)
   const { toast } = useToast()
+
+  const session = getSessionFromClient()
 
   const handleGuest = (): void => {
     toast({
@@ -51,34 +50,18 @@ export default function Page() {
       })
   }
 
-  const fetchMenus = async (session: any) => {
-    if (storeID === 0) return
-
-    await getStoreMenus(storeID)
-      .then((res) => res.json())
-      .then((data) => {
-        setMenus(data)
-      })
-      .catch((error) => {
-        setHasReservation(false)
-      })
-  }
-
-  const fetchData = async () => {
-    const session = await getSessionFromClient()
-
+  const fetchData = async (session: any) => {
     if (!session) {
       handleGuest()
       return
     }
 
     await fetchMyReservation(session)
-    await fetchMenus(session)
     setLoading(false)
   }
 
   useEffect(() => {
-    fetchData()
+    fetchData(session)
   }, [hasReservation, storeID])
 
   if (loading) {
@@ -92,20 +75,13 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-between p-8">
-      <Suspense fallback={<div>Loading...</div>}>
-        <ReactQueryProvider>
-          {hasReservation ? (
-            <div>
-              <InviteCode inviteCode={inviteCode} />
-              {menus.length && (
-                <MyReservation menus={menus} storeID={storeID} />
-              )}
-            </div>
-          ) : (
-            <NoReservation />
-          )}
-        </ReactQueryProvider>
-      </Suspense>
+      <ReactQueryProvider>
+        {hasReservation ? (
+          <MyReservation inviteCode={inviteCode} storeID={storeID} />
+        ) : (
+          <NoReservation />
+        )}
+      </ReactQueryProvider>
       <Toaster />
     </div>
   )

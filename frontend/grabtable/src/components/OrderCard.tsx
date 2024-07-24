@@ -165,13 +165,6 @@ export default function OrderCard({
         })
         return
       }
-
-      toast({
-        title: 'Confirmed',
-        description: 'Enjoy!',
-        duration: 1000,
-      })
-      router.push('/')
     })
   }
 

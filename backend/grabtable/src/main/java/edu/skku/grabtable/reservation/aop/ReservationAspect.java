@@ -22,34 +22,46 @@ public class ReservationAspect {
             "execution(* edu.skku.grabtable.cart.controller.CartController.addCartInSharedOrder(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.updateCartInSharedOrder(..)) || " +
             "execution(* edu.skku.grabtable.cart.controller.CartController.deleteCartInSharedOrder(..))")
-    public void cartControllerUpdateMethods() {
+    public void cartUpdateMethods() {
     }
 
-    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..))")
-    public void reservationControllerUpdateMethods() {
+    @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.join(..)) || " +
+            "execution(* edu.skku.grabtable.reservation.service.ReservationService.leaveFromReservation(..))")
+    public void reservationUpdateMethods() {
     }
 
     @Pointcut("execution(* edu.skku.grabtable.reservation.controller.ReservationController.confirm(..)) || " +
-            "execution(* edu.skku.grabtable.reservation.controller.ReservationController.cancelReservation(..))")
+            "execution(* edu.skku.grabtable.reservation.service.ReservationService.destroyReservation(..))")
     public void reservationDestroyMethods() {
     }
 
     @Pointcut("execution(* edu.skku.grabtable.order.controller.OrderController.processPayment(..))")
-    public void orderControllerUpdateMethods() {
+    public void orderUpdateMethods() {
     }
 
     @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.processPayment(..))")
-    public void sharedOrderControllerUpdateMethods() {
+    public void sharedOrderUpdateMethods() {
 
     }
 
-    @AfterReturning("cartControllerUpdateMethods() || reservationControllerUpdateMethods() || "
-            + "orderControllerUpdateMethods() || sharedOrderControllerUpdateMethods()")
-    public void sendReservationEvent(JoinPoint joinPoint) {
+    @AfterReturning("cartUpdateMethods() || reservationUpdateMethods() || "
+            + "orderUpdateMethods() || sharedOrderUpdateMethods()")
+    public void sendUpdateEvent(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
             if (arg instanceof User user) {
-                reservationService.send(user.getId());
+                reservationService.sendUpdateEvent(user.getId());
+                break;
+            }
+        }
+    }
+
+    @AfterReturning("reservationDestroyMethods()")
+    public void sendFinishEvent(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof User user) {
+                reservationService.sendFinishEvent(user.getId());
                 break;
             }
         }

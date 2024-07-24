@@ -23,47 +23,61 @@ interface MyReservationProps {
 export default function MyReservation(props: MyReservationProps) {
   const { storeID, menus } = props
   const router = useRouter()
-  const [orderConfirm, setOrderConfirm] = useState(false)
+  const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [myCarts, setMyCarts] = useState<Cart[]>([])
   const [myInfo, setMyInfo] = useState<User | null>()
   const [reservationInfo, setReservationInfo] = useState<Reservation>()
 
-  useEffect(() => {
-    const getReservationDetailWithSse = async () => {
-      const session = await getSessionFromClient()
-      const EventSource = EventSourcePolyfill || window.EventSource
+  const getReservationDetailWithSse = async () => {
+    const session = await getSessionFromClient()
+    const EventSource = EventSourcePolyfill || window.EventSource
 
-      const eventSource = new EventSource(
-        `${BASE_API_URL}/v1/reservations/me/subscribe`,
-        {
-          headers: {
-            Authorization: 'Bearer ' + session.formData['accessToken'],
-            Accept: 'text/event-stream',
-            Cache: 'no-cache',
-          },
-          heartbeatTimeout: 120000,
-          withCredentials: true,
+    const eventSource = new EventSource(
+      `${BASE_API_URL}/v1/reservations/me/subscribe`,
+      {
+        headers: {
+          Authorization: 'Bearer ' + session.formData['accessToken'],
+          Accept: 'text/event-stream',
+          Cache: 'no-cache',
         },
-      )
+        heartbeatTimeout: 1000 * 60 * 10,
+        withCredentials: true,
+      },
+    )
 
-      eventSource.addEventListener('reservation', (event: any) => {
-        const data = JSON.parse(event.data) // 이벤트 데이터 파싱
-        console.log(data)
-        setReservationInfo(data)
-        getMyCart().then((data) => setMyCarts(data))
-        getMyInfo().then((data) => setMyInfo(data))
+    eventSource.addEventListener('reservationUpdate', (event: any) => {
+      const data = JSON.parse(event.data) // 이벤트 데이터 파싱
+      console.log(data)
+      setReservationInfo(data.details)
+      getMyCart().then((data) => setMyCarts(data))
+      getMyInfo().then((data) => setMyInfo(data))
+    })
+
+    eventSource.addEventListener('reservationFinish', (event: any) => {
+      const data = JSON.parse(event.data) // 이벤트 데이터 파싱
+      console.log(data)
+      toast({
+        title: '예약이 종료되었습니다. 홈으로 이동합니다.',
+        description: 'Current Reservation was confirmed or destroyed.',
+        duration: 1500,
       })
 
-      eventSource.onerror = (error) => {
-        eventSource.close()
-      }
+      setTimeout(() => {
+        router.push('/')
+      }, 1500)
+    })
 
-      return () => {
-        eventSource.close() // 컴포넌트 언마운트 시 EventSource 닫기
-      }
+    eventSource.onerror = (error) => {
+      eventSource.close()
     }
 
+    return () => {
+      eventSource.close() // 컴포넌트 언마운트 시 EventSource 닫기
+    }
+  }
+
+  useEffect(() => {
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
 

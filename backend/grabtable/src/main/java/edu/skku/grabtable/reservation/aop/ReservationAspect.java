@@ -50,7 +50,18 @@ public class ReservationAspect {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
             if (arg instanceof User user) {
-                reservationService.send(user.getId());
+                reservationService.sendUpdateEvent(user.getId());
+                break;
+            }
+        }
+    }
+
+    @AfterReturning("reservationDestroyMethods()")
+    public void sendFinishEvent(JoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof User user) {
+                reservationService.sendFinishEvent(user.getId());
                 break;
             }
         }

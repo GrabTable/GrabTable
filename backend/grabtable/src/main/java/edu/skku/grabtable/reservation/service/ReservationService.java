@@ -292,10 +292,25 @@ public class ReservationService {
 
     private void sendToClient(SseEmitter emitter, Long userId, Object data) {
         try {
+            ReservationUpdateEvent reservationUpdateEvent = objectMapper.convertValue(data,
+                    ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
-                    .name("reservation")
-                    .data(data));
+                    .name("reservationUpdate")
+                    .data(reservationUpdateEvent, MediaType.APPLICATION_JSON));
+        } catch (IllegalArgumentException ignored) {
+        } catch (IOException e) {
+            sseEmitterRepository.deleteById(userId);
+        }
+
+        try {
+            ReservationFinishEvent reservationFinishEvent = objectMapper.convertValue(data,
+                    ReservationFinishEvent.class);
+            emitter.send(SseEmitter.event()
+                    .id(userId.toString())
+                    .name("reservationFinish")
+                    .data(reservationFinishEvent, MediaType.APPLICATION_JSON));
+        } catch (IllegalArgumentException ignored) {
         } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
         }

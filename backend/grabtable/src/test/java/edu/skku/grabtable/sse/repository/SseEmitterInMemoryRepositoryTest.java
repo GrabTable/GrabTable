@@ -2,6 +2,7 @@ package edu.skku.grabtable.sse.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ class SseEmitterInMemoryRepositoryTest {
 
         //when
         sseEmitterInMemoryRepository.save(userId);
-        SseEmitter emitter = sseEmitterInMemoryRepository.findById(userId);
+        Optional<SseEmitter> emitter = sseEmitterInMemoryRepository.findById(userId);
 
         //then
-        assertThat(emitter).isNotNull();
+        assertThat(emitter.isPresent()).isTrue();
 
     }
 
@@ -42,7 +43,7 @@ class SseEmitterInMemoryRepositoryTest {
         sseEmitterInMemoryRepository.deleteById(userId);
 
         //then
-        SseEmitter emitter = sseEmitterInMemoryRepository.findById(userId);
-        assertThat(emitter).isNull();
+        Optional<SseEmitter> emitter = sseEmitterInMemoryRepository.findById(userId);
+        assertThat(emitter.isEmpty()).isTrue();
     }
 }

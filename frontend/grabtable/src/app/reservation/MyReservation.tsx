@@ -2,8 +2,10 @@
 import MenuTable from '@/components/MenuTable'
 import Spinner from '@/components/spinner'
 import { Toaster } from '@/components/ui/toaster'
+import { useToast } from '@/components/ui/use-toast'
 import { getMyCart } from '@/lib/api/getMyCart'
 import { getMyInfo } from '@/lib/api/getMyInfo'
+import { getStoreMenus } from '@/lib/api/getStoreMenus'
 import { BASE_API_URL } from '@/lib/constants'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { EventSourcePolyfill } from 'event-source-polyfill'
@@ -11,20 +13,21 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import OrderCard from '../../components/OrderCard'
 import { Cart } from '../../lib/types/cart'
-import { Menu } from '../../lib/types/menu'
 import { Reservation } from '../../lib/types/reservation'
 import { User } from '../../lib/types/user'
+import InviteCode from './InvitateCode'
 
 interface MyReservationProps {
+  inviteCode: string
   storeID: number
-  menus: Menu[]
 }
 
 export default function MyReservation(props: MyReservationProps) {
-  const { storeID, menus } = props
+  const { inviteCode, storeID } = props
   const router = useRouter()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const [menus, setMenus] = useState([])
   const [myCarts, setMyCarts] = useState<Cart[]>([])
   const [myInfo, setMyInfo] = useState<User | null>()
   const [reservationInfo, setReservationInfo] = useState<Reservation>()
@@ -81,22 +84,43 @@ export default function MyReservation(props: MyReservationProps) {
     getReservationDetailWithSse()
   }, []) // 빈 배열을 의존성으로 사용하여 컴포넌트 마운트 시 한 번만 실행
 
+  useEffect(() => {
+    const session = getSessionFromClient()
+    fetchMenus(session)
+  }, [])
+
+  const fetchMenus = async (session: any) => {
+    if (storeID === 0) return
+
+    await getStoreMenus(storeID)
+      .then((res) => res.json())
+      .then((data) => {
+        setMenus(data)
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+
   if (!reservationInfo || !myInfo) {
     return <Spinner />
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between">
-      <div className="w-full mr-4 ">
-        {loading && <Spinner />}
-        <MenuTable menus={menus} />
+    <div>
+      <InviteCode inviteCode={inviteCode} />
+      <div className="flex flex-col md:flex-row justify-between">
+        <div className="w-full mr-4 ">
+          {loading && <Spinner />}
+          <MenuTable menus={menus} />
+        </div>
+        <OrderCard
+          reservationInfo={reservationInfo}
+          myInfo={myInfo}
+          myCarts={myCarts}
+        />
+        <Toaster />
       </div>
-      <OrderCard
-        reservationInfo={reservationInfo}
-        myInfo={myInfo}
-        myCarts={myCarts}
-      />
-      <Toaster />
     </div>
   )
 }

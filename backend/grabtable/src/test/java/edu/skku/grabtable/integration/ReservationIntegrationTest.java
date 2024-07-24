@@ -270,4 +270,56 @@ public class ReservationIntegrationTest {
                 .hasMessageContaining(ExceptionCode.UNPAID_AMOUNT_EXIST.getMessage());
     }
 
+    // TODO invitee - reservation 연관관계 수정 후 테스트
+//    @Test
+//    @DisplayName("가장 최근에 확정한 예약을 조회할 수 있다.")
+//    void read_last_recently_confirmed_reservation() {
+//        //given
+//        User host = User.builder()
+//                .username("host")
+//                .build();
+//
+//        User userA = User.builder()
+//                .username("userA")
+//                .build();
+//
+//        Store store = Store.builder()
+//                .storeName("storeA")
+//                .build();
+//
+//        int menuPrice = 1000;
+//
+//        Menu menuA = Menu.builder()
+//                .store(store)
+//                .menuName("menuA")
+//                .price(menuPrice)
+//                .build();
+//
+//        userRepository.save(host);
+//        userRepository.save(userA);
+//        storeRepository.save(store);
+//        menuRepository.save(menuA);
+//
+//        reservationService.createNewReservation(host, store.getId());
+//        String inviteCode = reservationService.findOngoingReservationByUser(host).getInviteCode();
+//        reservationService.joinExistingReservation(userA, inviteCode);
+//
+//        cartService.createCart(host, menuA.getId(), 1);
+//        cartService.createCart(userA, menuA.getId(), 1);
+//
+//        orderService.processPayment(host, new PaymentRequest("1", menuPrice));
+//        orderService.processPayment(userA, new PaymentRequest("1", menuPrice));
+//
+//        reservationService.confirmCurrentReservation(host);
+//
+//        //when
+//        Reservation hostLastConfirmed = reservationRepository.findLastRecentlyConfirmedReservationByUserId(host.getId())
+//                .orElseThrow();
+//        Reservation userALastConfirmed = reservationRepository.findLastRecentlyConfirmedReservationByUserId(
+//                userA.getId()).orElseThrow();
+//
+//        //then
+//        assertThat(hostLastConfirmed).isEqualTo(userALastConfirmed);
+//    }
+
 }

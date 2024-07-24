@@ -210,7 +210,7 @@ public class ReservationService {
                 .toList();
     }
 
-    /* Server-side Event 처리 */
+    /* Server-sent Event 처리 */
 
     public void sendUpdateEvent(Long userId) {
         User user = userRepository.findById(userId)
@@ -221,9 +221,8 @@ public class ReservationService {
     }
 
     public void sendFinishEvent(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
+        Reservation reservation = reservationRepository.findLastRecentlyConfirmedReservationByUserId(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_LAST_RECENT_CONFIRMED_RESERVATION));
         ReservationFinishEvent reservationFinishEvent = new ReservationFinishEvent(reservation.getId());
         redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservationFinishEvent);
     }

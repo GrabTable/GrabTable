@@ -267,12 +267,12 @@ public class ReservationService {
         });
     }
 
-    private ReservationDetailResponse serialize(Message message) {
+    private Object deserialize(Message message) {
         try {
             return objectMapper.readValue(message.getBody(),
-                    ReservationDetailResponse.class);
+                    Object.class);
         } catch (IOException e) {
-            //TODO
+            log.error("Redis Message Bytes 역직렬화 실패 = {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

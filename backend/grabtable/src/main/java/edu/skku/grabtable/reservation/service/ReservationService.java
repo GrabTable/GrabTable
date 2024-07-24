@@ -11,6 +11,8 @@ import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.reservation.domain.event.ReservationFinishEvent;
+import edu.skku.grabtable.reservation.domain.event.ReservationUpdateEvent;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
@@ -28,6 +30,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -209,11 +212,20 @@ public class ReservationService {
 
     /* Server-side Event 처리 */
 
-    public void send(Long userId) {
+    public void sendUpdateEvent(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
+        ReservationDetailResponse detail = findOngoingReservationByUser(user);
+        ReservationUpdateEvent reservationUpdateEvent = new ReservationUpdateEvent(detail);
+        redisTemplate.convertAndSend(getChannelName(detail.getId()), reservationUpdateEvent);
+    }
+
+    public void sendFinishEvent(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
         ReservationDetailResponse reservation = findOngoingReservationByUser(user);
-        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservation);
+        ReservationFinishEvent reservationFinishEvent = new ReservationFinishEvent(reservation.getId());
+        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservationFinishEvent);
     }
 
     public SseEmitter createEmitter(User user) {

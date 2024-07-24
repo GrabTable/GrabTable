@@ -244,10 +244,7 @@ public class ReservationService {
             throw new RuntimeException(e);
         }
 
-        MessageListener messageListener = (message, pattern) -> {
-            Object response = deserialize(message);
-            sendToClient(emitter, userId, response);
-        };
+        MessageListener messageListener = (message, pattern) -> sendToClient(emitter, userId, message);
 
         redisMessageListenerContainer
                 .addMessageListener(
@@ -279,31 +276,21 @@ public class ReservationService {
         });
     }
 
-    private Object deserialize(Message message) {
+    private void sendToClient(SseEmitter emitter, Long userId, Message data) {
         try {
-            return objectMapper.readValue(message.getBody(),
-                    Object.class);
-        } catch (IOException e) {
-            log.error("Redis Message Bytes 역직렬화 실패 = {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void sendToClient(SseEmitter emitter, Long userId, Object data) {
-        try {
-            ReservationUpdateEvent reservationUpdateEvent = objectMapper.convertValue(data,
+            ReservationUpdateEvent reservationUpdateEvent = objectMapper.readValue(data.getBody(),
                     ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationUpdate")
-                    .data(reservationUpdateEvent, MediaType.APPLICATION_JSON));
+                    .data(reservationUpdateEvent));
         } catch (IllegalArgumentException ignored) {
         } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
         }
 
         try {
-            ReservationFinishEvent reservationFinishEvent = objectMapper.convertValue(data,
+            ReservationFinishEvent reservationFinishEvent = objectMapper.readValue(data.getBody(),
                     ReservationFinishEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())

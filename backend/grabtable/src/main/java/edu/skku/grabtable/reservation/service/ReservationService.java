@@ -230,29 +230,30 @@ public class ReservationService {
 
     public SseEmitter createEmitter(User user) {
         Long userId = user.getId();
-        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
+        ReservationDetailResponse detail = findOngoingReservationByUser(user);
+        ReservationUpdateEvent reservationUpdateEvent = new ReservationUpdateEvent(detail);
         sseEmitterRepository.save(userId);
-        SseEmitter emitter = sseEmitterRepository.findById(userId);
+        SseEmitter emitter = sseEmitterRepository.findById(userId).orElseThrow();
 
         try {
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
-                    .name("reservation")
-                    .data(reservation));
+                    .name("reservationUpdate")
+                    .data(reservationUpdateEvent));
         } catch (IOException e) {
             log.error("SSE 연결 초기화 오류 발생, userId={}", userId);
             throw new RuntimeException(e);
         }
 
         MessageListener messageListener = (message, pattern) -> {
-            ReservationDetailResponse response = serialize(message);
+            Object response = deserialize(message);
             sendToClient(emitter, userId, response);
         };
 
         redisMessageListenerContainer
                 .addMessageListener(
                         messageListener,
-                        ChannelTopic.of(getChannelName(reservation.getId()))
+                        ChannelTopic.of(getChannelName(detail.getId()))
                 );
 
         setEmitterCallbacks(userId, emitter, messageListener);

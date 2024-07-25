@@ -38,7 +38,7 @@ public class ReservationAspect {
     public void orderControllerUpdateMethods() {
     }
 
-    @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.processPayment(..))")
+    @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.postProcessPayment(..))")
     public void sharedOrderControllerUpdateMethods() {
 
     }

@@ -1,6 +1,7 @@
 package edu.skku.grabtable.sse.repository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -17,8 +18,8 @@ public class SseEmitterInMemoryRepository {
         userEmitters.put(userId, emitter);
     }
 
-    public SseEmitter findById(Long userId) {
-        return userEmitters.getOrDefault(userId, null);
+    public Optional<SseEmitter> findById(Long userId) {
+        return Optional.ofNullable(userEmitters.get(userId));
     }
 
     public void deleteById(Long userId) {

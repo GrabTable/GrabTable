@@ -11,6 +11,8 @@ import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.reservation.domain.event.ReservationFinishEvent;
+import edu.skku.grabtable.reservation.domain.event.ReservationUpdateEvent;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
@@ -28,6 +30,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -133,20 +136,29 @@ public class ReservationService {
 
     public void cancel(User user) {
         if (user.getInvitedReservation() != null) {
-            user.clearReservation();
+            leaveFromReservation(user);
             return;
         }
+        destroyReservation(user);
+    }
 
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+    public void leaveFromReservation(User invitee) {
+        invitee.clearReservation();
+        cartRepository.findByUserId(invitee.getId())
+                .forEach(Cart::disconnectUser);
+    }
+
+    public void destroyReservation(User host) {
+        Reservation reservation = reservationRepository.findByHostId(host.getId())
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         reservationRepository.delete(reservation);
 
         List<User> invitees = userRepository.findByInvitedReservation(reservation);
         for (User invitee : invitees) {
+            invitee.clearReservation();
             cartRepository.findByUserId(invitee.getId())
                     .forEach(Cart::disconnectUser);
-            invitee.clearReservation();
         }
     }
 
@@ -198,40 +210,46 @@ public class ReservationService {
                 .toList();
     }
 
-    /* Server-side Event 처리 */
+    /* Server-sent Event 처리 */
 
-    public void send(Long userId) {
+    public void sendUpdateEvent(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_USER_ID));
-        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
-        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservation);
+        ReservationDetailResponse detail = findOngoingReservationByUser(user);
+        ReservationUpdateEvent reservationUpdateEvent = new ReservationUpdateEvent(detail);
+        redisTemplate.convertAndSend(getChannelName(detail.getId()), reservationUpdateEvent);
+    }
+
+    public void sendFinishEvent(Long userId) {
+        Reservation reservation = reservationRepository.findLastRecentlyConfirmedReservationByUserId(userId)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_LAST_RECENT_CONFIRMED_RESERVATION));
+        ReservationFinishEvent reservationFinishEvent = new ReservationFinishEvent(reservation.getId());
+        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservationFinishEvent);
     }
 
     public SseEmitter createEmitter(User user) {
         Long userId = user.getId();
-        ReservationDetailResponse reservation = findOngoingReservationByUser(user);
+        ReservationDetailResponse detail = findOngoingReservationByUser(user);
+        ReservationUpdateEvent reservationUpdateEvent = new ReservationUpdateEvent(detail);
         sseEmitterRepository.save(userId);
-        SseEmitter emitter = sseEmitterRepository.findById(userId);
+        SseEmitter emitter = sseEmitterRepository.findById(userId).orElseThrow();
 
         try {
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
-                    .name("reservation")
-                    .data(reservation));
+                    .name("reservationUpdate")
+                    .data(reservationUpdateEvent));
         } catch (IOException e) {
             log.error("SSE 연결 초기화 오류 발생, userId={}", userId);
             throw new RuntimeException(e);
         }
 
-        MessageListener messageListener = (message, pattern) -> {
-            ReservationDetailResponse response = serialize(message);
-            sendToClient(emitter, userId, response);
-        };
+        MessageListener messageListener = (message, pattern) -> sendToClient(emitter, userId, message);
 
         redisMessageListenerContainer
                 .addMessageListener(
                         messageListener,
-                        ChannelTopic.of(getChannelName(reservation.getId()))
+                        ChannelTopic.of(getChannelName(detail.getId()))
                 );
 
         setEmitterCallbacks(userId, emitter, messageListener);
@@ -258,22 +276,27 @@ public class ReservationService {
         });
     }
 
-    private ReservationDetailResponse serialize(Message message) {
+    private void sendToClient(SseEmitter emitter, Long userId, Message data) {
         try {
-            return objectMapper.readValue(message.getBody(),
-                    ReservationDetailResponse.class);
-        } catch (IOException e) {
-            //TODO
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void sendToClient(SseEmitter emitter, Long userId, Object data) {
-        try {
+            ReservationUpdateEvent reservationUpdateEvent = objectMapper.readValue(data.getBody(),
+                    ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
-                    .name("reservation")
-                    .data(data));
+                    .name("reservationUpdate")
+                    .data(reservationUpdateEvent));
+        } catch (IllegalArgumentException ignored) {
+        } catch (IOException e) {
+            sseEmitterRepository.deleteById(userId);
+        }
+
+        try {
+            ReservationFinishEvent reservationFinishEvent = objectMapper.readValue(data.getBody(),
+                    ReservationFinishEvent.class);
+            emitter.send(SseEmitter.event()
+                    .id(userId.toString())
+                    .name("reservationFinish")
+                    .data(reservationFinishEvent, MediaType.APPLICATION_JSON));
+        } catch (IllegalArgumentException ignored) {
         } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
         }

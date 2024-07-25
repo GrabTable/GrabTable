@@ -28,6 +28,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     Optional<Reservation> findOngoingReservationByUser(User user);
 
+    @Query("""
+                SELECT r
+                FROM Reservation r
+                WHERE (r.host.id = :userId
+                OR :userId IN (SELECT i.id FROM r.invitees i))
+                AND r.status = 'CONFIRMED'
+                ORDER BY r.lastModifiedAt DESC
+                LIMIT 1
+            """)
+    Optional<Reservation> findLastRecentlyConfirmedReservationByUserId(Long userId);
+
     Optional<Reservation> findByHostId(Long userId);
 
     Optional<Reservation> findByInviteCode(String inviteCode);

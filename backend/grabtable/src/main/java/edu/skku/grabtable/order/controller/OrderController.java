@@ -1,7 +1,7 @@
 package edu.skku.grabtable.order.controller;
 
 import edu.skku.grabtable.auth.annotation.AuthUser;
-import edu.skku.grabtable.order.domain.request.PaymentRequest;
+import edu.skku.grabtable.order.domain.request.PostPaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.service.OrderService;
 import edu.skku.grabtable.user.domain.User;
@@ -24,7 +24,7 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<OrderResponse> processPayment(
             @AuthUser User user,
-            @Valid @RequestBody PaymentRequest paymentRequest
+            @Valid @RequestBody PostPaymentRequest paymentRequest
     ) {
         OrderResponse orderResponse = orderService.processPayment(user, paymentRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);

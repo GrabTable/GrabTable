@@ -41,5 +41,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Optional<Reservation> findByHostId(Long userId);
 
+    @Query("""
+                SELECT r
+                FROM Reservation r
+                JOIN FETCH r.sharedOrder so
+                JOIN FETCH r.store s
+                LEFT JOIN FETCH r.invitees iv
+                WHERE r.host.id = :userId
+            """)
+    Optional<Reservation> findByHostIdFetchJoin(Long userId);
+
     Optional<Reservation> findByInviteCode(String inviteCode);
 }

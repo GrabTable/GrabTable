@@ -44,7 +44,7 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "shared_order_id")
     private SharedOrder sharedOrder;
 

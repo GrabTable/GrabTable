@@ -6,6 +6,7 @@ import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
@@ -181,14 +182,18 @@ public class ReservationService {
         reservation.confirm();
 
         List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
+        userRepository.resetReservationByReservation(reservation);
         List<User> invitees = reservation.getInvitees();
         for (User invitee : invitees) {
-            invitee.clearReservation();
             invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
+            cartRepository.findByUserId(invitee.getId())
+                    .forEach(Cart::disconnectUser);
         }
 
+        orderRepository.resetReservationByReservation(reservation);
         ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
         reservationHistoryRepository.save(reservationHistory);
+        reservationRepository.delete(reservation);
     }
 
     private void validateMoreThanOneOrderExists(Reservation reservation) {

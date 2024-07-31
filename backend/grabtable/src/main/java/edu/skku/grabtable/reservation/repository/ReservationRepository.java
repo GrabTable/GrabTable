@@ -39,7 +39,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     Optional<Reservation> findLastRecentlyConfirmedReservationByUserId(Long userId);
 
-    Optional<Reservation> findByHostId(Long userId);
+    Optional<Reservation> findByHost(User host);
 
     @Query("""
                 SELECT r
@@ -47,9 +47,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 JOIN FETCH r.sharedOrder so
                 JOIN FETCH r.store s
                 LEFT JOIN FETCH r.invitees iv
-                WHERE r.host.id = :userId
+                WHERE r.host = :host
             """)
-    Optional<Reservation> findByHostIdFetchJoin(Long userId);
+    Optional<Reservation> findByHostFetchJoin(User host);
 
     Optional<Reservation> findByInviteCode(String inviteCode);
 }

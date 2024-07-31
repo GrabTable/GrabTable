@@ -154,7 +154,7 @@ public class ReservationService {
     }
 
     public void destroyReservation(User host) {
-        Reservation reservation = reservationRepository.findByHostId(host.getId())
+        Reservation reservation = reservationRepository.findByHost(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         reservationRepository.delete(reservation);
@@ -168,7 +168,7 @@ public class ReservationService {
     }
 
     public void confirmCurrentReservation(User user) {
-        Reservation reservation = reservationRepository.findByHostIdFetchJoin(user.getId())
+        Reservation reservation = reservationRepository.findByHostFetchJoin(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //공유 주문과 개인 주문의 합이 하나도 없을 경우 확정 불가

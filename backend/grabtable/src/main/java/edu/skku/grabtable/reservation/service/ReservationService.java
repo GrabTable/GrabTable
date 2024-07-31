@@ -155,17 +155,22 @@ public class ReservationService {
     }
 
     public void destroyReservation(User host) {
-        Reservation reservation = reservationRepository.findByHost(host)
+        Reservation reservation = reservationRepository.findByHostFetchJoin(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        reservationRepository.delete(reservation);
-
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
+        userRepository.resetReservationByReservation(reservation);
+        List<User> invitees = reservation.getInvitees();
         for (User invitee : invitees) {
-            invitee.clearReservation();
+            invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
             cartRepository.findByUserId(invitee.getId())
                     .forEach(Cart::disconnectUser);
         }
+
+        orderRepository.resetReservationByReservation(reservation);
+        ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
+        reservationHistoryRepository.save(reservationHistory);
+        reservationRepository.delete(reservation);
     }
 
     public void confirmCurrentReservation(User user) {

@@ -19,6 +19,7 @@ import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.reservation.service.ReservationService;
 import edu.skku.grabtable.user.domain.User;
+import edu.skku.grabtable.user.repository.UserRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ public class SharedOrderService {
     private final ReservationRepository reservationRepository;
     private final CartRepository cartRepository;
     private final SharedOrderRepository sharedOrderRepository;
+    private final UserRepository userRepository;
     private final PaymentValidator validator;
     private final ReservationService reservationService;
 
@@ -54,26 +56,35 @@ public class SharedOrderService {
                 .orElseThrow();
         validateSharedCarts(sharedOrder);
         validatePayingAmount(prePaymentRequest.getAmount(), sharedOrder.calculateLeftAmount());
-        reservationService.send(user.getId());
-        return buildOrderResponse(user, sharedOrder, prePaymentRequest.getAmount());
+        reservationService.sendUpdateEvent(user.getId());
+        return buildPreOrderResponse(user, sharedOrder, prePaymentRequest.getAmount());
     }
 
     @Transactional
     public void postPayment(OrderStatus status, User user, PostPaymentRequest postPaymentRequest) {
+        Order order = orderRepository.findById(postPaymentRequest.getOrderId())
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION));
+        if (!user.getId().equals(order.getUser().getId())) {
+            throw new BadRequestException(ExceptionCode.INVALID_PAID_USER);
+        }
         if (status.equals(OrderStatus.CANCELED)) {
-            Order order = orderRepository.findById(postPaymentRequest.getOrderId())
-                    .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION));
             orderRepository.delete(order);
             return;
         }
-        validator.verify(postPaymentRequest);
-        Order order = orderRepository.findById(postPaymentRequest.getOrderId())
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_ORDER_FOUND_IN_RESERVATION));
+        PaymentRequest paymentRequest = new PaymentRequest(postPaymentRequest.getImpUid(),
+                postPaymentRequest.getAmount());
+        validator.verify(paymentRequest);
         order.finishOrder();
     }
 
     private OrderResponse buildOrderResponse(User user, SharedOrder sharedOrder, int amount) {
         Order order = sharedOrder.addOrder(user, amount);
+        orderRepository.save(order);
+        return OrderResponse.of(order);
+    }
+
+    private OrderResponse buildPreOrderResponse(User user, SharedOrder sharedOrder, int amount) {
+        Order order = sharedOrder.addPreOrder(user, amount);
         orderRepository.save(order);
         return OrderResponse.of(order);
     }

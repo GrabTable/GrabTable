@@ -28,7 +28,7 @@ public class RedisConfig {
     @Value("${spring.data.redis-lock.host}")
     private String lockHost;
 
-    @Value("${spring.data.redis-lock.port")
+    @Value("${spring.data.redis-lock.port}")
     private int lockPort;
 
     private static final String REDISSON_HOST_PREFIX = "redis://";

@@ -32,7 +32,6 @@ public class SharedOrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
     }
 
-    //TODO: orderId 관련 논의필요
     @PostMapping("postpayment")
     public ResponseEntity<Void> postProcessPayment(
             @RequestParam("success") OrderStatus success,

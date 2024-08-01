@@ -47,7 +47,7 @@ class SharedOrderControllerTest extends ControllerTest {
                 .thenReturn(expected);
 
         //when
-        MvcResult mvcResult = mockMvc.perform(post("/v1/shared-orders")
+        MvcResult mvcResult = mockMvc.perform(post("/v1/shared-orders/prepayment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .cookie(new Cookie("refresh-token", REFRESH_TOKEN))

@@ -56,6 +56,12 @@ public class SharedOrder extends BaseTimeEntity {
         return order;
     }
 
+    public Order addPreOrder(User user, int amount) {
+        Order order = new Order(this, user, amount, OrderStatus.PENDING);
+        this.orders.add(order);
+        return order;
+    }
+
     public int calculateTotalAmount() {
         return this.carts.stream()
                 .mapToInt(Cart::calculateTotalPrice)

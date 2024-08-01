@@ -6,15 +6,19 @@ import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
+import edu.skku.grabtable.reservation.domain.InvitedReservationHistory;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.reservation.domain.ReservationHistory;
 import edu.skku.grabtable.reservation.domain.event.ReservationFinishEvent;
 import edu.skku.grabtable.reservation.domain.event.ReservationUpdateEvent;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
+import edu.skku.grabtable.reservation.repository.ReservationHistoryRepository;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.sse.repository.SseEmitterInMemoryRepository;
 import edu.skku.grabtable.store.domain.Store;
@@ -22,6 +26,7 @@ import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.repository.UserRepository;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +51,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final ReservationHistoryRepository reservationHistoryRepository;
     private final SseEmitterInMemoryRepository sseEmitterRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -149,21 +155,26 @@ public class ReservationService {
     }
 
     public void destroyReservation(User host) {
-        Reservation reservation = reservationRepository.findByHostId(host.getId())
+        Reservation reservation = reservationRepository.findByHostFetchJoin(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        reservationRepository.delete(reservation);
-
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
+        userRepository.resetReservationByReservation(reservation);
+        List<User> invitees = reservation.getInvitees();
         for (User invitee : invitees) {
-            invitee.clearReservation();
+            invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
             cartRepository.findByUserId(invitee.getId())
                     .forEach(Cart::disconnectUser);
         }
+
+        orderRepository.resetReservationByReservation(reservation);
+        ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
+        reservationHistoryRepository.save(reservationHistory);
+        reservationRepository.delete(reservation);
     }
 
     public void confirmCurrentReservation(User user) {
-        Reservation reservation = reservationRepository.findByHostId(user.getId())
+        Reservation reservation = reservationRepository.findByHostFetchJoin(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //공유 주문과 개인 주문의 합이 하나도 없을 경우 확정 불가
@@ -175,11 +186,19 @@ public class ReservationService {
         //예약을 확정 처리
         reservation.confirm();
 
-        //invitee들의 예약 연관관계 해제
-        List<User> invitees = userRepository.findByInvitedReservation(reservation);
+        List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
+        userRepository.resetReservationByReservation(reservation);
+        List<User> invitees = reservation.getInvitees();
         for (User invitee : invitees) {
-            invitee.clearReservation();
+            invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
+            cartRepository.findByUserId(invitee.getId())
+                    .forEach(Cart::disconnectUser);
         }
+
+        orderRepository.resetReservationByReservation(reservation);
+        ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
+        reservationHistoryRepository.save(reservationHistory);
+        reservationRepository.delete(reservation);
     }
 
     private void validateMoreThanOneOrderExists(Reservation reservation) {

@@ -1,7 +1,7 @@
 'use client'
 
 import ReviewList from '@/components/ReviewList'
-import Spinner from '@/components/spinner'
+import Spinner from '@/components/Spinner'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

@@ -22,21 +22,21 @@ import { postCreateReservation } from '@/lib/api/postCreateReservation'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { Review } from '@/lib/types/review'
 import { Store } from '@/lib/types/store'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PiHandGrabbingDuotone } from 'react-icons/pi'
 import { useInView } from 'react-intersection-observer'
 
 export default function Restaurant() {
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: scrollRef,
-    offset: ['0 1', '1.33 1'],
-  })
-  const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1])
-  const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1])
+  // const scrollRef = useRef<HTMLDivElement>(null)
+  // const { scrollYProgress } = useScroll({
+  //   target: scrollRef,
+  //   offset: ['0 1', '1.33 1'],
+  // })
+  // const scaleProgess = useTransform(scrollYProgress, [0.7, 1], [0.9, 1])
+  // const opacityProgess = useTransform(scrollYProgress, [0.6, 1], [0.9, 1])
   const router = useRouter()
   const storeId = useParams<{ id: string }>()['id']
   const { toast } = useToast()
@@ -135,11 +135,11 @@ export default function Restaurant() {
     <>
       {loading && <Spinner />}
       <motion.div
-        ref={scrollRef}
-        style={{
-          scale: scaleProgess,
-          opacity: opacityProgess,
-        }}
+        // ref={scrollRef}
+        // style={{
+        //   scale: scaleProgess,
+        //   opacity: opacityProgess,
+        // }}
         className="group mb-3 sm:mb-8 last:mb-0 mx-4"
       >
         <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">

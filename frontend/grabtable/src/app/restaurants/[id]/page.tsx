@@ -1,7 +1,6 @@
 'use client'
 
-import ReactQueryProviders from '@/components/ReactQueryProviders'
-import { StarRating } from '@/components/StarRating'
+import ReviewList from '@/components/ReviewList'
 import Spinner from '@/components/spinner'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/badge'
@@ -15,13 +14,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
-import { useFetchStoreReviews } from '@/hooks/useFetchStoreReviews'
-import { useIntersect } from '@/hooks/useIntersect'
-import useIntersectingState from '@/hooks/useIntersectingState'
 import { getStoreDetail } from '@/lib/api/getStoreDetail'
+import { getStoreReviews } from '@/lib/api/getStoreReviews'
 import { postCreateReservation } from '@/lib/api/postCreateReservation'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { Review } from '@/lib/types/review'
@@ -29,13 +25,14 @@ import { Store } from '@/lib/types/store'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PiHandGrabbingDuotone } from 'react-icons/pi'
+import { useInView } from 'react-intersection-observer'
 
 export default function Restaurant() {
-  const ref = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: scrollRef,
     offset: ['0 1', '1.33 1'],
   })
   const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1])
@@ -45,25 +42,10 @@ export default function Restaurant() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [restaurant, setRestaurant] = useState<Store>()
-  const [isIntersecting, observerRef] = useIntersectingState<HTMLDivElement>()
-
-  const { data, hasNextPage, isFetching, fetchNextPage } = useFetchStoreReviews(
-    {
-      size: 20,
-    },
-  )
-
-  const reviews = useMemo(
-    () => (data ? data.pages.flatMap(({ data }) => data.values) : []),
-    [data],
-  )
-
-  const infiniteScrollRef = useIntersect(async (entry, observer) => {
-    observer.unobserve(entry.target)
-    if (hasNextPage && !isFetching) {
-      fetchNextPage()
-    }
-  })
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [cursor, setCursor] = useState(undefined)
+  const [hasNext, setHasNext] = useState(true)
+  const { ref, inView } = useInView()
 
   const fetchStore = async () => {
     const response = await getStoreDetail(storeId)
@@ -71,22 +53,32 @@ export default function Restaurant() {
     setRestaurant(data)
   }
 
-  // const fetchReview = async () => {
-  //   const response = await getStoreReviews(storeId)
-  //   const data = await response.json()
-  //   setReviews(data.values)
-  // }
+  const fetchReview = async () => {
+    const response = await getStoreReviews(storeId, cursor)
+    const data = await response.json()
+    console.log(data)
+    setCursor(data.cursor)
+    setHasNext(data.hasNext)
+    setReviews([...reviews, ...data.values])
+  }
+
+  const loadMoreReviews = async () => {
+    if (!hasNext) {
+      return
+    }
+    await fetchReview()
+  }
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreReviews()
+    }
+  }, [inView])
 
   useEffect(() => {
     fetchStore()
-    // fetchReview()
+    fetchReview()
   }, [])
-
-  useEffect(() => {
-    if (!isIntersecting || data === undefined) return
-
-    fetchNextPage()
-  }, [isIntersecting])
 
   const makeReservation = async () => {
     setLoading(true)
@@ -135,15 +127,15 @@ export default function Restaurant() {
     }, 500)
   }
 
-  // if (!restaurant) {
-  //   return <Spinner />
-  // }
+  if (!restaurant) {
+    return <Spinner />
+  }
 
   return (
-    <ReactQueryProviders>
+    <>
       {loading && <Spinner />}
       <motion.div
-        ref={ref}
+        ref={scrollRef}
         style={{
           scale: scaleProgess,
           opacity: opacityProgess,
@@ -210,31 +202,10 @@ export default function Restaurant() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Table>
-          <TableBody>
-            {reviews.map((review: Review) => (
-              <TableRow key={review.id}>
-                <TableCell className="flex items-start flex-col">
-                  <div className="flex items-center mt-4">
-                    <div>{review.username || 'anonymous user'}</div>
-                    <div>
-                      <StarRating rating={review.rating} />
-                    </div>
-                  </div>
-                  <p className="mt-2">{review.message}</p>
-                  <p className="mt-4 text-xs">
-                    This review was written on {review.reviewPlatform}.
-                  </p>
-                </TableCell>
-              </TableRow>
-            ))}
-            <div aria-hidden ref={infiniteScrollRef} />
-            {isFetching && <Spinner />}
-          </TableBody>
-        </Table>
+        <ReviewList reviews={reviews} />
+        <div ref={ref}></div>
       </motion.div>
       <Toaster />
-    </ReactQueryProviders>
+    </>
   )
 }

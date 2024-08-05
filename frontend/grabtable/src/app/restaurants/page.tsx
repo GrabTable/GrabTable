@@ -1,7 +1,7 @@
 'use client'
 import { InputWithButton } from '@/components/Inputwithbutton'
+import KakaoMap from '@/components/KakaoMap'
 import RestaurantCard from '@/components/RestaurantCard'
-import KakaoMap from '@/components/kakaoMap'
 import { getStores } from '@/lib/api/getStores'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'

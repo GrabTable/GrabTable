@@ -1,5 +1,5 @@
 'use client'
-import Spinner from '@/components/spinner'
+import Spinner from '@/components/Spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { getMyReservation } from '@/lib/api/getMyReservation'

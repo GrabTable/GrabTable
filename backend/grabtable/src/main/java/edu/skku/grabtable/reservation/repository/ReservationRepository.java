@@ -39,7 +39,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     Optional<Reservation> findLastRecentlyConfirmedReservationByUserId(Long userId);
 
-    Optional<Reservation> findByHostId(Long userId);
+    Optional<Reservation> findByHost(User host);
+
+    @Query("""
+                SELECT r
+                FROM Reservation r
+                JOIN FETCH r.sharedOrder so
+                JOIN FETCH r.store s
+                LEFT JOIN FETCH r.invitees iv
+                WHERE r.host = :host
+            """)
+    Optional<Reservation> findByHostFetchJoin(User host);
 
     Optional<Reservation> findByInviteCode(String inviteCode);
 }

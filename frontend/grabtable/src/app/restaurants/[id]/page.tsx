@@ -1,7 +1,7 @@
 'use client'
 
-import { StarRating } from '@/components/StarRating'
-import Spinner from '@/components/spinner'
+import ReviewList from '@/components/ReviewList'
+import Spinner from '@/components/Spinner'
 import { Input } from '@/components/ui/Input'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { getStoreDetail } from '@/lib/api/getStoreDetail'
@@ -23,26 +22,30 @@ import { postCreateReservation } from '@/lib/api/postCreateReservation'
 import getSessionFromClient from '@/lib/next-auth/getSessionFromClient'
 import { Review } from '@/lib/types/review'
 import { Store } from '@/lib/types/store'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PiHandGrabbingDuotone } from 'react-icons/pi'
+import { useInView } from 'react-intersection-observer'
 
 export default function Restaurant() {
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['0 1', '1.33 1'],
-  })
-  const scaleProgess = useTransform(scrollYProgress, [0, 1], [0.8, 1])
-  const opacityProgess = useTransform(scrollYProgress, [0, 1], [0.6, 1])
+  // const scrollRef = useRef<HTMLDivElement>(null)
+  // const { scrollYProgress } = useScroll({
+  //   target: scrollRef,
+  //   offset: ['0 1', '1.33 1'],
+  // })
+  // const scaleProgess = useTransform(scrollYProgress, [0.7, 1], [0.9, 1])
+  // const opacityProgess = useTransform(scrollYProgress, [0.6, 1], [0.9, 1])
   const router = useRouter()
   const storeId = useParams<{ id: string }>()['id']
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
   const [restaurant, setRestaurant] = useState<Store>()
   const [reviews, setReviews] = useState<Review[]>([])
+  const [cursor, setCursor] = useState(undefined)
+  const [hasNext, setHasNext] = useState(true)
+  const { ref, inView } = useInView()
 
   const fetchStore = async () => {
     const response = await getStoreDetail(storeId)
@@ -51,10 +54,26 @@ export default function Restaurant() {
   }
 
   const fetchReview = async () => {
-    const response = await getStoreReviews(storeId)
+    const response = await getStoreReviews(storeId, cursor)
     const data = await response.json()
-    setReviews(data.values)
+    console.log(data)
+    setCursor(data.cursor)
+    setHasNext(data.hasNext)
+    setReviews([...reviews, ...data.values])
   }
+
+  const loadMoreReviews = async () => {
+    if (!hasNext) {
+      return
+    }
+    await fetchReview()
+  }
+
+  useEffect(() => {
+    if (inView) {
+      loadMoreReviews()
+    }
+  }, [inView])
 
   useEffect(() => {
     fetchStore()
@@ -109,17 +128,18 @@ export default function Restaurant() {
   }
 
   if (!restaurant) {
-    return <></>
+    return <Spinner />
   }
+
   return (
     <>
       {loading && <Spinner />}
       <motion.div
-        ref={ref}
-        style={{
-          scale: scaleProgess,
-          opacity: opacityProgess,
-        }}
+        // ref={scrollRef}
+        // style={{
+        //   scale: scaleProgess,
+        //   opacity: opacityProgess,
+        // }}
         className="group mb-3 sm:mb-8 last:mb-0 mx-4"
       >
         <section className="bg-gray-100 border border-black/5 rounded-lg overflow-hidden sm:pr-8 relative sm:h-[20rem] hover:bg-gray-200 transition sm:group-even:pl-8 dark:text-white dark:bg-white/10 dark:hover:bg-white/20">
@@ -182,27 +202,8 @@ export default function Restaurant() {
             </DialogContent>
           </Dialog>
         </div>
-
-        <Table>
-          <TableBody>
-            {reviews.map((review: Review) => (
-              <TableRow key={review.id}>
-                <TableCell className="flex items-start flex-col">
-                  <div className="flex items-center mt-4">
-                    <div>{review.username || 'anonymous user'}</div>
-                    <div>
-                      <StarRating rating={review.rating} />
-                    </div>
-                  </div>
-                  <p className="mt-2">{review.message}</p>
-                  <p className="mt-4 text-xs">
-                    This review was written on {review.reviewPlatform}.
-                  </p>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <ReviewList reviews={reviews} />
+        <div ref={ref}></div>
       </motion.div>
       <Toaster />
     </>

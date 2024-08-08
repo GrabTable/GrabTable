@@ -81,13 +81,13 @@ public class SharedOrderService {
     private OrderResponse buildOrderResponse(User user, SharedOrder sharedOrder, int amount) {
         Order order = sharedOrder.addOrder(user, amount);
         orderRepository.save(order);
-        return OrderResponse.of(order);
+        return OrderResponse.from(order);
     }
 
     private OrderResponse buildPreOrderResponse(User user, SharedOrder sharedOrder, int amount) {
         Order order = sharedOrder.addPreOrder(user, amount);
         orderRepository.save(order);
-        return OrderResponse.of(order);
+        return OrderResponse.from(order);
     }
 
     private void validateSharedCarts(SharedOrder sharedOrder) {

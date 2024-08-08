@@ -40,7 +40,7 @@ public class OrderService {
         List<Cart> carts = cartRepository.findByUserId(user.getId());
         Order order = new Order(user, reservation, carts);
         orderRepository.save(order);
-        return OrderResponse.of(order);
+        return OrderResponse.from(order);
     }
 
     private void validateSameAmount(User user, int requestedAmount) {

@@ -19,7 +19,7 @@ public class OrderResponse {
     private Integer paidAmount;
     private String status;
 
-    public static OrderResponse of(Order order) {
+    public static OrderResponse from(Order order) {
         return new OrderResponse(
                 order.getId(),
                 order.getUser().getId(),
@@ -29,8 +29,8 @@ public class OrderResponse {
         );
     }
 
-    public static OrderResponse of(Long orderId, Long userId, List<CartResponse> carts, Integer paidAmount,
-                                   String status) {
+    public static OrderResponse from(Long orderId, Long userId, List<CartResponse> carts, Integer paidAmount,
+                                     String status) {
         return new OrderResponse(orderId, userId, carts, paidAmount, status);
     }
 }

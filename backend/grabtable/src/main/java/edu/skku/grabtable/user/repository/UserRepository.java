@@ -5,6 +5,7 @@ import edu.skku.grabtable.user.domain.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 
@@ -22,4 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             where u.invitedReservation = :reservation and r.host != u
             """)
     List<User> findAllByInvitedReservation(Reservation reservation);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update User u SET u.invitedReservation = null where u.invitedReservation = :reservation")
+    void resetReservationByReservation(Reservation reservation);
+
 }

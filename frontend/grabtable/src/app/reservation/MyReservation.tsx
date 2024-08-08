@@ -1,6 +1,6 @@
 'use client'
 import MenuTable from '@/components/MenuTable'
-import Spinner from '@/components/spinner'
+import Spinner from '@/components/Spinner'
 import { Toaster } from '@/components/ui/toaster'
 import { useToast } from '@/components/ui/use-toast'
 import { getMyCart } from '@/lib/api/getMyCart'

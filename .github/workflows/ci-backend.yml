@@ -44,6 +44,14 @@ jobs:
         with:
           redis-version: "7.2.5"
           redis-port: 6379
+          redis-container-name: redis-pubsub
+          
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.7.0
+        with:
+          redis-version: "7.2.5"
+          redis-container-name: redis-distribute-lock
+          redis-port: 6380
 
       - name: Build with Gradle Wrapper
         run: ./gradlew build

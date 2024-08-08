@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.common.ControllerTest;
-import edu.skku.grabtable.order.domain.request.PaymentRequest;
+import edu.skku.grabtable.order.domain.request.PrePaymentRequest;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.service.SharedOrderService;
 import jakarta.servlet.http.Cookie;
@@ -40,13 +40,14 @@ class SharedOrderControllerTest extends ControllerTest {
     @DisplayName("사용자가 공유 주문에 대해 결제할 수 있다.")
     void processPayment() throws Exception {
         //given
-        OrderResponse expected = new OrderResponse(1L, 1L, null, 10000, "PAID");
-        PaymentRequest paymentRequest = new PaymentRequest("1", 10000);
-        Mockito.when(sharedOrderService.processPayment(any(), any()))
+        //TODO: reservation 생성
+        OrderResponse expected = new OrderResponse(1L, 1L, null, 10000, "PENDING");
+        PrePaymentRequest paymentRequest = new PrePaymentRequest(1L, 1L, 10000);
+        Mockito.when(sharedOrderService.prePayment(any(), any()))
                 .thenReturn(expected);
 
         //when
-        MvcResult mvcResult = mockMvc.perform(post("/v1/shared-orders")
+        MvcResult mvcResult = mockMvc.perform(post("/v1/shared-orders/prepayment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN)
                         .cookie(new Cookie("refresh-token", REFRESH_TOKEN))

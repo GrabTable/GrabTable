@@ -76,6 +76,14 @@ public class Order extends BaseTimeEntity {
         this.status = OrderStatus.PAID;
     }
 
+    public Order(SharedOrder sharedOrder, User user, int amount, OrderStatus orderStatus) {
+        this.sharedOrder = sharedOrder;
+        this.user = user;
+        changeCartsMapping(carts);
+        this.totalPrice = amount;
+        this.status = orderStatus;
+    }
+
 
     public Order(List<Cart> carts) {
         changeCartsMapping(carts);
@@ -91,5 +99,9 @@ public class Order extends BaseTimeEntity {
 
     private int calculateTotalPrice(List<Cart> carts) {
         return carts.stream().mapToInt(Cart::calculateTotalPrice).sum();
+    }
+
+    public void finishOrder() {
+        this.status = OrderStatus.PAID;
     }
 }

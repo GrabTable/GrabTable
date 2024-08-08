@@ -6,7 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.auth.JwtUtil;
 import edu.skku.grabtable.auth.domain.UserTokens;
-import edu.skku.grabtable.order.domain.request.PaymentRequest;
+import edu.skku.grabtable.order.domain.request.PrePaymentRequest;
 import edu.skku.grabtable.order.infrastructure.PaymentValidator;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
@@ -54,13 +54,13 @@ public class SharedOrderApiQueryCountTest {
         UserTokens loginToken = jwtUtil.createLoginToken(String.valueOf(3L));
 
         //주의: carts.sql 수정 시 테스트 실패할 수 있음
-        PaymentRequest paymentRequest = new PaymentRequest("1000", 100);
+        PrePaymentRequest prePaymentRequest = new PrePaymentRequest(1000L, 100L, 1000);
 
-        mockMvc.perform(post("/v1/shared-orders")
+        mockMvc.perform(post("/v1/shared-orders/prepayment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + loginToken.getAccessToken())
                         .cookie(new Cookie("refresh-token", loginToken.getRefreshToken()))
-                        .content(objectMapper.writeValueAsString(paymentRequest)))
+                        .content(objectMapper.writeValueAsString(prePaymentRequest)))
                 .andExpect(status().isCreated())
                 .andReturn();
     }

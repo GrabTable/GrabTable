@@ -1,18 +1,20 @@
 package edu.skku.grabtable.order.domain.request;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class PaymentRequest {
-    @NotEmpty
-    private String impUid;
+public class PrePaymentRequest {
 
     @NotNull
+    private Long reservationId;
+
+    @NotNull
+    private Long cartId;
+
+    @Positive
     private Integer amount;
 }

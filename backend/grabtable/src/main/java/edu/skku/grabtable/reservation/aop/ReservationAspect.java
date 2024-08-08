@@ -39,13 +39,13 @@ public class ReservationAspect {
     public void orderUpdateMethods() {
     }
 
-    @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.processPayment(..))")
-    public void sharedOrderUpdateMethods() {
+    @Pointcut("execution(* edu.skku.grabtable.order.controller.SharedOrderController.postProcessPayment(..))")
+    public void sharedOrderControllerUpdateMethods() {
 
     }
 
     @AfterReturning("cartUpdateMethods() || reservationUpdateMethods() || "
-            + "orderUpdateMethods() || sharedOrderUpdateMethods()")
+            + "orderUpdateMethods()")
     public void sendUpdateEvent(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {

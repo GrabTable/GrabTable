@@ -6,7 +6,6 @@ import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
-import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
@@ -117,7 +116,7 @@ public class ReservationService {
                 reservation.getSharedOrder().getCarts()
                         .stream().map(CartResponse::of).toList(),
                 reservation.getSharedOrder().getOrders()
-                        .stream().map(OrderResponse::of).toList(),
+                        .stream().map(OrderResponse::from).toList(),
                 reservation.getSharedOrder().calculateTotalAmount(),
                 reservation.getSharedOrder().calculateLeftAmount()
         );

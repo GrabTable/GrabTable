@@ -34,7 +34,7 @@ public class DistributedLockAop {
                 joinPoint.getArgs(), distributedLock.key());
         RLock rLock = redissonClient.getLock(key);  // (1)
         try {
-            boolean available = rLock.tryLock(0L, distributedLock.leaseTime(),
+            boolean available = rLock.tryLock(distributedLock.waitTime(), distributedLock.leaseTime(),
                     distributedLock.timeUnit());  // (2)
             if (!available) {
                 return false;

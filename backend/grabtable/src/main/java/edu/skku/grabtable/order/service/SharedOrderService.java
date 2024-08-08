@@ -48,7 +48,7 @@ public class SharedOrderService {
         return buildOrderResponse(user, sharedOrder, paymentRequest.getAmount());
     }
 
-    @DistributedLock(key = "#prePaymentRequest.getReservationId()")
+    @DistributedLock(key = "#prePaymentRequest.getReservationId()", waitTime = 0L)
     public OrderResponse prePayment(User user, PrePaymentRequest prePaymentRequest) {
         Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
@@ -56,8 +56,9 @@ public class SharedOrderService {
                 .orElseThrow();
         validateSharedCarts(sharedOrder);
         validatePayingAmount(prePaymentRequest.getAmount(), sharedOrder.calculateLeftAmount());
+        OrderResponse orderResponse = buildPreOrderResponse(user, sharedOrder, prePaymentRequest.getAmount());
         reservationService.sendUpdateEvent(user.getId());
-        return buildPreOrderResponse(user, sharedOrder, prePaymentRequest.getAmount());
+        return orderResponse;
     }
 
     @Transactional

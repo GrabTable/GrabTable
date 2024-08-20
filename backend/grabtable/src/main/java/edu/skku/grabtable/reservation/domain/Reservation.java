@@ -62,10 +62,6 @@ public class Reservation extends BaseTimeEntity {
         this.inviteCode = createInviteCode();
     }
 
-    public void confirm() {
-        this.status = ReservationStatus.CONFIRMED;
-    }
-
     private String createInviteCode() {
         return UUID.randomUUID().toString();
     }

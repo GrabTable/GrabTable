@@ -144,12 +144,12 @@ public class ReservationService {
         destroyReservation(user);
     }
 
-    private void leaveFromReservation(User invitee) {
+    public void leaveFromReservation(User invitee) {
         invitee.clearReservation();
         cartRepository.clearByUser(invitee);
     }
 
-    private void destroyReservation(User host) {
+    public void destroyReservation(User host) {
         Reservation reservation = reservationRepository.findByHostFetchJoin(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 

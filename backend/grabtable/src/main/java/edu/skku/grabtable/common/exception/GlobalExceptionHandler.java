@@ -50,4 +50,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ExceptionResponse(e.getCode(), e.getMessage()));
     }
 
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<ExceptionResponse> handleInternalServerException(InternalServerException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ExceptionResponse(e.getCode(), e.getMessage()));
+    }
+
 }

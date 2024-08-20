@@ -26,6 +26,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("update Order o set o.reservation = null where o.reservation = :reservation")
-    void resetReservationByReservation(Reservation reservation);
+    void clearByReservation(Reservation reservation);
 
 }

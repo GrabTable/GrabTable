@@ -5,6 +5,7 @@ import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.InternalServerException;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
@@ -269,28 +270,36 @@ public class ReservationService {
 
     private void sendToClient(SseEmitter emitter, Long userId, Message data) {
         try {
+            //해당 클래스로 data를 변환 불가 시 IllegalArgumentException 발생
             ReservationUpdateEvent reservationUpdateEvent = objectMapper.readValue(data.getBody(),
                     ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationUpdate")
                     .data(reservationUpdateEvent));
+            return;
         } catch (IllegalArgumentException ignored) {
         } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
+            return;
         }
 
         try {
+            //해당 클래스로 data를 변환 불가 시 IllegalArgumentException 발생
             ReservationFinishEvent reservationFinishEvent = objectMapper.readValue(data.getBody(),
                     ReservationFinishEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationFinish")
                     .data(reservationFinishEvent, MediaType.APPLICATION_JSON));
+            return;
         } catch (IllegalArgumentException ignored) {
         } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
+            return;
         }
+
+        throw new InternalServerException(ExceptionCode.NO_EVENT_TYPE_MATCH);
     }
 
 

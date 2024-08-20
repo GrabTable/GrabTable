@@ -37,7 +37,9 @@ public enum ExceptionCode {
     HAS_PAID_IN_SHARED_ORDER(5006, "결제를 완료한 사용자가 있어 장바구니를 변경할 수 없습니다."),
     INVALID_PAY_AMOUNT(5007, "결제 요청 금액이 실제 결제해야 할 금액과 일치하지 않습니다."),
     UNPAID_AMOUNT_EXIST(5008, "공유 장바구니의 전체 금액이 결제되어야 예약을 확정할 수 있습니다."),
-    INVALID_PAID_USER(5009, "결제 요청자와 유저가 일치하지 않습니다.");
+    INVALID_PAID_USER(5009, "결제 요청자와 유저가 일치하지 않습니다."),
+
+    NO_EVENT_TYPE_MATCH(6001, "SSE 전송을 위한 메시지에 해당하는 이벤트 타입이 없습니다.");
 
     private final int code;
     private final String message;

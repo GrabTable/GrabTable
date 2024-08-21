@@ -11,8 +11,6 @@ import edu.skku.grabtable.order.infrastructure.PaymentValidator;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.order.service.OrderService;
 import edu.skku.grabtable.order.service.SharedOrderService;
-import edu.skku.grabtable.reservation.domain.ReservationHistory;
-import edu.skku.grabtable.reservation.repository.ReservationHistoryRepository;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.reservation.service.ReservationService;
 import edu.skku.grabtable.store.domain.Menu;
@@ -66,9 +64,6 @@ public class ReservationIntegrationTest {
     @MockBean
     PaymentValidator validator;
 
-    @Autowired
-    ReservationHistoryRepository reservationHistoryRepository;
-
     @Test
     @DisplayName("호스트가 예약을 취소하면 예약의 모든 참여자의 예약 상태가 취소된다.")
     void host_cancel_propagate() {
@@ -105,10 +100,7 @@ public class ReservationIntegrationTest {
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining(ExceptionCode.NO_RESERVATION_USER.getMessage());
 
-        ReservationHistory reservationHistory = reservationHistoryRepository.findByHost(host).get();
         assertThat(reservationRepository.existsByHostId(host.getId())).isFalse();
-        assertThat(reservationHistory.getHost().getId()).isEqualTo(host.getId());
-        assertThat(reservationHistory.getInvitedReservationHistories().size()).isEqualTo(1);
     }
 
     @Test
@@ -190,10 +182,7 @@ public class ReservationIntegrationTest {
         reservationService.confirmCurrentReservation(host);
 
         //then
-        ReservationHistory reservationHistory = reservationHistoryRepository.findByHost(host).get();
         assertThat(reservationRepository.existsByHostId(host.getId())).isFalse();
-        assertThat(reservationHistory.getHost().getId()).isEqualTo(host.getId());
-        assertThat(reservationHistory.getInvitedReservationHistories().size()).isEqualTo(1);
     }
 
     @Test

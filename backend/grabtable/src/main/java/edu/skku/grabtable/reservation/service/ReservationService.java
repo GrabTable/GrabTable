@@ -270,7 +270,7 @@ public class ReservationService {
 
     private void sendToClient(SseEmitter emitter, Long userId, Message data) {
         try {
-            //해당 클래스로 data를 변환 불가 시 IllegalArgumentException 발생
+            //해당 클래스로 data를 변환 불가 시 IOException 발생
             ReservationUpdateEvent reservationUpdateEvent = objectMapper.readValue(data.getBody(),
                     ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
@@ -278,27 +278,23 @@ public class ReservationService {
                     .name("reservationUpdate")
                     .data(reservationUpdateEvent));
             return;
-        } catch (IllegalArgumentException ignored) {
-        } catch (IOException e) {
-            sseEmitterRepository.deleteById(userId);
-            return;
+        } catch (IllegalArgumentException | IOException ignored) {
         }
 
         try {
-            //해당 클래스로 data를 변환 불가 시 IllegalArgumentException 발생
+            //해당 클래스로 data를 변환 불가 시 IOException 발생
             ReservationFinishEvent reservationFinishEvent = objectMapper.readValue(data.getBody(),
                     ReservationFinishEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationFinish")
                     .data(reservationFinishEvent, MediaType.APPLICATION_JSON));
-            return;
-        } catch (IllegalArgumentException ignored) {
-        } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
             return;
+        } catch (IllegalArgumentException | IOException ignored) {
         }
 
+        sseEmitterRepository.deleteById(userId);
         throw new InternalServerException(ExceptionCode.NO_EVENT_TYPE_MATCH);
     }
 

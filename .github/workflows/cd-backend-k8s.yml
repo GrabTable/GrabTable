@@ -7,7 +7,7 @@ on:
     
 env:
   dockerimage_tag: ${{ github.sha }}
-  dockerimage_name: ${{ secrets.HARBOR_REGISTRY }}/grabtable-be
+  dockerimage_name: ${{ secrets.HARBOR_REGISTRY }}/library/grabtable-be
 
 jobs:
   build-and-deploy:

@@ -67,7 +67,7 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v5.1.0
         with:
-          context: .
+          context: backend/grabtable
           file: ./Dockerfile
           platforms: linux/amd64
           push: true

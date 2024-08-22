@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v5.1.0
         with:
           context: backend/grabtable
-          file: ./Dockerfile
+          file: backend/grabtable/Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

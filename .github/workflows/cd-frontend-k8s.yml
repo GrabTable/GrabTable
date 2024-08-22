@@ -21,8 +21,6 @@ jobs:
       packages: write
       id-token: write
     steps:
-      - name: --------------- Code Repo ---------------
-        run: echo "Code Repo"
       - name: Code Repo 불러오기
         uses: actions/checkout@v4
 
@@ -51,8 +49,8 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v5.1.0
         with:
-          context: .
-          file: ./Dockerfile
+          context: frontend/grabtable
+          file: frontend/grabtable/Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

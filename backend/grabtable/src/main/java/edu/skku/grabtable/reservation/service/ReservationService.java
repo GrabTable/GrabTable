@@ -1,23 +1,20 @@
 package edu.skku.grabtable.reservation.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.skku.grabtable.cart.domain.Cart;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
 import edu.skku.grabtable.common.exception.BadRequestException;
 import edu.skku.grabtable.common.exception.ExceptionCode;
+import edu.skku.grabtable.common.exception.InternalServerException;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
-import edu.skku.grabtable.reservation.domain.InvitedReservationHistory;
 import edu.skku.grabtable.reservation.domain.Reservation;
-import edu.skku.grabtable.reservation.domain.ReservationHistory;
 import edu.skku.grabtable.reservation.domain.event.ReservationFinishEvent;
 import edu.skku.grabtable.reservation.domain.event.ReservationUpdateEvent;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
 import edu.skku.grabtable.reservation.domain.response.UserCartsInfoResponse;
-import edu.skku.grabtable.reservation.repository.ReservationHistoryRepository;
 import edu.skku.grabtable.reservation.repository.ReservationRepository;
 import edu.skku.grabtable.sse.repository.SseEmitterInMemoryRepository;
 import edu.skku.grabtable.store.domain.Store;
@@ -25,10 +22,10 @@ import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.repository.UserRepository;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -50,12 +47,12 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
-    private final ReservationHistoryRepository reservationHistoryRepository;
     private final SseEmitterInMemoryRepository sseEmitterRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RedisMessageListenerContainer redisMessageListenerContainer;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void createNewReservation(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
@@ -149,31 +146,23 @@ public class ReservationService {
 
     public void leaveFromReservation(User invitee) {
         invitee.clearReservation();
-        cartRepository.findByUserId(invitee.getId())
-                .forEach(Cart::disconnectUser);
+        cartRepository.clearByUser(invitee);
     }
 
     public void destroyReservation(User host) {
         Reservation reservation = reservationRepository.findByHostFetchJoin(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
-        userRepository.resetReservationByReservation(reservation);
+        userRepository.clearInvitedReservationByReservation(reservation);
         List<User> invitees = reservation.getInvitees();
-        for (User invitee : invitees) {
-            invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
-            cartRepository.findByUserId(invitee.getId())
-                    .forEach(Cart::disconnectUser);
-        }
+        cartRepository.clearByUsers(invitees);
 
-        orderRepository.resetReservationByReservation(reservation);
-        ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
-        reservationHistoryRepository.save(reservationHistory);
+        orderRepository.clearByReservation(reservation);
         reservationRepository.delete(reservation);
     }
 
-    public void confirmCurrentReservation(User user) {
-        Reservation reservation = reservationRepository.findByHostFetchJoin(user)
+    public void confirmCurrentReservation(User host) {
+        Reservation reservation = reservationRepository.findByHostFetchJoin(host)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
         //공유 주문과 개인 주문의 합이 하나도 없을 경우 확정 불가
@@ -182,21 +171,13 @@ public class ReservationService {
         //공유 주문 완료되었는지 검사
         validateSharedOrderIsFullyPaid(reservation);
 
-        //예약을 확정 처리
-        reservation.confirm();
-
-        List<InvitedReservationHistory> invitedReservationHistories = new ArrayList<>();
-        userRepository.resetReservationByReservation(reservation);
+        userRepository.clearInvitedReservationByReservation(reservation);
         List<User> invitees = reservation.getInvitees();
-        for (User invitee : invitees) {
-            invitedReservationHistories.add(InvitedReservationHistory.from(invitee));
-            cartRepository.findByUserId(invitee.getId())
-                    .forEach(Cart::disconnectUser);
-        }
+        cartRepository.clearByUsers(invitees);
+        orderRepository.clearByReservation(reservation);
 
-        orderRepository.resetReservationByReservation(reservation);
-        ReservationHistory reservationHistory = ReservationHistory.of(reservation, invitedReservationHistories);
-        reservationHistoryRepository.save(reservationHistory);
+        applicationEventPublisher.publishEvent(new ReservationFinishEvent(reservation.getId()));
+
         reservationRepository.delete(reservation);
     }
 
@@ -236,13 +217,6 @@ public class ReservationService {
         ReservationDetailResponse detail = findOngoingReservationByUser(user);
         ReservationUpdateEvent reservationUpdateEvent = new ReservationUpdateEvent(detail);
         redisTemplate.convertAndSend(getChannelName(detail.getId()), reservationUpdateEvent);
-    }
-
-    public void sendFinishEvent(Long userId) {
-        Reservation reservation = reservationRepository.findLastRecentlyConfirmedReservationByUserId(userId)
-                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_LAST_RECENT_CONFIRMED_RESERVATION));
-        ReservationFinishEvent reservationFinishEvent = new ReservationFinishEvent(reservation.getId());
-        redisTemplate.convertAndSend(getChannelName(reservation.getId()), reservationFinishEvent);
     }
 
     public SseEmitter createEmitter(User user) {
@@ -296,28 +270,32 @@ public class ReservationService {
 
     private void sendToClient(SseEmitter emitter, Long userId, Message data) {
         try {
+            //해당 클래스로 data를 변환 불가 시 IOException 발생
             ReservationUpdateEvent reservationUpdateEvent = objectMapper.readValue(data.getBody(),
                     ReservationUpdateEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationUpdate")
                     .data(reservationUpdateEvent));
-        } catch (IllegalArgumentException ignored) {
-        } catch (IOException e) {
-            sseEmitterRepository.deleteById(userId);
+            return;
+        } catch (IllegalArgumentException | IOException ignored) {
         }
 
         try {
+            //해당 클래스로 data를 변환 불가 시 IOException 발생
             ReservationFinishEvent reservationFinishEvent = objectMapper.readValue(data.getBody(),
                     ReservationFinishEvent.class);
             emitter.send(SseEmitter.event()
                     .id(userId.toString())
                     .name("reservationFinish")
                     .data(reservationFinishEvent, MediaType.APPLICATION_JSON));
-        } catch (IllegalArgumentException ignored) {
-        } catch (IOException e) {
             sseEmitterRepository.deleteById(userId);
+            return;
+        } catch (IllegalArgumentException | IOException ignored) {
         }
+
+        sseEmitterRepository.deleteById(userId);
+        throw new InternalServerException(ExceptionCode.NO_EVENT_TYPE_MATCH);
     }
 
 

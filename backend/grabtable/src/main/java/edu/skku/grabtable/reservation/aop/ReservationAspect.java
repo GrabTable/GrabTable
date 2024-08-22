@@ -55,15 +55,4 @@ public class ReservationAspect {
             }
         }
     }
-
-    @AfterReturning("reservationDestroyMethods()")
-    public void sendFinishEvent(JoinPoint joinPoint) {
-        Object[] args = joinPoint.getArgs();
-        for (Object arg : args) {
-            if (arg instanceof User user) {
-                reservationService.sendFinishEvent(user.getId());
-                break;
-            }
-        }
-    }
 }

@@ -44,40 +44,47 @@ jobs:
         working-directory: backend/grabtable
         run: ./gradlew build --exclude-task test --exclude-task asciidoctor
 
-      - name: Docker 준비(1/4) - 메타데이터 생성
-        id: meta
-        uses: docker/metadata-action@v5.5.1
-        with:
-          images: |
-            ${{ env.dockerimage_name }}
-          tags: |
-            ${{ env.dockerimage_tag }}
-            latest
-          flavor: |
-            latest=true
-      - name: Docker 준비(2/4) - QEMU 설정
-        uses: docker/setup-qemu-action@v3
-      - name: Docker 준비(3/4) - buildx 설정
-        uses: docker/setup-buildx-action@v3
-      - name: Docker 준비(4/4) - 레지스트리 로그인
-        uses: docker/login-action@v3.0.0
-        with:
-          registry: ${{ secrets.HARBOR_REGISTRY }}
-          username: ${{ secrets.HARBOR_USERNAME }}
-          password: ${{ secrets.HARBOR_PASSWORD }}
-      - name: Docker 이미지 빌드+푸시
-        id: build-and-push
-        uses: docker/build-push-action@v5.1.0
-        with:
-          context: backend/grabtable
-          file: backend/grabtable/Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: false
+      # - name: Docker 준비(1/4) - 메타데이터 생성
+      #   id: meta
+      #   uses: docker/metadata-action@v5.5.1
+      #   with:
+      #     images: |
+      #       ${{ env.dockerimage_name }}
+      #     tags: |
+      #       ${{ env.dockerimage_tag }}
+      #       latest
+      #     flavor: |
+      #       latest=true
+      # - name: Docker 준비(2/4) - QEMU 설정
+      #   uses: docker/setup-qemu-action@v3
+      # - name: Docker 준비(3/4) - buildx 설정
+      #   uses: docker/setup-buildx-action@v3
+      # - name: Docker 준비(4/4) - 레지스트리 로그인
+      #   uses: docker/login-action@v3.0.0
+      #   with:
+      #     registry: ${{ secrets.HARBOR_REGISTRY }}
+      #     username: ${{ secrets.HARBOR_USERNAME }}
+      #     password: ${{ secrets.HARBOR_PASSWORD }}
+      # - name: Docker 이미지 빌드+푸시
+      #   id: build-and-push
+      #   uses: docker/build-push-action@v5.1.0
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     platforms: linux/amd64
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+      #     cache-from: type=gha
+      #     cache-to: type=gha,mode=max
+      #     provenance: false
+      - name: Docker build & push
+        working-directory: backend/grabtable
+        run: |
+            docker login ${{ secrets.HARBOR_REGISTRY }} -u ${{ secrets.HARBOR_USERNAME }} -p ${{ secrets.HARBOR_PASSWORD }}
+            docker build -f Dockerfile -t ${{ env.dockerimage_name }}:${{ env.dockerimage_tag }} .
+            docker push ${{ env.dockerimage_name }}:${{ env.dockerimage_tag }}
+
 
       - name: --------------- Config Repo ---------------
         run: echo "[Config Repo]"

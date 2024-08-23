@@ -43,7 +43,7 @@ jobs:
       - name: Gradle build
         working-directory: backend/grabtable
         run: ./gradlew build --exclude-task test --exclude-task asciidoctor
-
+        
       # - name: Docker 준비(1/4) - 메타데이터 생성
       #   id: meta
       #   uses: docker/metadata-action@v5.5.1

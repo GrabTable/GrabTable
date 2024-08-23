@@ -45,6 +45,17 @@ jobs:
           registry: ${{ secrets.HARBOR_REGISTRY }}
           username: ${{ secrets.HARBOR_USERNAME }}
           password: ${{ secrets.HARBOR_PASSWORD }}
+
+      - name: env 파일 생성
+        working-directory: frontend/grabtable
+        run: |
+          echo NEXT_PUBLIC_BASE_API_URL=${{secrets.API_BASE_URL}} >> .env.local
+          echo NEXT_PUBLIC_BASE_URL=${{secrets.BASE_URL}} >> .env.local
+          echo NEXT_PUBLIC_KAKAO_MAP_KEY=${{secrets.KAKAO_MAP}} >> .env.local
+          echo NEXT_PUBLIC_KAKAO_REDIRECT_URI=${{secrets.KAKAO_REDIRECT}} >> .env.local
+          echo NEXT_PUBLIC_KAKAO_CLIENT_ID=${{secrets.KAKAO_CLIENT}} >> .env.local
+          echo SESSION_SECRET=${{secrets.SESSION_SECRET}} >> .env.local
+
       - name: Docker 이미지 빌드+푸시
         id: build-and-push
         uses: docker/build-push-action@v5.1.0

@@ -38,23 +38,22 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "host_id")
     private User host;
 
-    @OneToMany(mappedBy = "invitedReservation")
+    @OneToMany(mappedBy = "invitedReservation", fetch = FetchType.LAZY)
     private List<User> invitees = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "shared_order_id")
     private SharedOrder sharedOrder;
 
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Order> orders;
 
     private String inviteCode;
-
-
+    
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 

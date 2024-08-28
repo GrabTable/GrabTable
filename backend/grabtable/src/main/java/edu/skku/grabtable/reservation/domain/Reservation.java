@@ -1,6 +1,7 @@
 package edu.skku.grabtable.reservation.domain;
 
 import edu.skku.grabtable.common.domain.BaseTimeEntity;
+import edu.skku.grabtable.order.domain.Order;
 import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.store.domain.Store;
 import edu.skku.grabtable.user.domain.User;
@@ -44,9 +45,12 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "shared_order_id")
     private SharedOrder sharedOrder;
+
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Order> orders;
 
     private String inviteCode;
 

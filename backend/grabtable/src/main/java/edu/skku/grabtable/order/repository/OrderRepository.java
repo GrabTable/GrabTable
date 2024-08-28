@@ -1,6 +1,7 @@
 package edu.skku.grabtable.order.repository;
 
 import edu.skku.grabtable.order.domain.Order;
+import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.user.domain.User;
 import java.util.List;
@@ -18,7 +19,16 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             JOIN FETCH o.carts c
             WHERE  o.reservation = :reservation
             """)
-    List<Order> findByReservation(Reservation reservation);
+    List<Order> findAllByReservationFetchJoin(Reservation reservation);
+
+    @Query("""
+            SELECT o
+            FROM Order o
+            JOIN FETCH o.user u
+            JOIN FETCH o.carts c
+            WHERE  o.sharedOrder = :sharedOrder
+            """)
+    List<Order> findAllBySharedOrderFetchJoin(SharedOrder sharedOrder);
 
     boolean existsByReservation(Reservation reservation);
 

@@ -10,7 +10,13 @@ import edu.skku.grabtable.order.domain.SharedOrder;
 import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
+import edu.skku.grabtable.order.repository.SharedOrderRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
+import edu.skku.grabtable.reservation.domain.ReservationHistory;
+import edu.skku.grabtable.reservation.domain.ReservationHistory.OrderHistory;
+import edu.skku.grabtable.reservation.domain.ReservationHistory.SharedOrderHistory;
+import edu.skku.grabtable.reservation.domain.ReservationHistory.StoreHistory;
+import edu.skku.grabtable.reservation.domain.ReservationHistory.UserHistory;
 import edu.skku.grabtable.reservation.domain.event.ReservationFinishEvent;
 import edu.skku.grabtable.reservation.domain.event.ReservationUpdateEvent;
 import edu.skku.grabtable.reservation.domain.response.ReservationDetailResponse;
@@ -22,6 +28,7 @@ import edu.skku.grabtable.store.repository.StoreRepository;
 import edu.skku.grabtable.user.domain.User;
 import edu.skku.grabtable.user.repository.UserRepository;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +54,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final SharedOrderRepository sharedOrderRepository;
     private final SseEmitterInMemoryRepository sseEmitterRepository;
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -90,7 +98,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findOngoingReservationByUser(user)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NO_RESERVATION_USER));
 
-        List<OrderResponse> orders = orderRepository.findByReservation(reservation)
+        List<OrderResponse> orders = orderRepository.findAllByReservationFetchJoin(reservation)
                 .stream()
                 .map(order -> new OrderResponse(
                         order.getId(),
@@ -171,14 +179,51 @@ public class ReservationService {
         //공유 주문 완료되었는지 검사
         validateSharedOrderIsFullyPaid(reservation);
 
+        //클라이언트 화면 전환 위한 종료 이벤트 전송
+        applicationEventPublisher.publishEvent(new ReservationFinishEvent(reservation.getId()));
+
+        //이력 데이터 저장 위한 히스토리 데이터 전송
+        ReservationHistory reservationHistory = buildReservationHistory(reservation, host);
+        applicationEventPublisher.publishEvent(reservationHistory);
+
         userRepository.clearInvitedReservationByReservation(reservation);
         List<User> invitees = reservation.getInvitees();
         cartRepository.clearByUsers(invitees);
-        orderRepository.clearByReservation(reservation);
-
-        applicationEventPublisher.publishEvent(new ReservationFinishEvent(reservation.getId()));
 
         reservationRepository.delete(reservation);
+    }
+
+    private ReservationHistory buildReservationHistory(Reservation reservation, User host) {
+
+        List<UserHistory> inviteeHistories = reservation.getInvitees().stream()
+                .map(UserHistory::of)
+                .toList();
+
+        SharedOrder sharedOrder = sharedOrderRepository.findByReservationFetchJoin(reservation)
+                .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_SHARED_ORDER));
+
+        List<OrderHistory> orderHistoriesInSharedOrder = orderRepository.findAllBySharedOrderFetchJoin(sharedOrder)
+                .stream()
+                .map(OrderHistory::of)
+                .toList();
+
+        SharedOrderHistory sharedOrderHistory = SharedOrderHistory.from(sharedOrder, orderHistoriesInSharedOrder);
+
+        List<OrderHistory> orderHistories = orderRepository.findAllByReservationFetchJoin(reservation)
+                .stream()
+                .map(OrderHistory::of)
+                .toList();
+
+        return ReservationHistory.builder()
+                .reservationId(reservation.getId())
+                .host(UserHistory.of(host))
+                .invitees(inviteeHistories)
+                .sharedOrder(sharedOrderHistory)
+                .orders(orderHistories)
+                .store(StoreHistory.of(reservation.getStore()))
+                .createdAt(reservation.getCreatedAt())
+                .confirmedAt(LocalDateTime.now())
+                .build();
     }
 
     private void validateMoreThanOneOrderExists(Reservation reservation) {
@@ -198,7 +243,7 @@ public class ReservationService {
     public List<OrderResponse> findAllOrdersByReservationId(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BadRequestException(ExceptionCode.NOT_FOUND_RESERVATION_ID));
-        return orderRepository.findByReservation(reservation)
+        return orderRepository.findAllByReservationFetchJoin(reservation)
                 .stream()
                 .map(order -> new OrderResponse(
                         order.getId(),

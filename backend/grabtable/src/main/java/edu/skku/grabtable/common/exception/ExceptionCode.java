@@ -13,7 +13,7 @@ public enum ExceptionCode {
     NOT_FOUND_RESERVATION_ID(1004, "요청 ID에 해당하는 예약이 존재하지 않습니다."),
     NOT_FOUND_MENU_ID(1005, "요청 ID에 해당하는 메뉴가 존재하지 않습니다."),
     NOT_FOUND_CART_ID(1006, "요청 ID에 해당하는 장바구니 상품이 존재하지 않습니다."),
-    NOT_FOUND_LAST_RECENT_CONFIRMED_RESERVATION(1007, "가장 최근에 확정된 예약이 존재하지 않습니다."),
+    NOT_FOUND_SHARED_ORDER(1007, "예약 내 공유 주문을 찾을 수 없습니다."),
 
     UNABLE_TO_GET_USER_INFO(2001, "소셜 로그인 공급자로부터 유저 정보를 받아올 수 없습니다."),
     UNABLE_TO_GET_ACCESS_TOKEN(2002, "소셜 로그인 공급자로부터 인증 토큰을 받아올 수 없습니다."),

@@ -16,7 +16,7 @@ public interface SharedOrderRepository extends JpaRepository<SharedOrder, Long> 
     @Query("""
             SELECT so
             FROM SharedOrder so
-            JOIN FETCH so.carts c
+            LEFT JOIN FETCH so.carts c
             WHERE so.reservation = :reservation
             """)
     Optional<SharedOrder> findByReservationFetchJoin(Reservation reservation);

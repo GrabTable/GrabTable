@@ -67,6 +67,16 @@
     <img src="frontend/grabtable/public/workflow_1.png">
 </p>
 
+<p align="middle">
+    <img src="frontend/grabtable/public/view_1.png">
+</p>
+
+자신뿐만 아니라, 예약 내 다른 사용자의 장바구니 및 결제 여부도 실시간으로 확인할 수 있어야 합니다. <br>
+
+변경 발생 시에만 Server Sent Event를 전송하는 구조를 채택해 기존 폴링 방식에 비해 서버 부하를 최소화했습니다. <br>
+
+성능에 강점이 있고 이벤트 브로드캐스팅에 유리한 Redis pubsub 메시지 큐를 활용해 분산 WAS 환경에서 이벤트가 누락되는 문제를 해결했습니다.
+
 ### 2. PG 연동 결제 흐름
 
 <p align="middle">

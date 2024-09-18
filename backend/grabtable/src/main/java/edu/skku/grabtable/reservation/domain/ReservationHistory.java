@@ -26,6 +26,7 @@ public class ReservationHistory {
 
     @Builder
     @AllArgsConstructor
+    @Getter
     public static class UserHistory {
         private Long userId;
         private String socialLoginId;
@@ -42,6 +43,7 @@ public class ReservationHistory {
 
     @Builder
     @AllArgsConstructor
+    @Getter
     public static class StoreHistory {
         private Long storeId;
         private String storeName;
@@ -58,6 +60,7 @@ public class ReservationHistory {
 
     @Builder
     @AllArgsConstructor
+    @Getter
     public static class SharedOrderHistory {
         private Long sharedOrderId;
         private List<CartHistory> carts;
@@ -80,6 +83,7 @@ public class ReservationHistory {
 
     @Builder
     @AllArgsConstructor
+    @Getter
     public static class OrderHistory {
         private Long orderId;
         private List<CartHistory> carts;
@@ -100,6 +104,7 @@ public class ReservationHistory {
 
     @Builder
     @AllArgsConstructor
+    @Getter
     public static class CartHistory {
         private Long cartId;
         private String menuName;

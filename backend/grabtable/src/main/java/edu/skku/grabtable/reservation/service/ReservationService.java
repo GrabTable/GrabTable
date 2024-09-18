@@ -1,5 +1,6 @@
 package edu.skku.grabtable.reservation.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.skku.grabtable.cart.domain.response.CartResponse;
 import edu.skku.grabtable.cart.repository.CartRepository;
@@ -11,6 +12,8 @@ import edu.skku.grabtable.order.domain.response.OrderResponse;
 import edu.skku.grabtable.order.domain.response.SharedOrderResponse;
 import edu.skku.grabtable.order.repository.OrderRepository;
 import edu.skku.grabtable.order.repository.SharedOrderRepository;
+import edu.skku.grabtable.outbox.domain.OutboxMessage;
+import edu.skku.grabtable.outbox.repository.OutboxMessageRepository;
 import edu.skku.grabtable.reservation.domain.Reservation;
 import edu.skku.grabtable.reservation.domain.ReservationHistory;
 import edu.skku.grabtable.reservation.domain.ReservationHistory.OrderHistory;
@@ -56,9 +59,11 @@ public class ReservationService {
     private final CartRepository cartRepository;
     private final SharedOrderRepository sharedOrderRepository;
     private final SseEmitterInMemoryRepository sseEmitterRepository;
+    private final OutboxMessageRepository outboxMessageRepository;
+
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -186,10 +191,18 @@ public class ReservationService {
         ReservationHistory reservationHistory = buildReservationHistory(reservation, host);
         applicationEventPublisher.publishEvent(reservationHistory);
 
+        try {
+            String payload = objectMapper.writeValueAsString(reservationHistory);
+            log.info(payload);
+            OutboxMessage message = OutboxMessage.of(payload);
+            outboxMessageRepository.save(message);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
         userRepository.clearInvitedReservationByReservation(reservation);
         List<User> invitees = reservation.getInvitees();
         cartRepository.clearByUsers(invitees);
-
         reservationRepository.delete(reservation);
     }
 

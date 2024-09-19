@@ -5,7 +5,9 @@ import edu.skku.grabtable.outbox.domain.MessagePublishResult;
 import edu.skku.grabtable.outbox.domain.OutboxMessage;
 import edu.skku.grabtable.outbox.repository.OutboxMessageRepository;
 import edu.skku.grabtable.outbox.repository.ProcessedMessageCustomRepositoryImpl;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OutboxMessageScheduler {
 
     private final OutboxMessageRepository outboxMessageRepository;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ProcessedMessageCustomRepositoryImpl processedMessageCustomRepository;
     private static final int BATCH_SIZE = 1000;
 
@@ -42,7 +44,7 @@ public class OutboxMessageScheduler {
         Page<OutboxMessage> messages = outboxMessageRepository.findMessagesToPublish(
                 Pageable.ofSize(BATCH_SIZE));
 
-        log.info("foundMessage nums = {}", messages.getNumber());
+        log.info("foundMessage nums = {}, size = {}", messages.getTotalElements(), messages.getSize());
 
         if (messages.isEmpty()) {
             return;
@@ -50,6 +52,7 @@ public class OutboxMessageScheduler {
 
         MessagePublishResult result = publishMessages(messages);
         Set<Long> successMessageIds = result.getSuccessMessageIds();
+        log.info("success result = {}", successMessageIds.toString());
         processedMessageCustomRepository.batchInsert(BATCH_SIZE, successMessageIds);
 
         //재시도 로직 TODO
@@ -59,17 +62,22 @@ public class OutboxMessageScheduler {
         Set<Long> successMessageIds = new HashSet<>();
         Set<Long> failMessageIds = new HashSet<>();
 
-        for (OutboxMessage msg : messages) {
-            CompletableFuture<SendResult<String, Object>> send = kafkaTemplate.send(topicName, msg.getPayload());
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-            send.whenComplete((result, ex) -> {
+        for (OutboxMessage msg : messages) {
+            CompletableFuture<SendResult<String, String>> send = kafkaTemplate.send(topicName, msg.getPayload());
+
+            CompletableFuture<Void> future = send.whenComplete((result, ex) -> {
                 if (ex != null) {
-                    successMessageIds.add(msg.getId());
-                } else {
                     failMessageIds.add(msg.getId());
+                } else {
+                    successMessageIds.add(msg.getId());
                 }
-            });
+            }).thenApply(voidResult -> null);
+
+            futures.add(future);
         }
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
         return new MessagePublishResult(successMessageIds, failMessageIds);
     }
 

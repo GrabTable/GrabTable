@@ -3,9 +3,5 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-  kafka:
-    consumer:
-      bootstrap-servers: kafka:9094
-      group-id: reservation-history-group
   application:
     name: history-service

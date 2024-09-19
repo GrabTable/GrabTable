@@ -1,10 +1,8 @@
 package edu.skku.history_service.history.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -14,19 +12,22 @@ import org.springframework.data.mongodb.core.ReplaceOptions;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AcknowledgingMessageListener;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class KafkaConsumer {
+public class KafkaConsumer implements AcknowledgingMessageListener<String, String> {
 
     private final MongoTemplate mongoTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Override
     @KafkaListener(topics = "reservation-history",
             containerFactory = "kafkaListenerContainerFactory")
-    public void consume(ConsumerRecord<String, String> consumerRecord) {
+    public void onMessage(ConsumerRecord<String, String> consumerRecord, Acknowledgment acknowledgment) {
         String value = consumerRecord.value();
         try {
             // JSON 파싱 (재파싱 필요)
@@ -45,6 +46,8 @@ public class KafkaConsumer {
             Document document = Document.parse(actualJson);
             mongoTemplate.replace(query, document, ReplaceOptions.replaceOptions().upsert(),
                     "reservation-history");
+
+            acknowledgment.acknowledge();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

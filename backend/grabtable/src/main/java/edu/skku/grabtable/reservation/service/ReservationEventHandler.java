@@ -20,7 +20,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class ReservationEventHandler {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final OutboxMessageRepository outboxMessageRepository;
 
@@ -28,9 +28,15 @@ public class ReservationEventHandler {
     private String topicName;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    void sendReservationHistory(ReservationHistory reservationHistory) throws JsonProcessingException {
-        log.info("카프카 메시지 전송: {}", reservationHistory);
-        kafkaTemplate.send(topicName, reservationHistory);
+    void sendReservationHistory(ReservationHistory reservationHistory) {
+        try {
+            String history = objectMapper.writeValueAsString(reservationHistory);
+            log.info("카프카 메시지 전송: {}", history);
+            kafkaTemplate.send(topicName, history);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
  /*   @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)

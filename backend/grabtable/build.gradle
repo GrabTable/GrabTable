@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.4'
@@ -5,6 +7,7 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version "3.3.2"
     id 'jacoco'
     id "org.sonarqube" version "4.4.1.3373"
+    id 'org.jetbrains.kotlin.jvm' version '2.1.0'
 }
 
 group = 'edu.skku'
@@ -12,6 +15,12 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 
 sonar {
